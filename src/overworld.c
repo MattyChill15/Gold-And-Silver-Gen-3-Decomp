@@ -716,6 +716,32 @@ void WarpIntoMap(void)
     SetPlayerCoordsFromWarp();
 }
 
+#ifdef ARENA_JOHTO
+#include "data/arena_part_maps.h"
+// Matt D3: maps owned by a later part are closed in this part.
+bool8 ArenaJohto_IsMapBlocked(u8 mapGroup, u8 mapNum)
+{
+    u16 v = (mapGroup << 8) | mapNum;
+    u32 i;
+#if MATT_PART == 1
+    for (i = 0; i < ARRAY_COUNT(sArenaPart2Maps); i++)
+        if (sArenaPart2Maps[i] == v)
+            return TRUE;
+#endif
+#if MATT_PART == 1 || MATT_PART == 2
+    for (i = 0; i < ARRAY_COUNT(sArenaPart3Maps); i++)
+        if (sArenaPart3Maps[i] == v)
+            return TRUE;
+#endif
+    return FALSE;
+}
+
+bool8 ArenaJohto_IsWarpBlocked(void)
+{
+    return ArenaJohto_IsMapBlocked(sWarpDestination.mapGroup, sWarpDestination.mapNum);
+}
+#endif
+
 void SetWarpDestination(s8 mapGroup, s8 mapNum, s8 warpId, s8 x, s8 y)
 {
     SetWarpData(&sWarpDestination, mapGroup, mapNum, warpId, x, y);

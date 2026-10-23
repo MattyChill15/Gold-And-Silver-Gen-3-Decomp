@@ -32,7 +32,12 @@
  {
   "check": "[classic] Johto P3 -> Emerald P1 import",
   "status": "PASS",
-  "detail": "importPending=1 field=True party=2 imported=1 (Emerald has no storyline setting yet; not carried)"
+  "detail": "importPending=1 field=True party=2 imported=1"
+ },
+ {
+  "check": "[classic] Emerald P1 keeps storyline and re-saves it",
+  "status": "PASS",
+  "detail": "VAR_ARENA_STORYLINE=0 record story bits after Emerald save=0 expected=0"
  },
  {
   "check": "[chief] FR P2 -> Johto P1 import",
@@ -67,7 +72,12 @@
  {
   "check": "[chief] Johto P3 -> Emerald P1 import",
   "status": "PASS",
-  "detail": "importPending=1 field=True party=2 imported=1 (Emerald has no storyline setting yet; not carried)"
+  "detail": "importPending=1 field=True party=2 imported=1"
+ },
+ {
+  "check": "[chief] Emerald P1 keeps storyline and re-saves it",
+  "status": "PASS",
+  "detail": "VAR_ARENA_STORYLINE=1 record story bits after Emerald save=1 expected=1"
  },
  {
   "check": "[show] FR P2 -> Johto P1 import",
@@ -102,7 +112,42 @@
  {
   "check": "[show] Johto P3 -> Emerald P1 import",
   "status": "PASS",
-  "detail": "importPending=1 field=True party=2 imported=1 (Emerald has no storyline setting yet; not carried)"
+  "detail": "importPending=1 field=True party=2 imported=1"
+ },
+ {
+  "check": "[show] Emerald P1 keeps storyline and re-saves it",
+  "status": "PASS",
+  "detail": "VAR_ARENA_STORYLINE=2 record story bits after Emerald save=2 expected=2"
+ },
+ {
+  "check": "D3 P1 blocks MAP_CIANWOOD_CITY",
+  "status": "PASS",
+  "detail": "gate=1 field=True before=(1, 4) after=(1, 4) target=(0, 7)"
+ },
+ {
+  "check": "D3 P1 blocks MAP_PALLET_TOWN",
+  "status": "PASS",
+  "detail": "gate=1 field=True before=(1, 4) after=(1, 4) target=(0, 31)"
+ },
+ {
+  "check": "D3 P1 allows MAP_VIOLET_CITY",
+  "status": "PASS",
+  "detail": "gate=0 field=True before=(1, 4) after=(0, 2) target=(0, 2)"
+ },
+ {
+  "check": "D3 P2 blocks MAP_PALLET_TOWN",
+  "status": "PASS",
+  "detail": "gate=1 field=True before=(1, 4) after=(1, 4) target=(0, 31)"
+ },
+ {
+  "check": "D3 P2 allows MAP_CIANWOOD_CITY",
+  "status": "PASS",
+  "detail": "gate=0 field=True before=(1, 4) after=(0, 7) target=(0, 7)"
+ },
+ {
+  "check": "D3 P3 allows MAP_PALLET_TOWN",
+  "status": "PASS",
+  "detail": "gate=0 field=True before=(1, 4) after=(0, 31) target=(0, 31)"
  },
  {
   "check": "P2 rejects incomplete Johto P1 save",

@@ -15,6 +15,7 @@
 #include "metatile_behavior.h"
 #include "oras_dowse.h"
 #include "overworld.h"
+#include "event_scripts.h"
 #include "party_menu.h"
 #include "random.h"
 #include "rotating_gate.h"
@@ -987,6 +988,17 @@ static enum Collision CheckForPlayerAvatarCollision(enum Direction direction)
         return COLLISION_STAIR_WARP;
 
     MoveCoords(direction, &x, &y);
+#ifdef ARENA_JOHTO
+    {
+        const struct MapConnection *conn = GetMapConnectionAtPos(x, y);
+        if (conn != NULL && ArenaJohto_IsMapBlocked(conn->mapGroup, conn->mapNum))
+        {
+            if (!ScriptContext_IsEnabled())
+                ScriptContext_SetupScript(EventScript_ArenaNextPart);
+            return COLLISION_IMPASSABLE;
+        }
+    }
+#endif
     return CheckForObjectEventCollision(playerObjEvent, x, y, direction, MapGridGetMetatileBehaviorAt(x, y));
 }
 

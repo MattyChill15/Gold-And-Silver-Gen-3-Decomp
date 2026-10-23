@@ -912,6 +912,14 @@ static void ArenaPlaytest_Run(void)
         ArenaStory_Set(m->a);
         m->result[0] = ArenaStory_Get();
         break;
+    case 25: // D3 gate: is map group a / num b closed in this part? c=1: warp there if open
+        m->result[0] = ArenaJohto_IsMapBlocked(m->a, m->b);
+        if (m->c && !m->result[0])
+        {
+            SetWarpDestination(m->a, m->b, WARP_ID_NONE, 5, 5);
+            DoWarp();
+        }
+        break;
 #endif
     }
     m->done = cmd;

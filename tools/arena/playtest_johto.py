@@ -22,6 +22,7 @@ def consts(root, *files):
     return get
 C = consts(ROOT, 'include/constants/flags.h', 'include/constants/vars.h')
 CE = consts(EA, 'include/constants/flags.h')
+CEV = consts(EA, 'include/constants/vars.h')
 results = []
 def check(name, ok, detail):
     s = 'PASS' if ok else 'FAIL'; results.append(dict(check=name, status=s, detail=detail)); print(f'{s:5} {name}: {detail}', flush=True)
@@ -80,9 +81,30 @@ def ea_import(out, jsav, story, label):
     e = Emu(A.drv, str(EA / 'ept_p1.gba'), str(EA / 'ept_p1.elf'), str(t))
     e.run(1500); pend = e.r8(e.s('gArenaSeriesImportPending')); e.close()
     e = Emu(A.drv, str(EA / 'ept_p1.gba'), str(EA / 'ept_p1.elf'), str(t)); inf = boot_new(e); pc = e.r8(e.s('gPlayerPartyCount'))
-    imp = e.cmd(22, CE('FLAG_ARENA_SERIES_IMPORTED'))[0] if inf else 0; e.shot(str(out / f'{label}_ea.png')); e.close()
+    imp = e.cmd(22, CE('FLAG_ARENA_SERIES_IMPORTED'))[0] if inf else 0; e.shot(str(out / f'{label}_ea.png'))
+    est = e.cmd(20, CEV('VAR_ARENA_STORYLINE'))[0] if inf else -1
+    save(e); sf = e.cmd(22, 0)[1] & 0xff; e.close()
     check(f'[{label}] Johto P3 -> Emerald P1 import', pend == 1 and inf and pc == 2 and imp == 1,
-          f'importPending={pend} field={inf} party={pc} imported={imp} (Emerald has no storyline setting yet; not carried)')
+          f'importPending={pend} field={inf} party={pc} imported={imp}')
+    check(f'[{label}] Emerald P1 keeps storyline and re-saves it', est == story and ((sf >> 2) & 3) == story,
+          f'VAR_ARENA_STORYLINE={est} record story bits after Emerald save={(sf>>2)&3} expected={story}')
+MAPS = None
+def mapid(name):
+    global MAPS
+    if MAPS is None:
+        MAPS = {}; d = json.load(open(ROOT / 'data/maps/map_groups.json'))
+        for gi, g in enumerate(d['group_order']):
+            for ni, m in enumerate(d[g]): MAPS[json.load(open(ROOT / f'data/maps/{m}/map.json'))['id']] = (gi, ni)
+    return MAPS[name]
+def gate(n, sav, target, expect_blocked, out):
+    # D3: ask the part's gate (cmd 25, ArenaJohto_IsMapBlocked) and warp if open. Function-level, not input-driven.
+    t = out / f'gate_p{n}_{target}.sav'; shutil.copy(sav, t)
+    e = jemu(n, t); inf = boot_continue(e); before = e.location()[2:4] if inf else None
+    g, m = mapid(target); bl = e.cmd(25, g, m, 1)[0]; e.run(600)
+    after = e.location()[2:4]; e.shot(str(out / f'gate_p{n}_{target}.png')); e.close()
+    blocked = inf and bl == 1 and after == before and after != (g, m)
+    ok = inf and (blocked if expect_blocked else (bl == 0 and after == (g, m)))
+    check(f'D3 P{n} {"blocks" if expect_blocked else "allows"} {target}', ok, f'gate={bl} field={inf} before={before} after={after} target={(g, m)}')
 def main():
     global A
     ap = argparse.ArgumentParser(); ap.add_argument('--drv', default='/workspace/fr/smoke/playtest_drv'); ap.add_argument('--out', default='/tmp/johto_pt')
@@ -93,6 +115,12 @@ def main():
     for st in (0, 1, 2):
         finals[st] = chain(out, st, A.fr_sav, names[st])
         ea_import(out, finals[st], st, names[st])
+    gate(1, out / 'classic_p1_complete.sav', 'MAP_CIANWOOD_CITY', True, out)
+    gate(1, out / 'classic_p1_complete.sav', 'MAP_PALLET_TOWN', True, out)
+    gate(1, out / 'classic_p1_complete.sav', 'MAP_VIOLET_CITY', False, out)
+    gate(2, out / 'classic_p2_complete.sav', 'MAP_PALLET_TOWN', True, out)
+    gate(2, out / 'classic_p2_complete.sav', 'MAP_CIANWOOD_CITY', False, out)
+    gate(3, finals[0], 'MAP_PALLET_TOWN', False, out)
     def rej_case(name, n, src):
         t = out / f'rej_p{n}_{Path(src).name}'; shutil.copy(src, t)
         e = jemu(n, t); e.run(1500); r = e.r8(e.s('gArenaSeriesRejectedSave')); e.close()

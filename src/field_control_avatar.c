@@ -952,6 +952,13 @@ static bool8 TryArrowWarp(struct MapPosition *position, u16 metatileBehavior, en
     if (IsArrowWarpMetatileBehavior(metatileBehavior, direction) == TRUE)
     {
         StorePlayerStateAndSetupWarp(position, warpEventId);
+#ifdef ARENA_JOHTO
+        if (ArenaJohto_IsWarpBlocked())
+        {
+            ScriptContext_SetupScript(EventScript_ArenaNextPart);
+            return TRUE;
+        }
+#endif
         DoWarp();
         return TRUE;
     }
@@ -965,6 +972,13 @@ static bool8 TryArrowWarp(struct MapPosition *position, u16 metatileBehavior, en
         }
 
         StorePlayerStateAndSetupWarp(position, warpEventId);
+#ifdef ARENA_JOHTO
+        if (ArenaJohto_IsWarpBlocked())
+        {
+            ScriptContext_SetupScript(EventScript_ArenaNextPart);
+            return TRUE;
+        }
+#endif
         DoStairWarp(metatileBehavior, delay);
         return TRUE;
     }
@@ -979,6 +993,13 @@ static bool8 TryStartWarpEventScript(struct MapPosition *position, u16 metatileB
     {
         StoreInitialPlayerAvatarState();
         SetupWarp(&gMapHeader, warpEventId, position);
+#ifdef ARENA_JOHTO
+        if (ArenaJohto_IsWarpBlocked())
+        {
+            ScriptContext_SetupScript(EventScript_ArenaNextPart);
+            return TRUE;
+        }
+#endif
         if (MetatileBehavior_IsEscalator(metatileBehavior) == TRUE)
         {
             DoEscalatorWarp(metatileBehavior);
@@ -1122,6 +1143,13 @@ static bool8 TryDoorWarp(struct MapPosition *position, u16 metatileBehavior, enu
             {
                 StoreInitialPlayerAvatarState();
                 SetupWarp(&gMapHeader, warpEventId, position);
+#ifdef ARENA_JOHTO
+                if (ArenaJohto_IsWarpBlocked())
+                {
+                    ScriptContext_SetupScript(EventScript_ArenaNextPart);
+                    return TRUE;
+                }
+#endif
                 DoDoorWarp();
                 return TRUE;
             }

@@ -979,6 +979,13 @@ bool8 ScrCmd_warp(struct ScriptContext *ctx)
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE | SCREFF_HARDWARE);
 
     SetWarpDestination(mapGroup, mapNum, warpId, x, y);
+#ifdef ARENA_JOHTO
+    if (ArenaJohto_IsMapBlocked(mapGroup, mapNum))
+    {
+        ScriptJump(ctx, EventScript_ArenaNextPart);
+        return FALSE;
+    }
+#endif
     DoWarp();
     ResetInitialPlayerAvatarState();
     return TRUE;
@@ -995,6 +1002,13 @@ bool8 ScrCmd_warpsilent(struct ScriptContext *ctx)
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE | SCREFF_HARDWARE);
 
     SetWarpDestination(mapGroup, mapNum, warpId, x, y);
+#ifdef ARENA_JOHTO
+    if (ArenaJohto_IsMapBlocked(mapGroup, mapNum))
+    {
+        ScriptJump(ctx, EventScript_ArenaNextPart);
+        return FALSE;
+    }
+#endif
     DoDiveWarp();
     ResetInitialPlayerAvatarState();
     return TRUE;
@@ -1011,6 +1025,13 @@ bool8 ScrCmd_warpdoor(struct ScriptContext *ctx)
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE | SCREFF_HARDWARE);
 
     SetWarpDestination(mapGroup, mapNum, warpId, x, y);
+#ifdef ARENA_JOHTO
+    if (ArenaJohto_IsMapBlocked(mapGroup, mapNum))
+    {
+        ScriptJump(ctx, EventScript_ArenaNextPart);
+        return FALSE;
+    }
+#endif
     DoDoorWarp();
     ResetInitialPlayerAvatarState();
     return TRUE;
@@ -1047,6 +1068,13 @@ bool8 ScrCmd_warpteleport(struct ScriptContext *ctx)
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE | SCREFF_HARDWARE);
 
     SetWarpDestination(mapGroup, mapNum, warpId, x, y);
+#ifdef ARENA_JOHTO
+    if (ArenaJohto_IsMapBlocked(mapGroup, mapNum))
+    {
+        ScriptJump(ctx, EventScript_ArenaNextPart);
+        return FALSE;
+    }
+#endif
     DoTeleportTileWarp();
     ResetInitialPlayerAvatarState();
     return TRUE;
@@ -1063,6 +1091,13 @@ bool8 ScrCmd_warpmossdeepgym(struct ScriptContext *ctx)
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE | SCREFF_HARDWARE);
 
     SetWarpDestination(mapGroup, mapNum, warpId, x, y);
+#ifdef ARENA_JOHTO
+    if (ArenaJohto_IsMapBlocked(mapGroup, mapNum))
+    {
+        ScriptJump(ctx, EventScript_ArenaNextPart);
+        return FALSE;
+    }
+#endif
     DoMossdeepGymWarp();
     ResetInitialPlayerAvatarState();
     return TRUE;
@@ -1079,6 +1114,13 @@ bool8 ScrCmd_setwarp(struct ScriptContext *ctx)
     Script_RequestEffects(SCREFF_V1);
 
     SetWarpDestination(mapGroup, mapNum, warpId, x, y);
+#ifdef ARENA_JOHTO
+    if (ArenaJohto_IsMapBlocked(mapGroup, mapNum))
+    {
+        ScriptJump(ctx, EventScript_ArenaNextPart);
+        return FALSE;
+    }
+#endif
     return FALSE;
 }
 
@@ -3035,6 +3077,13 @@ bool8 ScrCmd_warpspinenter(struct ScriptContext *ctx)
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE | SCREFF_HARDWARE);
 
     SetWarpDestination(mapGroup, mapNum, warpId, x, y);
+#ifdef ARENA_JOHTO
+    if (ArenaJohto_IsMapBlocked(mapGroup, mapNum))
+    {
+        ScriptJump(ctx, EventScript_ArenaNextPart);
+        return FALSE;
+    }
+#endif
     SetSpinStartFacingDir(GetPlayerFacingDirection());
     DoSpinEnterWarp();
     ResetInitialPlayerAvatarState();
@@ -3097,6 +3146,13 @@ bool8 ScrCmd_warpwhitefade(struct ScriptContext *ctx)
     Script_RequestEffects(SCREFF_V1 | SCREFF_SAVE | SCREFF_HARDWARE);
 
     SetWarpDestination(mapGroup, mapNum, warpId, x, y);
+#ifdef ARENA_JOHTO
+    if (ArenaJohto_IsMapBlocked(mapGroup, mapNum))
+    {
+        ScriptJump(ctx, EventScript_ArenaNextPart);
+        return FALSE;
+    }
+#endif
     DoWhiteFadeWarp();
     ResetInitialPlayerAvatarState();
     return TRUE;

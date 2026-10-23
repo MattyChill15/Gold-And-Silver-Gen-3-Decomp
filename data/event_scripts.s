@@ -2243,3 +2243,14 @@ EventScript_PalletTown_PlayersHouse_2F_TurnOnPC::
 	.include "data/maps/Route29/scripts.inc"
 
 	.include "data/maps/WorldHub/scripts.inc"
+@ Matt D3: a map owned by a later part.
+	.align 2
+EventScript_ArenaNextPart::
+	lockall
+	msgbox Text_ArenaNextPart, MSGBOX_DEFAULT
+	releaseall
+	end
+
+Text_ArenaNextPart:
+	.string "This area opens in the next part.\n"
+	.string "Save and continue in the next ROM.$"
