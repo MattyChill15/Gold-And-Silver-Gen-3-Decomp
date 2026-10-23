@@ -40,3 +40,8 @@ Branch `arena` (local only). Commits: ed44097d (copy), dbdee09e (overlay compile
 - Storyline selector is now 2 bits (FLAG_ARENA_STORY_BIT0 0x2B8 + BIT1 0x2B9): 0 Classic (default), 1 Chief, 2 Show. Series record: seriesFlags bits 2-3 (ARENA_SERIES_STORY_MASK). Chief = 4 = old bit, so existing records stay compatible. ArenaStory_TryHook dispatches per-storyline scene tables (sChiefStoryScenes, sShowStoryScenes; all NULL for now).
 - TODO later: FireRed (VAR_ARENA_STORYLINE writer only knows Chief) and Emerald (stores the field only) need the same 3-value change: write/read the 2-bit field and add a Show scene table.
 - Show Story v1 approved (SJ1–SJ13 Part 1, SJ14–SJ18 Part 2): queued after Chief J1–J18. Every scripted loss leads into a rematch; lines <=35 chars; Show-flag playtests. Companion followers (Misty/Brock) need new engine work: do last or stub.
+
+## 2026-10-23 — Option 1 per-part arena-art rosters
+- tools/arena/johto_part_rosters.py writes .arena-dev/pmd/sprites_p{1,2,3}.inc (from sprites_all386.inc, regenerated with import_sprites.py over roster+roster_part2+roster_part3); arena_sprites.c picks by MATT_PART. Species without art use the native-sprite fallback; in-arena evolution animation declines for them and the stock post-battle evolution runs (no content cut).
+- Builds: make FILE_NAME=johto_pN BUILD_DIR=build-pN MATT_PART=N. P1 84.90% / P2 84.84% / P3 84.59% ROM, EWRAM 239,020 B (23,124 B free). Rosters in tools/arena/johto_part_rosters.json.
+- Next: 3-part segment/stamp/completion flags, Chief J1-J18, Show SJ1-SJ18, harness + round trips, Drive backup.

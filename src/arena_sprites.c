@@ -1,7 +1,15 @@
 #include "arena_sprites.h"
 #ifndef ARENA_SPRITES_HOST
 #include "constants/species.h"
+#if defined(ARENA_JOHTO) && MATT_PART == 3
+#include "../.arena-dev/pmd/sprites_p3.inc"
+#elif defined(ARENA_JOHTO) && MATT_PART == 2
+#include "../.arena-dev/pmd/sprites_p2.inc"
+#elif defined(ARENA_JOHTO)
+#include "../.arena-dev/pmd/sprites_p1.inc"
+#else
 #include "../.arena-dev/pmd/sprites.inc"
+#endif
 
 const struct ArenaSpriteSet *ArenaSprites_Get(u16 species)
 {
