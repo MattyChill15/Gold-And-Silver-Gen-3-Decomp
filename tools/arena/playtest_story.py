@@ -92,6 +92,7 @@ def drive(e, f, maxf=24000):
                 for _ in range(60):
                     if (e.cb2() | 1) != (e.s('CB2_PokeStorage') | 1): break
                     e.run(6, 2); e.run(40); e.run(6, 2); e.run(40); e.run(6, 1); e.run(40)  # B,B -> 'exit box?' -> A (yes); converges if a menu was open
+                for _ in range(3): e.run(6, 2); e.run(40)  # B out of the PC menu (Move/Deposit/.../See Ya) it returns to
                 t += 400; continue
             nw = lose(e) if LOSS else (battle_win(e), nowhite(e))[1]
             OUTCOMES.append((CUR[0], nw, e.r8(e.s('gBattleOutcome')), e.location()[:2])); print('  outcome', OUTCOMES[-1], flush=True)

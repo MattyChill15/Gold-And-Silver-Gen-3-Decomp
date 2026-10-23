@@ -42,8 +42,8 @@
   },
   {
    "check": "[show] ArenaStory_SJ17_48 on PALLET_TOWN_LAB",
-   "status": "FAIL",
-   "detail": "flag FLAG_ARENA_SHOW_SJ17=0 battles=0 loc=(13, 21, 11, 4)"
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ17=1 battles=0 loc=(13, 21, 11, 4)"
   },
   {
    "check": "[show] ArenaStory_SJ18_49 on BATTLE_FRONTIER_OUTSIDE_EAST",
