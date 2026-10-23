@@ -47,6 +47,7 @@ TRI = {k: i for i, k in enumerate(TR)}
 
 # ---- scenes: (id, story, map, flag, gates[], cond, steps) ----
 # steps: 'L a-b' lines, 'B:x' story battle, 'XB:x' scripted-loss story battle,
+# SJ11: Whirl Cup forced loss to Briana, Misty vs Katie, then the player's Briana rematch (Matt 10-23).
 # 'S:TRAINER' stock battle, 'XS:TRAINER' scripted-loss stock battle, 'G:SPECIES,lvl',
 # 'NOCTOWL', 'CZ_OUT', 'CZ_IN', 'I+:ITEM', 'I-:ITEM', 'PC', 'OPT:x' optional battle,
 # 'IN:MAP,x,y' portal in, 'OUT:MAP' portal out, 'SET:FLAG'
@@ -90,7 +91,7 @@ SC = [
  ('SJ10', S, 'OLIVINE_CITY_LIGHTHOUSE', 'FLAG_ARENA_SHOW_SJ10', ['FLAG_ARENA_SHOW_SJ10B'], 0, ['I-:ITEM_SECRET_POTION', 'L 4-5']),
  ('SJ11', S, 'WHIRL_ISLANDS_1F', None, ['FLAG_ARENA_SHOW_SJ10'], 0, ['IN:ARENA_WHIRL_CUP,9,5']),
  ('SJ11', S, 'ARENA_WHIRL_CUP', 'FLAG_ARENA_SHOW_SJ11', [], 0,
-    ['L 0-0', 'XS:TRAINER_BRIANA', 'L 1-1', 'S:TRAINER_KATIE', 'L 2-3', 'B:NAMBA', 'L 4-5', 'OUT:WHIRL_ISLANDS_1F']),
+    ['L 0-0', 'XS:TRAINER_BRIANA', 'L 1-1', 'S:TRAINER_KATIE', 'S:TRAINER_BRIANA', 'L 2-3', 'B:NAMBA', 'L 4-5', 'OUT:WHIRL_ISLANDS_1F']),
  ('SJ12', S, 'LAKE_OF_RAGE', 'FLAG_ARENA_SHOW_SJ12', ['FLAG_ARENA_SHOW_SJ11'], 0, ['L 0-3']),
  ('SJ13', S, 'INDIGO_PLATEAU_POKEMON_CENTER', None, ['FLAG_ARENA_SHOW_SJ12', B(8)], 0, ['IN:ARENA_SILVER_CONFERENCE,9,5']),
  ('SJ13', S, 'ARENA_SILVER_CONFERENCE', 'FLAG_ARENA_SHOW_SJ13', [], 0,

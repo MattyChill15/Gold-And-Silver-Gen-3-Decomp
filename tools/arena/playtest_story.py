@@ -37,15 +37,17 @@ def xy(m):
 def flag(e, f):
     try: return e.cmd(22, C(f), frames=200)[0]
     except RuntimeError: return 0
+SHORTCUTS_PP = []
 def drive(e, f, maxf=24000):
     """Tap A through text; hand battles to Emu.battle; stop when flag f set and back in field."""
-    t = 0; battles = 0
+    t = 0; battles = 0; topup = False
     while t < maxf:
         if not e.in_field():
             e.shot(str(OUT / f'live_{ONLY}.png'))
             cb = e.cb2() & ~1; nm = next((k for k, v in e.sym.items() if (v & ~1) == cb), hex(cb))
             print(f'  non-field cb2={nm} t={t}', flush=True)
-            e.battle(maxf=30000); battles += 1; t += 600; continue
+            e.battle(maxf=30000); battles += 1; t += 600; topup = True; continue
+        if topup: refresh(e); topup = False; SHORTCUTS_PP.append(battles)  # shortcut: PP/HP top-up between back-to-back scene battles
         e.run(20, 1); e.run(20); t += 40
         if t % 2000 == 0: e.shot(str(OUT / f'live_{ONLY}.png'))
         if t % 400 == 0 and flag(e, f): 
@@ -111,5 +113,6 @@ for story in (1, 2):
     for part, sav in ((1, SAVES / 'classic_p1_complete.sav'), (2, SAVES / 'classic_p1_complete.sav'), (3, SAVES / 'classic_p2_complete.sav')):
         if ONLY and ONLY != f'{nm}{part}': continue
         run(story, part, sav)
+shortcuts.append(f'harness: lead PP/HP topped up (cmd 19/13) between back-to-back battles inside one scene, {len(SHORTCUTS_PP)} times') if SHORTCUTS_PP else None
 (OUT / f'story-results-{ONLY or "all"}.json').write_text(json.dumps(dict(results=results, shortcuts=shortcuts), indent=1))
 print(f"\n{sum(r['status']=='PASS' for r in results)}/{len(results)} PASS, {sum(r['status']=='SKIP' for r in results)} SKIP")

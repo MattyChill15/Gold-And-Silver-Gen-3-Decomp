@@ -575,6 +575,8 @@ ArenaStory_SJ11_35::
 	msgbox ArenaStory_SJ11_T1, MSGBOX_DEFAULT
 	cleartrainerflag TRAINER_KATIE
 	trainerbattle_no_intro TRAINER_KATIE, ArenaStory_Text_Lose
+	cleartrainerflag TRAINER_BRIANA
+	trainerbattle_no_intro TRAINER_BRIANA, ArenaStory_Text_Lose
 	msgbox ArenaStory_SJ11_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ11_T3, MSGBOX_DEFAULT
 	setvar VAR_0x8004, 7

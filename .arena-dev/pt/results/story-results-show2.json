@@ -1,0 +1,44 @@
+{
+ "results": [
+  {
+   "check": "[show] ArenaStory_SJ10_31 on OLIVINE_CITY_LIGHTHOUSE",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ10A=1 battles=0 loc=(14, 19, 7, 9)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ10_32 on CIANWOOD_SHOP",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ10B=1 battles=0 loc=(8, 12, 8, 4)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ10_33 on OLIVINE_CITY_LIGHTHOUSE",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ10=1 battles=0 loc=(14, 19, 7, 9)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ11_34 on WHIRL_ISLANDS_1F",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ11=1 battles=3 loc=(13, 12, 24, 28)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ12_36 on LAKE_OF_RAGE",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ12=1 battles=0 loc=(39, 42, 24, 23)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ13_37 on INDIGO_PLATEAU_POKEMON_CENTER",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ13=1 battles=3 loc=(19, 17, 21, 0)"
+  },
+  {
+   "check": "[show] P2_END set after Harrison rematch",
+   "status": "PASS",
+   "detail": ""
+  }
+ ],
+ "shortcuts": [
+  "show P2: story battles run in classic engine (playtest cmd 30)",
+  "show P2: party set to Mewtwo L100; badges 1-8 forced",
+  "harness: lead PP/HP topped up (cmd 19/13) between back-to-back battles inside one scene, 6 times"
+ ]
+}
