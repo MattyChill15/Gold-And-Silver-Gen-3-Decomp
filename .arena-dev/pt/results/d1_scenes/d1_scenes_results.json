@@ -1,0 +1,100 @@
+{
+ "item": "D1 (checklist v2 items 1+5)",
+ "tested_roms": {
+  "johto_p1": {
+   "md5": "ece6833960b7282b0bc8ae3fbdd3e88e",
+   "rom_usage": "84.95%"
+  },
+  "jpt_p1": {
+   "md5": "8fd9ce40a3402c96b71cdef32201c3d2",
+   "rom_usage": "84.96%"
+  },
+  "johto_p2": {
+   "md5": "edbd9a309bfc66fe74cfb2ffdf13bf35",
+   "rom_usage": "84.93%"
+  },
+  "jpt_p2": {
+   "md5": "a9d1fe6deffaf1d60cd3ff7dbb01f0db",
+   "rom_usage": "84.93%"
+  },
+  "johto_p3": {
+   "md5": "4b0d43ac9b07ba02d006d4b7ca66c5aa",
+   "rom_usage": "84.58%"
+  },
+  "jpt_p3": {
+   "md5": "dce4c6aa683b4c9134e655f8638220cb",
+   "rom_usage": "84.59%"
+  }
+ },
+ "build_note": "clean BUILD_DIR per part (build-pN-d1s / build-ptN-d1s), MATT_PART=N assets, restored to 3; scenes driven on jpt_pN (release + ARENA_PLAYTEST cmds)",
+ "shortcuts": [
+  "warp to scene map (playtest cmd 14)",
+  "storyline set (cmd 24)",
+  "classic battle engine (cmd 30)",
+  "lead Mewtwo L100 + damaging moves (cmd 1/19/13)",
+  "badges forced",
+  "win assist: lead HP/PP refill in story battles (ARENA_ASSIST=1)"
+ ],
+ "scenes": [
+  {
+   "part": 1,
+   "mode": "chief",
+   "script": "ArenaStory_J1_0",
+   "map": "NEW_BARK_TOWN",
+   "on_screen": "Sailor: \"Where you headed after?\"",
+   "screenshot": ".arena-dev/pt/results/d1_scenes/chief_p1_ArenaStory_J1_0_04.png",
+   "flag_set_by_script": true,
+   "status": "PASS"
+  },
+  {
+   "part": 1,
+   "mode": "show",
+   "script": "ArenaStory_SJ1_20",
+   "map": "NEW_BARK_TOWN_PLAYERS_HOUSE_1F",
+   "on_screen": "Brock: \"Not a chance. We're coming.\"",
+   "screenshot": ".arena-dev/pt/results/d1_scenes/show_p1_ArenaStory_SJ1_20_04.png",
+   "flag_set_by_script": true,
+   "status": "PASS"
+  },
+  {
+   "part": 2,
+   "mode": "chief",
+   "script": "ArenaStory_J8_7",
+   "map": "OLIVINE_CITY_CAFE",
+   "on_screen": "Chief: \"Name your price.\" then story battle (won)",
+   "screenshot": ".arena-dev/pt/results/d1_scenes/chief_p2_ArenaStory_J8_7_02.png",
+   "flag_set_by_script": true,
+   "status": "PASS"
+  },
+  {
+   "part": 2,
+   "mode": "show",
+   "script": "ArenaStory_SJ10_31",
+   "map": "OLIVINE_CITY_LIGHTHOUSE",
+   "on_screen": "Jasmine: \"Cianwood has medicine.\"",
+   "screenshot": ".arena-dev/pt/results/d1_scenes/show_p2_ArenaStory_SJ10_31_02.png",
+   "flag_set_by_script": true,
+   "status": "PASS"
+  },
+  {
+   "part": 3,
+   "mode": "chief",
+   "script": "ArenaStory_J13_13",
+   "map": "SSAQUA_CAPTAINS_ROOM",
+   "on_screen": "Chief: \"Police are boarding at Vermilion.\" then story battle (won)",
+   "screenshot": ".arena-dev/pt/results/d1_scenes/chief_p3_ArenaStory_J13_13_02.png",
+   "flag_set_by_script": true,
+   "status": "PASS"
+  },
+  {
+   "part": 3,
+   "mode": "show",
+   "script": "ArenaStory_SJ14_39",
+   "map": "PALLET_TOWN_REDS_HOUSE_1F",
+   "on_screen": "Scott: \"Ever heard of a Frontier?\"",
+   "screenshot": ".arena-dev/pt/results/d1_scenes/show_p3_ArenaStory_SJ14_39_02.png",
+   "flag_set_by_script": true,
+   "status": "PASS"
+  }
+ ]
+}
