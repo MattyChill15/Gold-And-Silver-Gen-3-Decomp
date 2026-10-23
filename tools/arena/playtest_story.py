@@ -74,8 +74,7 @@ def run(story, part, sav):
             shortcuts.append(f'{name}: 7 silver symbols forced for {scr}')
         if g2.startswith('FLAG_SYS_'): e.cmd(6, C(g2), 1); shortcuts.append(f'{name}: {g2} forced for {scr}')
         if cond == '1':
-            check(f'[{name}] {scr} on {m}', None, 'SKIPPED: needs night RTC; flag forced'); results[-1]['status'] = 'SKIP'
-            e.cmd(6, C(f), 1); continue
+            tod = e.cmd(31, 22, 0)[0]; shortcuts.append(f'{name}: game clock set to 22:00 (cmd 31) for {scr}, time of day={tod}')
         g, n = PJ.mapid('MAP_' + m); x, y = xy(m)
         refresh(e)
         e.cmd(14, g, n, x | y << 8); e.run(300)
@@ -83,12 +82,26 @@ def run(story, part, sav):
         ok, nb = drive(e, f)
         e.shot(str(OUT / f'{name}_{scr}.png'))
         check(f'[{name}] {scr} on {m}', ok, f'flag {f}={int(ok)} battles={nb} loc={e.location()}')
-    if story == 2 and part == 1:  # SJ7 is on Whitney's talk script: run its hooks directly
-        a = e.s('ArenaStory_SJ7_Pre')
-        for i in range(2):
-            e.cmd(21, a & 0xffff, a >> 16, C('FLAG_ARENA_SHOW_SJ7_LOSS')); drive(e, 'FLAG_ARENA_SHOW_SJ7_LOSS', 6000)
-        b = e.s('ArenaStory_SJ7_Badge'); e.cmd(21, b & 0xffff, b >> 16, C('FLAG_ARENA_SHOW_SJ7')); ok, nb = drive(e, 'FLAG_ARENA_SHOW_SJ7', 6000)
-        check('[show] SJ7 Whitney hooks (Pre x2, Badge) via cmd 21', ok and flag(e, 'FLAG_ARENA_SHOW_SJ7_LOSS') == 1, f'SJ7_LOSS={flag(e,"FLAG_ARENA_SHOW_SJ7_LOSS")} SJ7={int(ok)} battles={nb}')
+    if story == 2 and part == 1:
+        # SJ4 shares Route 30 with SJ3B and fires straight after it; check it explicitly.
+        check('[show] SJ4 set (fires after SJ3B on ROUTE30)', flag(e, 'FLAG_ARENA_SHOW_SJ4') == 1, f'SJ4={flag(e, "FLAG_ARENA_SHOW_SJ4")}')
+        # SJ7 hooks are `call`ed from the stock Whitney script, so drive the real gym:
+        # talk -> forced loss (SJ7_LOSS) -> talk -> rematch win (state 3) -> state 4 -> badge (SJ7).
+        e.cmd(6, C('FLAG_BADGE03_GET'), 0); refresh(e)
+        g, n = PJ.mapid('MAP_GOLDENROD_CITY_GYM'); e.cmd(14, g, n, 15 | 10 << 8); e.run(400)
+        e.run(10, 64); e.run(30); ok, nb = drive(e, 'FLAG_ARENA_SHOW_SJ7_LOSS', 8000)
+        nb2 = 0
+        for _ in range(40):  # talk again: rematch (stock Whitney battle) -> state 3
+            st = e.cmd(20, C('VAR_GOLDENROD_CITY_STATE'))[0] if e.in_field() else -1
+            if st == 3: break
+            if not e.in_field(): e.battle(maxf=30000); nb2 += 1; continue
+            refresh(e); e.run(10, 64); e.run(20); e.run(20, 1); e.run(200)
+        nb += nb2
+        check('[show] SJ7 forced loss then rematch at Whitney', ok and st == 3, f'SJ7_LOSS={int(ok)} state={st} battles={nb}')
+        e.cmd(20, C('VAR_GOLDENROD_CITY_STATE'), 4, 1); shortcuts.append('show: Bridget trigger skipped, VAR_GOLDENROD_CITY_STATE=4 forced')
+        e.run(10, 64); e.run(30); ok, nb = drive(e, 'FLAG_ARENA_SHOW_SJ7', 8000)
+        for _ in range(60): e.run(20, 1); e.run(20)  # finish the badge script
+        check('[show] SJ7 badge hook', ok and flag(e, 'FLAG_BADGE03_GET') == 1, f'SJ7={int(ok)} badge3={flag(e, "FLAG_BADGE03_GET")}')
     if story == 2 and part == 2:
         check('[show] P2_END set after Harrison rematch', flag(e, 'FLAG_ARENA_SHOW_P2_END') == 1, '')
     e.close()

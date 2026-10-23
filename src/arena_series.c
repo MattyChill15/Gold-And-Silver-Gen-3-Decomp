@@ -1,6 +1,7 @@
 // Arena series save hub (see docs/SERIES_SAVE.md). Shared verbatim between
 // the FireRed (chapter 1) and Emerald (chapter 3) trees.
 #include "global.h"
+#include "rtc.h"
 #include "fieldmap.h"
 #include "arena_series.h"
 #include "save.h"
@@ -883,6 +884,13 @@ static void ArenaPlaytest_Run(void)
     case 21: // run event script at address a | b << 16; result[0] = flag c
         ScriptContext_SetupScript((const u8 *)(m->a | ((u32)m->b << 16)));
         m->result[0] = FlagGet(m->c);
+        break;
+#endif
+#ifndef FIRERED
+    case 31: // game clock := hour a, minute b (real RTC offset, like setting the clock)
+        RtcInitLocalTimeOffset(m->a, m->b);
+        RtcCalcLocalTime();
+        m->result[0] = GetTimeOfDay();
         break;
 #endif
     case 22: // flag a; record seriesFlags; MATT_PART
