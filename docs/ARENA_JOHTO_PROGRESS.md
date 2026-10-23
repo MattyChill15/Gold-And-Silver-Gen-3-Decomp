@@ -33,3 +33,10 @@ Branch `arena` (local only). Commits: ed44097d (copy), dbdee09e (overlay compile
   Dragonite 74 (Leftovers); competitive moves
 - J8 sailor: Tentacool 25, Machoke 26, Seaking 27
 - J13 Rocket boss: Weezing 46, Arbok 46, Houndoom 47, Muk 47, Tyranitar 49
+
+## 2026-10-23 06:30 AZ: Milestones 2–3 + storyline selector
+- M2 (069e21f4): Johto save handoff + in-ROM FireRed P2 -> Johto converter (party, PC boxes, held items via table, balls, moves <=354). Hooks: intro boot check, new-game import/stamp, save OnSaved, overworld FieldTick. Full build still ROM 106.22% (sprite blocker, unchanged); EWRAM 91.18%.
+- M3 (ea b08f607e3): Emerald P1 reads Johto saves (expansion boxes -> pret; forms -> base species; items/balls mapped; moves >354 and hidden ability dropped). P1 rebuilt: ROM 83.72%, EWRAM 95.14% (12,744 B free). playtest_ea.py 10/10 PASS.
+- Storyline selector is now 2 bits (FLAG_ARENA_STORY_BIT0 0x2B8 + BIT1 0x2B9): 0 Classic (default), 1 Chief, 2 Show. Series record: seriesFlags bits 2-3 (ARENA_SERIES_STORY_MASK). Chief = 4 = old bit, so existing records stay compatible. ArenaStory_TryHook dispatches per-storyline scene tables (sChiefStoryScenes, sShowStoryScenes; all NULL for now).
+- TODO later: FireRed (VAR_ARENA_STORYLINE writer only knows Chief) and Emerald (stores the field only) need the same 3-value change: write/read the 2-bit field and add a Show scene table.
+- Show Story v1 approved (SJ1–SJ13 Part 1, SJ14–SJ18 Part 2): queued after Chief J1–J18. Every scripted loss leads into a rematch; lines <=35 chars; Show-flag playtests. Companion followers (Misty/Brock) need new engine work: do last or stub.

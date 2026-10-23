@@ -26,7 +26,11 @@
 
 #define ARENA_SERIES_FLAG_DEX_REWARD 1 // 386 reward claimed in some chapter
 #define ARENA_SERIES_FLAG_YELLOW     2 // chapter 1 played in Yellow mode (Pikachu starter, Eevee rival)
-#define ARENA_SERIES_FLAG_CHIEF_STORY 4 // storyline: Chief Story (stored only for now)
+// Storyline: 2-bit field in seriesFlags bits 2-3 (0 Classic, 1 Chief, 2 Show, 3 reserved).
+// Chief = 1 << 2 = 4, so records written with the old single Chief bit read back unchanged.
+#define ARENA_SERIES_STORY_SHIFT      2
+#define ARENA_SERIES_STORY_MASK       (3 << ARENA_SERIES_STORY_SHIFT)
+#define ARENA_SERIES_FLAG_CHIEF_STORY (1 << ARENA_SERIES_STORY_SHIFT) // legacy name = storyline Chief
 
 struct ArenaSeriesRecord
 {

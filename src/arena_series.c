@@ -29,6 +29,7 @@ void ReadFlash(u16 sectorNum, u32 offset, u8 *dest, u32 size);
 #include "arena_mon_xfer.h"
 #include "pokeball.h"
 #include "constants/characters.h"
+#include "arena_story.h"
 #include "data/arena_xfer_tables.h"
 #endif
 
@@ -321,9 +322,7 @@ bool8 ArenaSeries_WriteChapterComplete(void)
         r->seriesFlags |= ARENA_SERIES_FLAG_CHIEF_STORY;
 #endif
 #ifdef ARENA_JOHTO
-    r->seriesFlags &= ~ARENA_SERIES_FLAG_CHIEF_STORY;
-    if (FlagGet(FLAG_ARENA_CHIEF_STORY))
-        r->seriesFlags |= ARENA_SERIES_FLAG_CHIEF_STORY;
+    r->seriesFlags = (r->seriesFlags & ~ARENA_SERIES_STORY_MASK) | (ArenaStory_Get() << ARENA_SERIES_STORY_SHIFT);
 #endif
     for (i = 0; i < ARENA_SERIES_DEX_BYTES; i++)
     {
@@ -692,8 +691,7 @@ void ArenaSeries_ApplyImport(void)
     if (r->seriesFlags & ARENA_SERIES_FLAG_DEX_REWARD)
         FlagSet(ARENA_DEX_REWARD_FLAG);
 #ifdef ARENA_JOHTO
-    if (r->seriesFlags & ARENA_SERIES_FLAG_CHIEF_STORY)
-        FlagSet(FLAG_ARENA_CHIEF_STORY); // storyline chosen in chapter 1 carries over
+    ArenaStory_Set((r->seriesFlags & ARENA_SERIES_STORY_MASK) >> ARENA_SERIES_STORY_SHIFT); // storyline carries over
 #endif
     FlagSet(FLAG_ARENA_SERIES_IMPORTED);
     gArenaSeriesDexDirty = 1;

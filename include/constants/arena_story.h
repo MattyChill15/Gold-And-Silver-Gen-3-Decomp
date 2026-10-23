@@ -1,9 +1,13 @@
 #ifndef GUARD_CONSTANTS_ARENA_STORY_H
 #define GUARD_CONSTANTS_ARENA_STORY_H
-// Storyline selector: FLAG_ARENA_CHIEF_STORY clear = Classic (stock G/S), set = Chief Story.
-// Hook slots for Chief Story scenes (content written separately by Shorty).
+// Storyline selector (2 bits: FLAG_ARENA_STORY_BIT0/BIT1). Classic = stock G/S scripts.
+#define ARENA_STORYLINE_CLASSIC 0
+#define ARENA_STORYLINE_CHIEF   1
+#define ARENA_STORYLINE_SHOW    2 // anime-based Show Story (content pending)
+#define ARENA_STORYLINE_COUNT   3
+// Hook slots for storyline scenes (content written separately by Shorty).
 // A map script calls:  setvar VAR_0x8004, ARENA_STORY_HOOK_x / special ArenaStory_TryHook
-// VAR_RESULT = TRUE when a Chief scene ran (script should skip its Classic scene).
+// VAR_RESULT = TRUE when a storyline scene ran (script should skip its Classic scene).
 #define ARENA_STORY_HOOK_NEW_GAME          0
 #define ARENA_STORY_HOOK_NEW_BARK_START    1
 #define ARENA_STORY_HOOK_ELM_STARTER       2

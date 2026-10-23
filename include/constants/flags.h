@@ -753,7 +753,10 @@
 #define FLAG_ARENA_DEX_REWARD      FLAG_UNUSED_0x2B5 // dex reward claimed
 #define FLAG_MATT_PART2_COMPLETE   FLAG_UNUSED_0x2B6 // Johto Part 2: Red beaten
 #define FLAG_MATT_PART3_INIT       FLAG_UNUSED_0x2B7 // unused in Johto (no Part 3)
-#define FLAG_ARENA_CHIEF_STORY     FLAG_UNUSED_0x2B8 // storyline: 0 = Classic (default), 1 = Chief Story
+// Storyline selector, 2 bits: value = STORY_BIT0 | STORY_BIT1 << 1 (see ARENA_STORYLINE_* in constants/arena_story.h)
+#define FLAG_ARENA_STORY_BIT0      FLAG_UNUSED_0x2B8
+#define FLAG_ARENA_STORY_BIT1      FLAG_UNUSED_0x2B9
+#define FLAG_ARENA_CHIEF_STORY     FLAG_ARENA_STORY_BIT0 // legacy name; use ArenaStory_Get()
 
 // Event Flags
 #define FLAG_HIDE_ROUTE_101_BIRCH_STARTERS_BAG                      0x2BC
