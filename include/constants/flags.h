@@ -1741,4 +1741,6 @@
 #define FLAG_WORLD_MAP_SEVEN_ISLAND_SEVAULT_CANYON_TANOBY_KEY       0
 #define FLAG_WORLD_MAP_BIRTH_ISLAND_EXTERIOR                        0
 
+#include "constants/arena_story_flags.h"
+
 #endif // GUARD_CONSTANTS_FLAGS_H

@@ -46,8 +46,10 @@ GoldenrodCity_Gym_EventScript_Whitney::
 	goto_if_eq VAR_GOLDENROD_CITY_STATE, 3, GoldenrodCity_Gym_EventScript_WhitneyCrying
 	goto_if_eq VAR_GOLDENROD_CITY_STATE, 4, GoldenrodCity_Gym_EventScript_WhitneyBadge
 	goto_if_set FLAG_DEFEATED_GOLDENROD_CITY_GYM, GoldenrodCity_Gym_EventScript_WhitneyDefeated
+	call ArenaStory_SJ7_Pre
 	msgbox GoldenrodCity_Gym_Text_WhitneyBefore, MSGBOX_DEFAULT
 	trainerbattle_no_intro TRAINER_WHITNEY_1, GoldenrodCity_Gym_Text_WhitneyShouldntBeSoSerious
+	call ArenaStory_SJ7_PostWin
 	msgbox GoldenrodCity_Gym_Text_WhitneyYouMeanie, MSGBOX_DEFAULT
 	setvar VAR_GOLDENROD_CITY_STATE, 3
 	closemessage
@@ -66,6 +68,7 @@ GoldenrodCity_Gym_EventScript_WhitneyBadge::
 	lock
 	faceplayer
 	msgbox GoldenrodCity_Gym_Text_WhitneyWhatDoYouWant, MSGBOX_DEFAULT
+	call ArenaStory_SJ7_Badge
 	closemessage
 	message GoldenrodCity_Gym_Text_PlayerReceivedPlainBadge
 	waitmessage

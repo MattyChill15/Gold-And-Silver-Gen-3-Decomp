@@ -671,3 +671,9 @@ gSpecials::
 	def_special NameRival
 	def_special GetRandomSpeciesScripted
 	def_special ValidateBugContestSelectedMon
+	def_special ArenaStory_PrepBattle
+	def_special ArenaStory_WasCaught
+	def_special ArenaStory_SaveReturn
+	def_special ArenaStory_LoadReturn
+	def_special ArenaStory_CharizardToLiza
+	def_special ArenaStory_CharizardFromLiza

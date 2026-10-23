@@ -276,9 +276,16 @@ static inline u16 GetPartnerIdFromTrainerId(u16 trainerId)
     return (trainerId - TRAINER_PARTNER(PARTNER_NONE));
 }
 
+#ifdef ARENA_JOHTO
+#define TRAINER_ARENA_STORY          TRAINER_CHANSEY3
+const struct Trainer *ArenaStory_GetTrainer(void);
+#endif
 static inline const struct Trainer *GetTrainerStructFromId(u16 trainerId)
 {
     if (gIsDebugBattle) return GetDebugAiTrainer();
+#ifdef ARENA_JOHTO
+    if (trainerId == TRAINER_ARENA_STORY) return ArenaStory_GetTrainer();
+#endif
     enum DifficultyLevel difficulty;
 
     if (IsPartnerTrainerId(trainerId))

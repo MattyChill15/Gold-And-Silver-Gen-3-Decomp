@@ -5,6 +5,7 @@ NewBarkTown_PlayersHouse_1F_MapScripts::
 	.byte 0
 
 NewBarkTown_PlayersHouse_1F_OnTransition::
+	call ArenaStory_MistyOnTransition
 	call_if_eq VAR_NEWBARK_TOWN_STATE, 1, NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable
 	call_if_eq VAR_NEWBARK_TOWN_STATE, 2, NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable
 	call_if_eq VAR_NEWBARK_TOWN_STATE, 3, NewBarkTown_PlayersHouse_1F_SetMomStandingAtTable

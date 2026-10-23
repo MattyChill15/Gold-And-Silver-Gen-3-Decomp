@@ -6,6 +6,7 @@
 #include "constants/apricorn_tree.h"
 #include "constants/battle.h"
 #include "constants/battle_arena.h"
+#include "constants/arena_story.h"
 #include "constants/battle_dome.h"
 #include "constants/battle_factory.h"
 #include "constants/battle_frontier.h"
@@ -755,6 +756,9 @@ gStdScripts_End::
 	.include "data/maps/IcePath_B3F/scripts.inc"
 
 	.include "data/maps/IcePath_B4F/scripts.inc"
+	.include "data/maps/ArenaCharicificValley/scripts.inc"
+	.include "data/maps/ArenaWhirlCup/scripts.inc"
+	.include "data/maps/ArenaSilverConference/scripts.inc"
 
 	.include "data/maps/IlexForest/scripts.inc"
 
@@ -2200,6 +2204,7 @@ EventScript_PalletTown_PlayersHouse_2F_TurnOnPC::
 	.include "data/text/save.inc"
 	.include "data/text/birch_speech.inc"
 	.include "data/scripts/arena_practice.inc"
+	.include "data/scripts/arena_story_scenes.inc"
 	.include "data/scripts/dexnav.inc"
 	.include "data/scripts/battle_frontier.inc"
 	.include "data/scripts/apricorn_tree.inc"

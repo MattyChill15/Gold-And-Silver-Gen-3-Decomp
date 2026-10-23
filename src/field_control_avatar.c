@@ -177,6 +177,11 @@ int ProcessPlayerFieldInput(struct FieldInput *input)
 
     if (TryRunOnFrameMapScript() == TRUE)
         return TRUE;
+#ifdef ARENA_JOHTO
+    extern bool8 ArenaStory_TryScene(void);
+    if (ArenaStory_TryScene() == TRUE)
+        return TRUE;
+#endif
 
     if (input->pressedBButton && TrySetupDiveEmergeScript() == TRUE)
         return TRUE;
