@@ -42,9 +42,12 @@ def drive(e, f, maxf=24000):
     t = 0; battles = 0
     while t < maxf:
         if not e.in_field():
-            e.shot(str(OUT / 'live.png')); e.battle(maxf=30000); battles += 1; t += 600; continue
+            e.shot(str(OUT / f'live_{ONLY}.png'))
+            cb = e.cb2() & ~1; nm = next((k for k, v in e.sym.items() if (v & ~1) == cb), hex(cb))
+            print(f'  non-field cb2={nm} t={t}', flush=True)
+            e.battle(maxf=30000); battles += 1; t += 600; continue
         e.run(20, 1); e.run(20); t += 40
-        if t % 2000 == 0: e.shot(str(OUT / 'live.png'))
+        if t % 2000 == 0: e.shot(str(OUT / f'live_{ONLY}.png'))
         if t % 400 == 0 and flag(e, f): 
             e.run(200, 1); e.run(200)
             return True, battles
@@ -57,7 +60,8 @@ def run(story, part, sav):
     s = OUT / f'{name}_p{part}.sav'; shutil.copy(sav, s)
     e = PJ.jemu(part, s); inf = PJ.boot_continue(e)
     if not inf: check(f'[{name} P{part}] boot', False, 'not in field'); e.close(); return
-    e.cmd(24, story)
+    e.cmd(24, story); e.cmd(30, 1)  # shortcut: classic battle engine (harness can't drive realtime)
+    shortcuts.append(f'{name} P{part}: story battles run in classic engine (playtest cmd 30)')
     e.cmd(1, 150, 100, 0); e.cmd(19, CM('MOVE_PSYSTRIKE'), 0, 0); e.cmd(19, CM('MOVE_AURA_SPHERE'), 1, 0)  # strong lead, damaging moves first
     for b in range(1, 9 if part > 1 else 4): e.cmd(6, C(f'FLAG_BADGE0{b}_GET'), 1)
     shortcuts.append(f'{name} P{part}: party set to Mewtwo L100; badges 1-{8 if part>1 else 3} forced')

@@ -669,6 +669,9 @@ void RealtimeArena_ResetBattle(void)
 static bool8 Eligible(void)
 {
     gArenaCompatibilityReason=ARENA_COMPAT_LAB;
+#if ARENA_PLAYTEST
+    { extern bool8 gArenaPlaytestClassic; if (gArenaPlaytestClassic) return FALSE; }
+#endif
 #if ARENA_LAB
     if (gArenaLabMailbox.classic) return FALSE;
 #endif

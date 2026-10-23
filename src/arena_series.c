@@ -729,6 +729,7 @@ void ArenaSeries_ApplyImport(void) {}
 // and sets done = cmd. Only compiled into ARENA_PLAYTEST=1 test ROMs.
 #include "script.h"
 #include "script_pokemon_util.h"
+#include "move.h"
 #include "field_player_avatar.h"
 #include "overworld.h"
 #ifdef FIRERED
@@ -738,6 +739,7 @@ extern u8 gArenaItemsUsed;
 #else
 #include "field_screen_effect.h"
 #endif
+bool8 gArenaPlaytestClassic;
 static u32 PtCountStorageMons(void)
 {
     u32 b, p, n = 0;
@@ -848,13 +850,13 @@ static void ArenaPlaytest_Run(void)
         i = m->b;
         SetMonData(&gPlayerParty[m->a], MON_DATA_HELD_ITEM, &i);
         break;
+#endif
     case 19: // party slot c: move slot b := move a (full PP)
         i = m->a;
         SetMonData(&gPlayerParty[m->c], MON_DATA_MOVE1 + m->b, &i);
         i = GetMovePP(m->a);
         SetMonData(&gPlayerParty[m->c], MON_DATA_PP1 + m->b, &i);
         break;
-#endif
     case 18: // remove item a x b
         m->result[0] = RemoveBagItem(m->a, m->b);
         break;
@@ -907,6 +909,10 @@ static void ArenaPlaytest_Run(void)
         m->result[1] = PtCountStorageMons();
         m->result[2] = GetMonData(&gPlayerParty[0], MON_DATA_SPECIES) | (GetMonData(&gPlayerParty[1], MON_DATA_SPECIES) << 16);
         m->result[3] = ArenaStory_Get() | (FlagGet(FLAG_ARENA_SERIES_IMPORTED) << 8);
+        break;
+    case 30: // D5 shortcut: a=1 runs trainer battles in the classic engine
+        gArenaPlaytestClassic = m->a;
+        m->result[0] = gArenaPlaytestClassic;
         break;
     case 24: // storyline := a
         ArenaStory_Set(m->a);
