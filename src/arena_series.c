@@ -25,6 +25,12 @@ void ReadFlash(u16 sectorNum, u32 offset, u8 *dest, u32 size);
 #include "constants/flags.h"
 #include "constants/moves.h"
 #include "constants/trainers.h"
+#ifdef ARENA_JOHTO
+#include "arena_mon_xfer.h"
+#include "pokeball.h"
+#include "constants/characters.h"
+#include "data/arena_xfer_tables.h"
+#endif
 
 #ifndef MATT_PART
 #define MATT_PART 1
@@ -41,6 +47,18 @@ void ReadFlash(u16 sectorNum, u32 offset, u8 *dest, u32 size);
 #define ARENA_DEX_REWARD_FLAG FLAG_HIDDEN_ITEM_UNUSED_0x07
 #define ARENA_SCALING_ACTIVE() FALSE /* chapter 1: never scales story levels */
 static const u8 sChapterText[] = _("CHAPTER 1 COMPLETE!");
+#elif defined(ARENA_JOHTO)
+#define ARENA_GAME_STAMP ARENA_GAME_STAMP_JOHTO
+#if MATT_PART == 2
+#define ARENA_SEG ARENA_SEG_JOHTO
+#define ARENA_CHAPTER_CLEAR() FlagGet(FLAG_MATT_PART2_COMPLETE) /* Part 2 ends at Red */
+#else
+#define ARENA_SEG ARENA_SEG_JOHTO_P1
+#define ARENA_CHAPTER_CLEAR() FlagGet(FLAG_MATT_PART1_COMPLETE) /* Part 1 ends at Lance */
+#endif
+#define ARENA_DEX_REWARD_FLAG FLAG_ARENA_DEX_REWARD
+#define ARENA_SCALING_ACTIVE() FlagGet(FLAG_ARENA_SERIES_IMPORTED)
+static const u8 sChapterText[] = _("CHAPTER 2 COMPLETE!");
 #else
 #define ARENA_GAME_STAMP ARENA_GAME_STAMP_EMERALD
 #if MATT_PART == 3
@@ -115,6 +133,166 @@ static u8 CountBadges(void)
     return n;
 }
 
+
+#if defined(ARENA_JOHTO) || !defined(FIRERED)
+#ifndef ARENA_JOHTO
+#include "arena_mon_xfer.h"
+#include "data/arena_xfer_tables.h"
+#endif
+// Expansion-numbered fields -> pret (Emerald) numbering. FALSE: no Gen 1-3 species.
+static bool8 XferExpFieldsToPret(struct ArenaMonFields *f)
+{
+    u32 i, n;
+    u16 species = f->species;
+    for (i = 0; species > ARENA_SERIES_DEX_TOTAL && i < ARRAY_COUNT(sXferExpFormToBase); i++)
+        if (sXferExpFormToBase[i][0] == species)
+            species = sXferExpFormToBase[i][1];
+    f->species = species <= ARENA_SERIES_DEX_TOTAL ? sXferNationalToPretSpecies[species] : 0;
+    if (f->species == 0)
+        return FALSE;
+    f->heldItem = f->heldItem < XFER_EXP_ITEM_COUNT ? sXferExpItemToEa[f->heldItem] : 0;
+    f->ball = f->ball < ARRAY_COUNT(sXferExpBallToPret) ? sXferExpBallToPret[f->ball] : 4;
+    f->abilityNum = f->abilityNum == 1; // hidden abilities do not exist in pret
+    for (i = 0, n = 0; i < 4; i++)
+    {
+        if (f->moves[i] == 0 || f->moves[i] > 354) // MOVE_PSYCHO_BOOST: later-gen moves dropped
+            continue;
+        f->moves[n] = f->moves[i];
+        f->pp[n] = f->pp[i];
+        n++;
+    }
+    for (; n < 4; n++)
+        f->moves[n] = f->pp[n] = 0;
+    return TRUE;
+}
+#endif
+
+#ifdef ARENA_JOHTO
+// ---- Johto (expansion) <-> pret mon conversion -------------------------
+static const u8 sXferRibbonFields[] =
+{
+    MON_DATA_COOL_RIBBON, MON_DATA_BEAUTY_RIBBON, MON_DATA_CUTE_RIBBON, MON_DATA_SMART_RIBBON, MON_DATA_TOUGH_RIBBON,
+    MON_DATA_CHAMPION_RIBBON, MON_DATA_WINNING_RIBBON, MON_DATA_VICTORY_RIBBON, MON_DATA_ARTIST_RIBBON,
+    MON_DATA_EFFORT_RIBBON, MON_DATA_MARINE_RIBBON, MON_DATA_LAND_RIBBON, MON_DATA_SKY_RIBBON,
+    MON_DATA_COUNTRY_RIBBON, MON_DATA_NATIONAL_RIBBON, MON_DATA_EARTH_RIBBON, MON_DATA_WORLD_RIBBON,
+};
+
+static u32 RibbonValue(u32 ribbons, u32 i)
+{
+    return i < 5 ? (ribbons >> (3 * i)) & 7 : (ribbons >> (15 + i - 5)) & 1;
+}
+
+// FireRed (pret) box mon bytes -> native box mon. FALSE leaves dst empty.
+static bool8 Johto_ImportPretBoxMon(const u8 *raw, struct BoxPokemon *dst)
+{
+    struct ArenaMonFields f;
+    u32 i, v;
+    u16 species;
+    u8 nick[POKEMON_NAME_LENGTH + 1];
+    ZeroBoxMonData(dst);
+    if (!ArenaXfer_DecodePret(raw, &f) || f.isBadEgg || f.species >= ARRAY_COUNT(sXferPretSpeciesToNational))
+        return FALSE;
+    species = sXferPretSpeciesToNational[f.species]; // expansion species ids are national for 1-386
+    if (species == SPECIES_NONE)
+        return FALSE;
+    CreateBoxMonLegacy(dst, species, 1, 0, TRUE, f.personality, OT_ID_PRESET, f.otId);
+    memset(nick, EOS, sizeof(nick));
+    memcpy(nick, f.nickname, 10);
+    SetBoxMonData(dst, MON_DATA_NICKNAME, nick);
+    SetBoxMonData(dst, MON_DATA_OT_NAME, f.otName);
+    v = f.language;    SetBoxMonData(dst, MON_DATA_LANGUAGE, &v);
+    v = f.markings;    SetBoxMonData(dst, MON_DATA_MARKINGS, &v);
+    v = f.heldItem < XFER_FR_ITEM_COUNT ? sXferFrItemToExp[f.heldItem] : ITEM_NONE;
+    SetBoxMonData(dst, MON_DATA_HELD_ITEM, &v);
+    SetBoxMonData(dst, MON_DATA_EXP, &f.exp);
+    v = f.ppBonuses;   SetBoxMonData(dst, MON_DATA_PP_BONUSES, &v);
+    v = f.friendship;  SetBoxMonData(dst, MON_DATA_FRIENDSHIP, &v);
+    for (i = 0; i < MAX_MON_MOVES; i++)
+    {
+        v = f.moves[i] <= MOVE_PSYCHO_BOOST ? f.moves[i] : MOVE_NONE; // Gen 1-3 move ids match
+        SetBoxMonData(dst, MON_DATA_MOVE1 + i, &v);
+        v = v ? f.pp[i] : 0;
+        SetBoxMonData(dst, MON_DATA_PP1 + i, &v);
+    }
+    for (i = 0; i < NUM_STATS; i++)
+    {
+        v = f.evs[i]; SetBoxMonData(dst, MON_DATA_HP_EV + i, &v);
+        v = f.ivs[i]; SetBoxMonData(dst, MON_DATA_HP_IV + i, &v);
+    }
+    v = f.contest[0]; SetBoxMonData(dst, MON_DATA_COOL, &v);
+    v = f.contest[1]; SetBoxMonData(dst, MON_DATA_BEAUTY, &v);
+    v = f.contest[2]; SetBoxMonData(dst, MON_DATA_CUTE, &v);
+    v = f.contest[3]; SetBoxMonData(dst, MON_DATA_SMART, &v);
+    v = f.contest[4]; SetBoxMonData(dst, MON_DATA_TOUGH, &v);
+    v = f.contest[5]; SetBoxMonData(dst, MON_DATA_SHEEN, &v);
+    v = f.pokerus;     SetBoxMonData(dst, MON_DATA_POKERUS, &v);
+    v = f.metLocation; SetBoxMonData(dst, MON_DATA_MET_LOCATION, &v);
+    v = f.metLevel;    SetBoxMonData(dst, MON_DATA_MET_LEVEL, &v);
+    v = f.metGame;     SetBoxMonData(dst, MON_DATA_MET_GAME, &v);
+    v = f.otGender;    SetBoxMonData(dst, MON_DATA_OT_GENDER, &v);
+    v = ItemIdToBallId(f.ball && f.ball < XFER_FR_ITEM_COUNT ? sXferFrItemToExp[f.ball] : ITEM_POKE_BALL);
+    SetBoxMonData(dst, MON_DATA_POKEBALL, &v);
+    v = f.abilityNum;  SetBoxMonData(dst, MON_DATA_ABILITY_NUM, &v);
+    v = f.fateful;     SetBoxMonData(dst, MON_DATA_MODERN_FATEFUL_ENCOUNTER, &v);
+    for (i = 0; i < ARRAY_COUNT(sXferRibbonFields); i++)
+    {
+        v = RibbonValue(f.ribbons, i);
+        SetBoxMonData(dst, sXferRibbonFields[i], &v);
+    }
+    if (f.isEgg)
+    {
+        v = TRUE;
+        SetBoxMonData(dst, MON_DATA_IS_EGG, &v);
+    }
+    return TRUE;
+}
+
+// Native box mon -> pret fields (Emerald numbering), via the same decoder
+// Emerald uses on Johto PC boxes.
+static bool8 Johto_ExportFields(const struct BoxPokemon *src, struct ArenaMonFields *f)
+{
+    if (!ArenaXfer_DecodeExpansion((const u8 *)src, f))
+        return FALSE;
+    return XferExpFieldsToPret(f);
+}
+
+// Native party mon -> 100-byte pret party mon (Emerald numbering).
+static void Johto_EncodePartyMon(struct Pokemon *mon, u8 *dst)
+{
+    struct ArenaMonFields f;
+    u32 i;
+    u16 *stats = (u16 *)(dst + 86);
+    memset(dst, 0, ARENA_PARTYMON_SIZE_PRET);
+    if (!Johto_ExportFields(&mon->box, &f))
+        return;
+    ArenaXfer_EncodePret(&f, dst);
+    *(u32 *)(dst + 80) = GetMonData(mon, MON_DATA_STATUS);
+    dst[84] = GetMonData(mon, MON_DATA_LEVEL);
+    dst[85] = 0xFF; // no mail
+    stats[0] = GetMonData(mon, MON_DATA_HP);
+    stats[1] = GetMonData(mon, MON_DATA_MAX_HP);
+    for (i = 0; i < NUM_STATS - 1; i++)
+        stats[2 + i] = GetMonData(mon, MON_DATA_ATK + i);
+}
+
+// 100-byte FireRed party mon -> native party mon.
+static bool8 Johto_ImportPretPartyMon(const u8 *src, struct Pokemon *mon)
+{
+    u32 hp, status;
+    ZeroMonData(mon);
+    if (!Johto_ImportPretBoxMon(src, &mon->box))
+        return FALSE;
+    CalculateMonStats(mon);
+    hp = *(const u16 *)(src + 86);
+    status = *(const u32 *)(src + 80);
+    if (hp > GetMonData(mon, MON_DATA_MAX_HP) || hp == 0)
+        hp = GetMonData(mon, MON_DATA_MAX_HP);
+    SetMonData(mon, MON_DATA_HP, &hp);
+    SetMonData(mon, MON_DATA_STATUS, &status);
+    return TRUE;
+}
+#endif
+
 bool8 ArenaSeries_WriteChapterComplete(void)
 {
     struct ArenaSeriesRecord *r = SectorRecord();
@@ -142,6 +320,11 @@ bool8 ArenaSeries_WriteChapterComplete(void)
     if (VarGet(VAR_ARENA_STORYLINE) == 1)
         r->seriesFlags |= ARENA_SERIES_FLAG_CHIEF_STORY;
 #endif
+#ifdef ARENA_JOHTO
+    r->seriesFlags &= ~ARENA_SERIES_FLAG_CHIEF_STORY;
+    if (FlagGet(FLAG_ARENA_CHIEF_STORY))
+        r->seriesFlags |= ARENA_SERIES_FLAG_CHIEF_STORY;
+#endif
     for (i = 0; i < ARENA_SERIES_DEX_BYTES; i++)
     {
         r->dexSeen[i] |= gSaveBlock1Ptr->dexSeen[i];
@@ -149,7 +332,11 @@ bool8 ArenaSeries_WriteChapterComplete(void)
     }
     r->partyCount = gPlayerPartyCount;
     for (i = 0; i < PARTY_SIZE; i++)
+#ifdef ARENA_JOHTO
+        Johto_EncodePartyMon(&gPlayerParty[i], r->party[i]);
+#else
         r->party[i] = gPlayerParty[i];
+#endif
     r->writeCount++;
     r->saveCounter = gSaveCounter;
     r->checksum = RecordChecksum(r);
@@ -360,8 +547,13 @@ void ArenaSeries_CheckImportAtBoot(void)
 #if MATT_PART >= 2
     return; // later parts continue from the previous part's save
 #endif
+#ifdef ARENA_JOHTO
+    if (r->sourceSegment != ARENA_SEG_FIRERED)
+        return; // Johto continues the completed FireRed chapter only
+#else
     if (r->sourceSegment != ARENA_SEG_FIRERED && r->sourceSegment != ARENA_SEG_JOHTO)
         return; // only completed earlier chapters import (not FireRed Part 1)
+#endif
     // The slot still holds that chapter's own save (same counter), or no
     // valid Emerald save exists: offer a clean New Game that imports.
     if (status != SAVE_STATUS_OK || counter == r->saveCounter)
@@ -371,9 +563,12 @@ void ArenaSeries_CheckImportAtBoot(void)
     }
 }
 
-// Copies PC boxes from the slot written with the record (pret sectors 5-13;
-// struct PokemonStorage is byte-identical in FireRed and Emerald).
-static bool8 ImportBoxes(u32 saveCounter)
+// Copies PC boxes from the slot written with the record (sectors 5-13).
+// currentBox..boxWallpapers sit at the same offsets in every tree; the mons
+// themselves are converted when the source format differs (FireRed -> Johto,
+// Johto -> Emerald). srcSize = the source game's sizeof(struct PokemonStorage).
+#define PRET_STORAGE_COPY 0x83D0
+static bool8 ImportBoxes(u32 saveCounter, u32 srcSize)
 {
     u32 slot, i, best = 2, off;
     for (slot = 0; slot < NUM_SAVE_SLOTS && best == 2; slot++)
@@ -387,7 +582,7 @@ static bool8 ImportBoxes(u32 saveCounter)
              || s->id < SECTOR_ID_PKMN_STORAGE_START || s->id > SECTOR_ID_PKMN_STORAGE_END)
                 continue;
             off = (s->id - SECTOR_ID_PKMN_STORAGE_START) * SECTOR_DATA_SIZE;
-            if (s->checksum == SectorChecksum(s->data, min(SECTOR_DATA_SIZE, sizeof(struct PokemonStorage) - off)))
+            if (off < srcSize && s->checksum == SectorChecksum(s->data, min(SECTOR_DATA_SIZE, srcSize - off)))
                 found |= 1 << (s->id - SECTOR_ID_PKMN_STORAGE_START);
         }
         if (found == (1 << (SECTOR_ID_PKMN_STORAGE_END - SECTOR_ID_PKMN_STORAGE_START + 1)) - 1)
@@ -402,22 +597,57 @@ static bool8 ImportBoxes(u32 saveCounter)
         if (s->signature != SECTOR_SIGNATURE || s->id < SECTOR_ID_PKMN_STORAGE_START || s->id > SECTOR_ID_PKMN_STORAGE_END)
             continue;
         off = (s->id - SECTOR_ID_PKMN_STORAGE_START) * SECTOR_DATA_SIZE;
-        memcpy((u8 *)gPokemonStoragePtr + off, s->data, min(SECTOR_DATA_SIZE, sizeof(struct PokemonStorage) - off));
+        if (off < PRET_STORAGE_COPY)
+            memcpy((u8 *)gPokemonStoragePtr + off, s->data, min(SECTOR_DATA_SIZE, PRET_STORAGE_COPY - off));
     }
     return TRUE;
 }
 
+// Converts every PC slot in place after ImportBoxes. Returns mons kept.
+static u32 ConvertImportedBoxes(u8 sourceSegment)
+{
+    u32 box, pos, kept = 0;
+    u8 raw[ARENA_BOXMON_SIZE];
+    for (box = 0; box < TOTAL_BOXES_COUNT; box++)
+        for (pos = 0; pos < IN_BOX_COUNT; pos++)
+        {
+            struct BoxPokemon *mon = &gPokemonStoragePtr->boxes[box][pos];
+            memcpy(raw, mon, ARENA_BOXMON_SIZE);
+#ifdef ARENA_JOHTO
+            kept += Johto_ImportPretBoxMon(raw, mon);
+#else
+            if (sourceSegment == ARENA_SEG_JOHTO)
+            {
+                struct ArenaMonFields f;
+                if (ArenaXfer_DecodeExpansion(raw, &f) && !f.isBadEgg && XferExpFieldsToPret(&f))
+                    ArenaXfer_EncodePret(&f, (u8 *)mon);
+                else
+                    memset(mon, 0, ARENA_BOXMON_SIZE);
+            }
+            if (GetBoxMonData(mon, MON_DATA_SPECIES))
+            {
+                u16 item = GetBoxMonData(mon, MON_DATA_HELD_ITEM);
+                if (item >= ITEM_HM01) { item = ITEM_NONE; SetBoxMonData(mon, MON_DATA_HELD_ITEM, &item); }
+                kept++;
+            }
+#endif
+        }
+    return kept;
+}
+
+#ifndef ARENA_JOHTO
 static void SanitizeMon(struct Pokemon *mon)
 {
     u16 item = GetMonData(mon, MON_DATA_HELD_ITEM);
     if (item >= ITEM_HM01 || item > ITEMS_COUNT) { item = ITEM_NONE; SetMonData(mon, MON_DATA_HELD_ITEM, &item); }
     CalculateMonStats(mon);
 }
+#endif
 
 void ArenaSeries_ApplyImport(void)
 {
     struct ArenaSeriesRecord *r;
-    u32 i, b, box, pos;
+    u32 i, b;
     if (!gArenaSeriesImportPending)
         return;
     gArenaSeriesImportPending = 0;
@@ -432,19 +662,24 @@ void ArenaSeries_ApplyImport(void)
     memcpy(gSaveBlock2Ptr->playerTrainerId, r->trainerId, 4); // same OT: no "traded" disobedience
     SetMoney(&gSaveBlock1Ptr->money, r->money);
     ZeroPlayerPartyMons();
-    for (i = 0; i < PARTY_SIZE && i < r->partyCount; i++)
+    for (i = 0, b = 0; i < PARTY_SIZE && i < r->partyCount; i++)
     {
+#ifdef ARENA_JOHTO
+        if (Johto_ImportPretPartyMon(r->party[i], &gPlayerParty[b]))
+            b++;
+#else
         gPlayerParty[i] = r->party[i];
         SanitizeMon(&gPlayerParty[i]);
+#endif
     }
     CalculatePlayerPartyCount();
-    ImportBoxes(r->saveCounter);
-    for (box = 0; box < TOTAL_BOXES_COUNT; box++)
-        for (pos = 0; pos < IN_BOX_COUNT; pos++)
-        {
-            u16 item = GetBoxMonData(&gPokemonStoragePtr->boxes[box][pos], MON_DATA_HELD_ITEM);
-            if (item >= ITEM_HM01) { item = ITEM_NONE; SetBoxMonData(&gPokemonStoragePtr->boxes[box][pos], MON_DATA_HELD_ITEM, &item); }
-        }
+#ifdef ARENA_JOHTO
+    if (ImportBoxes(r->saveCounter, PRET_STORAGE_COPY))
+        ConvertImportedBoxes(r->sourceSegment);
+#else
+    if (ImportBoxes(r->saveCounter, r->sourceSegment == ARENA_SEG_JOHTO ? ARENA_JOHTO_STORAGE_SIZE : sizeof(struct PokemonStorage)))
+        ConvertImportedBoxes(r->sourceSegment);
+#endif
     EnableNationalPokedex();
     for (i = 1; i <= ARENA_SERIES_DEX_TOTAL; i++)
     {
@@ -456,6 +691,10 @@ void ArenaSeries_ApplyImport(void)
     }
     if (r->seriesFlags & ARENA_SERIES_FLAG_DEX_REWARD)
         FlagSet(ARENA_DEX_REWARD_FLAG);
+#ifdef ARENA_JOHTO
+    if (r->seriesFlags & ARENA_SERIES_FLAG_CHIEF_STORY)
+        FlagSet(FLAG_ARENA_CHIEF_STORY); // storyline chosen in chapter 1 carries over
+#endif
     FlagSet(FLAG_ARENA_SERIES_IMPORTED);
     gArenaSeriesDexDirty = 1;
     Free(r);

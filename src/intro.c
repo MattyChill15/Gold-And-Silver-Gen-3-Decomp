@@ -1,4 +1,5 @@
 #include "global.h"
+#include "arena_series.h"
 #include "main.h"
 #include "palette.h"
 #include "scanline_effect.h"
@@ -1143,6 +1144,10 @@ void CB2_InitCopyrightScreenAfterBootup(void)
         Save_ResetSaveCounters();
         LoadGameSave(SAVE_NORMAL);
         if (gSaveFileStatus == SAVE_STATUS_EMPTY || gSaveFileStatus == SAVE_STATUS_CORRUPT)
+            Sav2_ClearSetDefault();
+        ArenaSeries_CheckImportAtBoot();
+        ArenaSeries_ValidatePartSave();
+        if (gArenaSeriesRejectedSave || gArenaSeriesImportPending)
             Sav2_ClearSetDefault();
         SetPokemonCryStereo(gSaveBlock2Ptr->optionsSound);
         InitHeap(gHeap, HEAP_SIZE);

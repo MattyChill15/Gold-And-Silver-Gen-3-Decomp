@@ -1,4 +1,5 @@
 #include "global.h"
+#include "arena_series.h"
 #include "clock.h"
 #include "new_game.h"
 #include "random.h"
@@ -259,6 +260,8 @@ void NewGameInitData(void)
     InitMatchCallCounters();
     ClearMysteryGift();
     WipeTrainerNameRecords();
+    ArenaSeries_ApplyImport(); // series: FireRed team/boxes/dex carry-over
+    ArenaSeries_StampNewGame();
     ResetTrainerHillResults();
     ResetTrainerTowerResults();
     ResetContestLinkResults();
