@@ -1,0 +1,71 @@
+tools/jsonproc/jsonproc src/data/wild_encounters_part2.json src/data/wild_encounters.json.txt src/data/wild_encounters.h
+tools/jsonproc/jsonproc src/data/wild_encounters_part2.json src/data/wild_encounters.constants.json.txt include/constants/wild_encounter.h
+tools/scaninc/scaninc -M build-part3/emerald/src/arena_series.d -g build-part3/assets -I include -I tools/agbcc/include src/arena_series.c
+tools/scaninc/scaninc -M build-part3/emerald/src/arena_sprites.d -g build-part3/assets -I include -I tools/agbcc/include src/arena_sprites.c
+tools/scaninc/scaninc -M build-part3/emerald/src/battle_main.d -g build-part3/assets -I include -I tools/agbcc/include src/battle_main.c
+tools/scaninc/scaninc -M build-part3/emerald/src/battle_pyramid.d -g build-part3/assets -I include -I tools/agbcc/include src/battle_pyramid.c
+tools/scaninc/scaninc -M build-part3/emerald/src/berry_powder.d -g build-part3/assets -I include -I tools/agbcc/include src/berry_powder.c
+tools/scaninc/scaninc -M build-part3/emerald/src/cable_club.d -g build-part3/assets -I include -I tools/agbcc/include src/cable_club.c
+tools/scaninc/scaninc -M build-part3/emerald/src/contest_util.d -g build-part3/assets -I include -I tools/agbcc/include src/contest_util.c
+tools/scaninc/scaninc -M build-part3/emerald/src/field_control_avatar.d -g build-part3/assets -I include -I tools/agbcc/include src/field_control_avatar.c
+tools/scaninc/scaninc -M build-part3/emerald/src/field_player_avatar.d -g build-part3/assets -I include -I tools/agbcc/include src/field_player_avatar.c
+tools/scaninc/scaninc -M build-part3/emerald/src/field_screen_effect.d -g build-part3/assets -I include -I tools/agbcc/include src/field_screen_effect.c
+tools/scaninc/scaninc -M build-part3/emerald/src/fldeff_sweetscent.d -g build-part3/assets -I include -I tools/agbcc/include src/fldeff_sweetscent.c
+tools/scaninc/scaninc -M build-part3/emerald/src/frontier_util.d -g build-part3/assets -I include -I tools/agbcc/include src/frontier_util.c
+tools/scaninc/scaninc -M build-part3/emerald/src/intro.d -g build-part3/assets -I include -I tools/agbcc/include src/intro.c
+tools/scaninc/scaninc -M build-part3/emerald/src/item.d -g build-part3/assets -I include -I tools/agbcc/include src/item.c
+tools/scaninc/scaninc -M build-part3/emerald/src/load_save.d -g build-part3/assets -I include -I tools/agbcc/include src/load_save.c
+tools/scaninc/scaninc -M build-part3/emerald/src/main.d -g build-part3/assets -I include -I tools/agbcc/include src/main.c
+tools/scaninc/scaninc -M build-part3/emerald/src/match_call.d -g build-part3/assets -I include -I tools/agbcc/include src/match_call.c
+tools/scaninc/scaninc -M build-part3/emerald/src/new_game.d -g build-part3/assets -I include -I tools/agbcc/include src/new_game.c
+tools/scaninc/scaninc -M build-part3/emerald/src/overworld.d -g build-part3/assets -I include -I tools/agbcc/include src/overworld.c
+tools/scaninc/scaninc -M build-part3/emerald/src/pokedex_area_screen.d -g build-part3/assets -I include -I tools/agbcc/include src/pokedex_area_screen.c
+tools/scaninc/scaninc -M build-part3/emerald/src/post_battle_event_funcs.d -g build-part3/assets -I include -I tools/agbcc/include src/post_battle_event_funcs.c
+tools/scaninc/scaninc -M build-part3/emerald/src/record_mixing.d -g build-part3/assets -I include -I tools/agbcc/include src/record_mixing.c
+tools/scaninc/scaninc -M build-part3/emerald/src/reload_save.d -g build-part3/assets -I include -I tools/agbcc/include src/reload_save.c
+tools/scaninc/scaninc -M build-part3/emerald/src/save.d -g build-part3/assets -I include -I tools/agbcc/include src/save.c
+tools/scaninc/scaninc -M build-part3/emerald/src/start_menu.d -g build-part3/assets -I include -I tools/agbcc/include src/start_menu.c
+tools/scaninc/scaninc -M build-part3/emerald/src/trade.d -g build-part3/assets -I include -I tools/agbcc/include src/trade.c
+tools/scaninc/scaninc -M build-part3/emerald/src/union_room.d -g build-part3/assets -I include -I tools/agbcc/include src/union_room.c
+tools/scaninc/scaninc -M build-part3/emerald/src/union_room_chat.d -g build-part3/assets -I include -I tools/agbcc/include src/union_room_chat.c
+tools/scaninc/scaninc -M build-part3/emerald/src/wild_encounter.d -g build-part3/assets -I include -I tools/agbcc/include src/wild_encounter.c
+tools/scaninc/scaninc -M build-part3/emerald/data/mystery_gift.d -g build-part3/assets -I include -I "" data/mystery_gift.s
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/arena_series.o src/arena_series.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/arena_sprites.o src/arena_sprites.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/battle_main.o src/battle_main.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/battle_pyramid.o src/battle_pyramid.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/berry_powder.o src/berry_powder.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/cable_club.o src/cable_club.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/contest_util.o src/contest_util.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/field_control_avatar.o src/field_control_avatar.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/field_player_avatar.o src/field_player_avatar.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/field_screen_effect.o src/field_screen_effect.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/fldeff_sweetscent.o src/fldeff_sweetscent.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/frontier_util.o src/frontier_util.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/intro.o src/intro.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/item.o src/item.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/load_save.o src/load_save.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/main.o src/main.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/match_call.o src/match_call.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/new_game.o src/new_game.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/overworld.o src/overworld.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/pokedex_area_screen.o src/pokedex_area_screen.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/post_battle_event_funcs.o src/post_battle_event_funcs.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/record_mixing.o src/record_mixing.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/reload_save.o src/reload_save.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/save.o src/save.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/start_menu.o src/start_menu.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/trade.o src/trade.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/union_room.o src/union_room.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/union_room_chat.o src/union_room_chat.c
+tools/agbcc/bin/agbcc <flags> -o build-part3/emerald/src/wild_encounter.o src/wild_encounter.c
+tools/preproc/preproc data/mystery_gift.s charmap.txt | cpp -I include -DARENA_LAB=0 - | tools/preproc/preproc -ie data/mystery_gift.s charmap.txt | arm-none-eabi-as -mcpu=arm7tdmi --defsym MODERN=0 -o build-part3/emerald/data/mystery_gift.o
+tools/ramscrgen/ramscrgen COMMON sym_common.txt ENGLISH -c build-part3/emerald/src,common_syms > build-part3/emerald/sym_common.ld
+Memory region         Used Size  Region Size  %age Used
+           EWRAM:      249400 B       256 KB     95.14%
+           IWRAM:       30892 B        32 KB     94.27%
+             ROM:    28085584 B        32 MB     83.70%
+cd build-part3/emerald && arm-none-eabi-ld -Map ../../pokeemerald-part3.map -T ../../ld_script.ld --print-memory-usage -o ../../pokeemerald-part3.elf <objs> <libs> | cat
+tools/gbafix/gbafix pokeemerald-part3.elf -t"POKEMON EMER" -cBPEE -m01 -r0 --silent
+arm-none-eabi-objcopy -O binary pokeemerald-part3.elf pokeemerald-part3.gba
+tools/gbafix/gbafix pokeemerald-part3.gba -p --silent

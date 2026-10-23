@@ -1,0 +1,1465 @@
+[
+  {
+    "dex": "0001",
+    "species": "BULBASAUR",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0002",
+    "species": "IVYSAUR",
+    "level": 20,
+    "poses": {
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0003",
+    "species": "VENUSAUR",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0004",
+    "species": "CHARMANDER",
+    "level": 20,
+    "poses": {
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0005",
+    "species": "CHARMELEON",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0006",
+    "species": "CHARIZARD",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0007",
+    "species": "SQUIRTLE",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0008",
+    "species": "WARTORTLE",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0009",
+    "species": "BLASTOISE",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0010",
+    "species": "CATERPIE",
+    "level": 20,
+    "poses": {}
+  },
+  {
+    "dex": "0011",
+    "species": "METAPOD",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0012",
+    "species": "BUTTERFREE",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0013",
+    "species": "WEEDLE",
+    "level": 20,
+    "poses": {}
+  },
+  {
+    "dex": "0014",
+    "species": "KAKUNA",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0015",
+    "species": "BEEDRILL",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0016",
+    "species": "PIDGEY",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0017",
+    "species": "PIDGEOTTO",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0018",
+    "species": "PIDGEOT",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0019",
+    "species": "RATTATA",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0020",
+    "species": "RATICATE",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0021",
+    "species": "SPEAROW",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0022",
+    "species": "FEAROW",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    },
+    "frame_offset": [
+      0,
+      1
+    ]
+  },
+  {
+    "dex": "0023",
+    "species": "EKANS",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0024",
+    "species": "ARBOK",
+    "level": 60,
+    "poses": {
+      "Shoot": "Idle",
+      "Attack": "Idle",
+      "SpAttack": "Idle"
+    }
+  },
+  {
+    "dex": "0025",
+    "species": "PIKACHU",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0026",
+    "species": "RAICHU",
+    "level": 55,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0027",
+    "species": "SANDSHREW",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0028",
+    "species": "SANDSLASH",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0029",
+    "species": "NIDORAN_F",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0030",
+    "species": "NIDORINA",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0031",
+    "species": "NIDOQUEEN",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0032",
+    "species": "NIDORAN_M",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0033",
+    "species": "NIDORINO",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0034",
+    "species": "NIDOKING",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0035",
+    "species": "CLEFAIRY",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge",
+      "Shoot": "Double",
+      "SpAttack": "Double"
+    }
+  },
+  {
+    "dex": "0036",
+    "species": "CLEFABLE",
+    "level": 60,
+    "poses": {
+      "Shoot": "Double",
+      "Attack": "Double",
+      "SpAttack": "Double"
+    }
+  },
+  {
+    "dex": "0037",
+    "species": "VULPIX",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0039",
+    "species": "JIGGLYPUFF",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0040",
+    "species": "WIGGLYTUFF",
+    "level": 35,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0041",
+    "species": "ZUBAT",
+    "level": 11,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0042",
+    "species": "GOLBAT",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0043",
+    "species": "ODDISH",
+    "level": 26,
+    "poses": {
+      "Attack": "Double"
+    }
+  },
+  {
+    "dex": "0044",
+    "species": "GLOOM",
+    "level": 28,
+    "poses": {
+      "Attack": "Double"
+    }
+  },
+  {
+    "dex": "0048",
+    "species": "VENONAT",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0049",
+    "species": "VENOMOTH",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0050",
+    "species": "DIGLETT",
+    "level": 20,
+    "poses": {}
+  },
+  {
+    "dex": "0051",
+    "species": "DUGTRIO",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0052",
+    "species": "MEOWTH",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0053",
+    "species": "PERSIAN",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0056",
+    "species": "MANKEY",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0057",
+    "species": "PRIMEAPE",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0058",
+    "species": "GROWLITHE",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0059",
+    "species": "ARCANINE",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0060",
+    "species": "POLIWAG",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0061",
+    "species": "POLIWHIRL",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    },
+    "frame_offset": [
+      0,
+      3
+    ]
+  },
+  {
+    "dex": "0063",
+    "species": "ABRA",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0064",
+    "species": "KADABRA",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0065",
+    "species": "ALAKAZAM",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0066",
+    "species": "MACHOP",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0067",
+    "species": "MACHOKE",
+    "level": 30,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0068",
+    "species": "MACHAMP",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0069",
+    "species": "BELLSPROUT",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0070",
+    "species": "WEEPINBELL",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0071",
+    "species": "VICTREEBEL",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0072",
+    "species": "TENTACOOL",
+    "level": 35,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0073",
+    "species": "TENTACRUEL",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0074",
+    "species": "GEODUDE",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0075",
+    "species": "GRAVELER",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge",
+      "Shoot": "SpAttack"
+    }
+  },
+  {
+    "dex": "0076",
+    "species": "GOLEM",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0077",
+    "species": "PONYTA",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0078",
+    "species": "RAPIDASH",
+    "level": 60,
+    "poses": {
+      "Shoot": "Idle",
+      "Attack": "Idle",
+      "SpAttack": "Idle"
+    }
+  },
+  {
+    "dex": "0079",
+    "species": "SLOWPOKE",
+    "level": 20,
+    "poses": {}
+  },
+  {
+    "dex": "0086",
+    "species": "SEEL",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0087",
+    "species": "DEWGONG",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0088",
+    "species": "GRIMER",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0089",
+    "species": "MUK",
+    "level": 38,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0090",
+    "species": "SHELLDER",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0091",
+    "species": "CLOYSTER",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0098",
+    "species": "KRABBY",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0099",
+    "species": "KINGLER",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0102",
+    "species": "EXEGGCUTE",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0103",
+    "species": "EXEGGUTOR",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0104",
+    "species": "CUBONE",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0105",
+    "species": "MAROWAK",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0109",
+    "species": "KOFFING",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0110",
+    "species": "WEEZING",
+    "level": 35,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0118",
+    "species": "GOLDEEN",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0119",
+    "species": "SEAKING",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0126",
+    "species": "MAGMAR",
+    "level": 60,
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0129",
+    "species": "MAGIKARP",
+    "level": 45,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0130",
+    "species": "GYARADOS",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    },
+    "frame_fit": [
+      5,
+      7
+    ]
+  },
+  {
+    "dex": "0169",
+    "species": "CROBAT",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0183",
+    "species": "MARILL",
+    "level": 35,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0184",
+    "species": "AZUMARILL",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0218",
+    "species": "SLUGMA",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0219",
+    "species": "MAGCARGO",
+    "level": 38,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0222",
+    "species": "CORSOLA",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0227",
+    "species": "SKARMORY",
+    "level": 45,
+    "frame_offset": [
+      0,
+      2
+    ],
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0258",
+    "species": "MUDKIP",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0259",
+    "species": "MARSHTOMP",
+    "level": 16,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0260",
+    "species": "SWAMPERT",
+    "level": 36,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0261",
+    "species": "POOCHYENA",
+    "level": 12,
+    "poses": {
+      "Attack": "RearUp"
+    }
+  },
+  {
+    "dex": "0262",
+    "species": "MIGHTYENA",
+    "level": 30,
+    "poses": {
+      "Attack": "RearUp"
+    }
+  },
+  {
+    "dex": "0263",
+    "species": "ZIGZAGOON",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0264",
+    "species": "LINOONE",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0265",
+    "species": "WURMPLE",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0266",
+    "species": "SILCOON",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0267",
+    "species": "BEAUTIFLY",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0268",
+    "species": "CASCOON",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0269",
+    "species": "DUSTOX",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0270",
+    "species": "LOTAD",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0271",
+    "species": "LOMBRE",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0272",
+    "species": "LUDICOLO",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0273",
+    "species": "SEEDOT",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0274",
+    "species": "NUZLEAF",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge",
+      "SpAttack": "Charge"
+    }
+  },
+  {
+    "dex": "0275",
+    "species": "SHIFTRY",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0276",
+    "species": "TAILLOW",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0277",
+    "species": "SWELLOW",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0278",
+    "species": "WINGULL",
+    "level": 26,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0279",
+    "species": "PELIPPER",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0280",
+    "species": "RALTS",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0281",
+    "species": "KIRLIA",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0282",
+    "species": "GARDEVOIR",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0285",
+    "species": "SHROOMISH",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0286",
+    "species": "BRELOOM",
+    "level": 30,
+    "poses": {
+      "Attack": "Double"
+    }
+  },
+  {
+    "dex": "0287",
+    "species": "SLAKOTH",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0288",
+    "species": "VIGOROTH",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0289",
+    "species": "SLAKING",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0290",
+    "species": "NINCADA",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0293",
+    "species": "WHISMUR",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0294",
+    "species": "LOUDRED",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0295",
+    "species": "EXPLOUD",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0296",
+    "species": "MAKUHITA",
+    "level": 11,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0297",
+    "species": "HARIYAMA",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0299",
+    "species": "NOSEPASS",
+    "level": 20,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0300",
+    "species": "SKITTY",
+    "level": 10,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0301",
+    "species": "DELCATTY",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0302",
+    "species": "SABLEYE",
+    "level": 12,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0304",
+    "species": "ARON",
+    "level": 12,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0305",
+    "species": "LAIRON",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0306",
+    "species": "AGGRON",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge",
+      "Shoot": "Charge",
+      "SpAttack": "Charge"
+    }
+  },
+  {
+    "dex": "0309",
+    "species": "ELECTRIKE",
+    "level": 13,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0310",
+    "species": "MANECTRIC",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0311",
+    "species": "PLUSLE",
+    "level": 13,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0312",
+    "species": "MINUN",
+    "level": 13,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0313",
+    "species": "VOLBEAT",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0314",
+    "species": "ILLUMISE",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0316",
+    "species": "GULPIN",
+    "level": 13,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0317",
+    "species": "SWALOT",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0318",
+    "species": "CARVANHA",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0319",
+    "species": "SHARPEDO",
+    "level": 35,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0320",
+    "species": "WAILMER",
+    "level": 45,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0321",
+    "species": "WAILORD",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    },
+    "frame_fit": [
+      1,
+      1
+    ]
+  },
+  {
+    "dex": "0322",
+    "species": "NUMEL",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0323",
+    "species": "CAMERUPT",
+    "level": 40,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0324",
+    "species": "TORKOAL",
+    "level": 25,
+    "poses": {
+      "Shoot": "Charge",
+      "Attack": "Attack",
+      "SpAttack": "Charge"
+    }
+  },
+  {
+    "dex": "0325",
+    "species": "SPOINK",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0326",
+    "species": "GRUMPIG",
+    "level": 32,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0327",
+    "species": "SPINDA",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0328",
+    "species": "TRAPINCH",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0329",
+    "species": "VIBRAVA",
+    "level": 5,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0330",
+    "species": "FLYGON",
+    "level": 52,
+    "frame_offset": [
+      0,
+      3
+    ],
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0331",
+    "species": "CACNEA",
+    "level": 5,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0332",
+    "species": "CACTURNE",
+    "level": 46,
+    "frame_offset": [
+      0,
+      4
+    ],
+    "poses": {
+      "Attack": "Shoot",
+      "SpAttack": "Shoot"
+    }
+  },
+  {
+    "dex": "0333",
+    "species": "SWABLU",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0334",
+    "species": "ALTARIA",
+    "level": 52,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0336",
+    "species": "SEVIPER",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0338",
+    "species": "SOLROCK",
+    "level": 25,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0339",
+    "species": "BARBOACH",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0340",
+    "species": "WHISCASH",
+    "level": 55,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0341",
+    "species": "CORPHISH",
+    "level": 45,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0342",
+    "species": "CRAWDAUNT",
+    "level": 30,
+    "poses": {
+      "Attack": "Charge"
+    }
+  },
+  {
+    "dex": "0343",
+    "species": "BALTOY",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0344",
+    "species": "CLAYDOL",
+    "level": 45,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  },
+  {
+    "dex": "0352",
+    "species": "KECLEON",
+    "level": 26,
+    "poses": {
+      "Attack": "Double"
+    }
+  },
+  {
+    "dex": "0370",
+    "species": "LUVDISC",
+    "level": 20,
+    "poses": {
+      "Attack": "Shoot"
+    }
+  }
+]

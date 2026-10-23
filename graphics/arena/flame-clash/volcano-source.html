@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Caldera de basalto · fondo de batalla 240×160</title>
+<style>
+  :root{color-scheme:dark}
+  body{margin:0;min-height:100vh;background:#0f0b0d;color:#d9c7b6;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;display:flex;flex-direction:column;align-items:center;gap:10px;padding:16px;box-sizing:border-box}
+  h1{font-size:14px;margin:0;color:#e9a46a;font-weight:normal;letter-spacing:.04em}
+  #view{width:960px;max-width:100%;height:auto;image-rendering:pixelated;image-rendering:crisp-edges;border:2px solid #3b2723;background:#000}
+  .bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:center}
+  button{background:#251a19;color:#ecd9c6;border:1px solid #5b3a2f;padding:5px 10px;font:inherit;cursor:pointer}
+  button:hover{background:#352421}
+  #info{color:#9c8776;max-width:960px;text-align:center}
+  label{display:inline-flex;gap:5px;align-items:center;cursor:pointer}
+</style>
+</head>
+<body>
+<h1>Caldera de basalto — Charizard vs Magmar · 240×160 · 6 frames × 150 ms</h1>
+<canvas id="view" width="960" height="640"></canvas>
+<div class="bar">
+  <button id="prev">◀ Anterior</button>
+  <button id="play">❚❚ Pausa</button>
+  <button id="next">Siguiente ▶</button>
+  <span id="label">frame 0/5</span>
+  <label><input type="checkbox" id="guides"> Guías HUD / piso</label>
+</div>
+<div class="bar">
+  <button id="dlSheet">Descargar spritesheet PNG</button>
+  <button id="dlMeta">Descargar metadatos JSON</button>
+  <button id="dlFrames">Descargar frames PNG</button>
+  <button id="dlFrame0">Descargar frame 0</button>
+</div>
+<div id="info"></div>
+<script>
+(function(){
+'use strict';
+
+/* ---------- constantes ---------- */
+const W=240,H=160,FRAME_COUNT=6,FRAME_MS=150;
+const RX0=14,RX1=225,RY0=35,RY1=144;           // piso caminable garantizado
+const CL=0,CF=1,CFACE=2,CB=3,CW=4,CI=5,CS=6;    // lava, piso, cara de acantilado, talud, muro, islote, humo
+const SEED=20260923;
+
+/* paleta fija de 48 colores */
+const PALETTE=[
+  // 0-7 piso carbón-marrón
+  '#120c0c','#1a1311','#221916','#2a201b','#322620','#3a2d25','#43342a','#4d3b30',
+  // 8-13 luz de borde rojo quemado
+  '#2e1a16','#3a1e17','#4a2318','#5c2a1a','#6e321c','#84401f',
+  // 14-17 ceniza
+  '#2b2626','#36302e','#423a36','#514640',
+  // 18-23 acantilado de basalto
+  '#0e0909','#17100e','#211714','#2c1e19','#3a2820','#4a3226',
+  // 24-28 reflejo naranja
+  '#5e2416','#7d2e14','#a33e12','#c95a14','#e07a1c',
+  // 29-38 lava
+  '#3a0e0a','#561208','#7a1a08','#9e2608','#c43a0a','#e0560e','#f07818','#f89a2a','#fcc048','#ffe27a',
+  // 39-41 costra
+  '#24130f','#33190f','#4a2210',
+  // 42-47 humo y brasas
+  '#1a1014','#24161a','#2e1c1e','#ff6a1a','#fff0b0','#0a0606'
+];
+const RGB=new Uint8Array(PALETTE.length*3);
+PALETTE.forEach((h,i)=>{const v=parseInt(h.slice(1),16);RGB[i*3]=v>>16;RGB[i*3+1]=(v>>8)&255;RGB[i*3+2]=v&255;});
+
+/* ---------- utilidades deterministas ---------- */
+function rng(seed){let a=seed>>>0;return function(){a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function hash(x,y,s){let h=(Math.imul(x|0,374761393)+Math.imul(y|0,668265263)+Math.imul((s+SEED)|0,1442695041))|0;h=Math.imul(h^(h>>>13),1274126177);h^=h>>>16;return(h>>>0)/4294967296;}
+function vnoise(x,y,sc,s){
+  const fx=x/sc,fy=y/sc,ix=Math.floor(fx),iy=Math.floor(fy);
+  let tx=fx-ix,ty=fy-iy;tx=tx*tx*(3-2*tx);ty=ty*ty*(3-2*ty);
+  const a=hash(ix,iy,s),b=hash(ix+1,iy,s),c=hash(ix,iy+1,s),d=hash(ix+1,iy+1,s);
+  return a+(b-a)*tx+(c-a)*ty+(a-b-c+d)*tx*ty;
+}
+// ruido periódico en u (para el flujo continuo alrededor de la caldera)
+function pnoise(u,v,per,s){
+  const ix=Math.floor(u),iy=Math.floor(v);
+  let tx=u-ix,ty=v-iy;tx=tx*tx*(3-2*tx);ty=ty*ty*(3-2*ty);
+  const x0=((ix%per)+per)%per,x1=(x0+1)%per;
+  const a=hash(x0,iy,s),b=hash(x1,iy,s),c=hash(x0,iy+1,s),d=hash(x1,iy+1,s);
+  return a+(b-a)*tx+(c-a)*ty+(a-b-c+d)*tx*ty;
+}
+// orilla dentada: puntos de control + escalones de 1px + dientes ocasionales
+function edgeLine(n,lo,hi,seed,sMin,sMax){
+  const r=rng(seed),pts=[];let i=-sMax;
+  while(i<=n+sMax){pts.push([i,lo+r()*(hi-lo)]);i+=sMin+Math.floor(r()*(sMax-sMin+1));}
+  const out=new Int16Array(n);let k=0;
+  for(let x=0;x<n;x++){
+    while(pts[k+1][0]<=x)k++;
+    const a=pts[k],b=pts[k+1],t=(x-a[0])/(b[0]-a[0]);
+    let v=a[1]+(b[1]-a[1])*t+(vnoise(x,0,2.7,seed)-0.5)*2.6;
+    const sp=hash(Math.floor((x+seed%3)/2),seed,9);
+    if(sp<0.07)v+=2;else if(sp>0.95)v-=2;
+    out[x]=Math.max(lo,Math.min(hi,Math.round(v)));
+  }
+  return out;
+}
+// columnas de basalto de ancho irregular
+function columns(n,seed,wMin,wMax){
+  const r=rng(seed),id=new Int16Array(n),pos=new Uint8Array(n),wid=new Uint8Array(n);
+  let x=0,k=0;
+  while(x<n){const w=wMin+Math.floor(r()*(wMax-wMin+1));for(let j=0;j<w&&x+j<n;j++){id[x+j]=k;pos[x+j]=j;wid[x+j]=w;}x+=w;k++;}
+  return{id,pos,wid};
+}
+function distField(test,maxD){
+  const N=W*H,d=new Uint8Array(N).fill(255);let q=[];
+  for(let p=0;p<N;p++)if(test(p)){d[p]=0;q.push(p);}
+  for(let k=1;k<=maxD&&q.length;k++){
+    const nq=[];
+    for(const p of q){
+      const x=p%W,y=(p/W)|0;
+      for(let dy=-1;dy<=1;dy++){const yy=y+dy;if(yy<0||yy>=H)continue;
+        for(let dx=-1;dx<=1;dx++){const xx=x+dx;if(xx<0||xx>=W)continue;const n=yy*W+xx;if(d[n]===255){d[n]=k;nq.push(n);}}}
+    }
+    q=nq;
+  }
+  return d;
+}
+// una sola meseta conectada, sin agujeros cerrados
+function cleanFloor(cat){
+  const N=W*H,keep=new Uint8Array(N),st=[RY0*W+RX0];keep[st[0]]=1;
+  const nb=(p,f)=>{const x=p%W;if(x>0)f(p-1);if(x<W-1)f(p+1);if(p>=W)f(p-W);if(p<N-W)f(p+W);};
+  while(st.length){const p=st.pop();nb(p,n=>{if(!keep[n]&&cat[n]===CF){keep[n]=1;st.push(n);}});}
+  for(let p=0;p<N;p++)if(cat[p]===CF&&!keep[p])cat[p]=CL;
+  const out=new Uint8Array(N);
+  for(let p=0;p<N;p++){const x=p%W,y=(p/W)|0;if((x===0||y===0||x===W-1||y===H-1)&&cat[p]!==CF){out[p]=1;st.push(p);}}
+  while(st.length){const p=st.pop();nb(p,n=>{if(!out[n]&&cat[n]!==CF){out[n]=1;st.push(n);}});}
+  for(let p=0;p<N;p++)if(cat[p]!==CF&&!out[p])cat[p]=CF;
+}
+// coordenada de perímetro (640 px) para que la lava fluya alrededor de la caldera
+function perim(x,y){
+  const TW=RX1-RX0,TH=RY1-RY0;
+  const l=RX0-x,r=x-RX1,t=RY0-y,b=y-RY1;
+  const qx=Math.max(RX0,Math.min(RX1,x)),qy=Math.max(RY0,Math.min(RY1,y));
+  const m=Math.max(l,r,t,b);
+  if(m===t)return qx-RX0;
+  if(m===r)return TW+(qy-RY0);
+  if(m===b)return TW+TH+(RX1-qx);
+  return 2*TW+TH+(RY1-qy);
+}
+
+/* ---------- capa estática (piso idéntico en todos los frames) ---------- */
+let STATIC=null;
+function build(){
+  if(STATIC)return STATIC;
+  const N=W*H,cat=new Uint8Array(N),tone=new Uint8Array(N);
+  const topE=edgeLine(W,23,33,101,5,13),botE=edgeLine(W,145,149,202,6,14);
+  const leftE=edgeLine(H,6,12,303,5,12),rightE=edgeLine(H,227,233,404,5,12);
+  const wallE=edgeLine(W,12,20,505,4,10);
+
+  // 1. meseta caminable
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    if(y<topE[x]||y>botE[x]||x<leftE[y]||x>rightE[y])continue;
+    const ox=Math.max(RX0-x,x-RX1,0),oy=Math.max(RY0-y,y-RY1,0);
+    if(ox>0&&oy>0&&ox+oy>5+Math.floor(vnoise(x,y,3,99)*4))continue;
+    cat[y*W+x]=CF;
+  }
+  for(let y=RY0;y<=RY1;y++)for(let x=RX0;x<=RX1;x++)cat[y*W+x]=CF;
+  cleanFloor(cat);
+
+  // 2. muro lejano de columnas de basalto + humo
+  const wc=columns(W,606,4,7);
+  for(let x=0;x<W;x++){
+    const j=wc.pos[x],w=wc.wid[x],cid=wc.id[x];
+    let bot=wallE[x-j];if(j===0||j===w-1)bot--;
+    const top=1+Math.floor(hash(cid,0,607)*6);
+    const ledge=top+3+Math.floor(hash(cid,2,609)*4);
+    const shade=hash(cid,1,608)<0.5?20:21;
+    for(let y=0;y<bot;y++){
+      const p=y*W+x;if(cat[p])continue;
+      if(y<top){cat[p]=CS;const n=vnoise(x,y,5,91);tone[p]=n>0.68?44:n>0.5?43:n<0.22?47:42;continue;}
+      cat[p]=CW;
+      let t=shade;
+      if(j===w-1)t=19;else if(j===0)t=shade+1;
+      if(y===top||y===ledge)t=(j===w-1)?20:22;
+      else if(y<ledge)t=Math.max(19,t-1);
+      tone[p]=t;
+    }
+  }
+
+  // 3. talud lateral (escalón inferior hacia la lava)
+  const bankJ=new Uint8Array(N);
+  for(let y=0;y<H;y++){
+    let fl=-1,fr=-1;
+    for(let x=0;x<W;x++)if(cat[y*W+x]===CF){if(fl<0)fl=x;fr=x;}
+    if(fl<0)continue;
+    const bw=2+Math.floor(vnoise(0,y,4,801)*3);
+    for(let j=1;j<=bw;j++){const x=fl-j;if(x<2)break;const p=y*W+x;if(cat[p])break;cat[p]=CB;bankJ[p]=j;}
+    const bw2=2+Math.floor(vnoise(9,y,4,802)*3);
+    for(let j=1;j<=bw2;j++){const x=fr+j;if(x>W-3)break;const p=y*W+x;if(cat[p])break;cat[p]=CB;bankJ[p]=j;}
+  }
+
+  // 4. cara sur del acantilado (grosor visible)
+  const fcol=columns(W,707,3,6),faceK=new Uint8Array(N);
+  for(let x=0;x<W;x++){
+    let yl=-1;for(let y=H-1;y>=0;y--){const c=cat[y*W+x];if(c===CF||c===CB){yl=y;break;}}
+    if(yl<0)continue;
+    const j=fcol.pos[x],w=fcol.wid[x],cid=fcol.id[x];
+    let hf=cat[yl*W+x]===CF?4+Math.floor(hash(cid,3,708)*4):3;
+    if(j===0||j===w-1)hf--;
+    for(let k=1;k<=hf;k++){const y=yl+k;if(y>=H)break;const p=y*W+x;if(cat[p]!==CL)break;cat[p]=CFACE;faceK[p]=k;}
+  }
+  for(let p=0;p<N;p++){
+    if(cat[p]===CFACE){
+      const x=p%W,k=faceK[p],j=fcol.pos[x],w=fcol.wid[x],cid=fcol.id[x];
+      let t=hash(cid,1,709)<0.5?20:21;
+      if(j===w-1)t=19;else if(j===0)t+=1;
+      if(k===1)t=18;
+      else if(k===2&&j!==0)t=Math.max(19,t-1);
+      else{const sb=3+Math.floor(hash(cid,2,710)*3);if(k===sb&&j!==0&&hash(cid,4,711)<0.55)t=19;}
+      tone[p]=t;
+    }else if(cat[p]===CB){
+      const x=p%W,y=(p/W)|0,j=bankJ[p],nv=vnoise(x,y,2.4,811);
+      let t=nv>0.62?22:nv>0.38?21:20;
+      if(j===1)t=19;
+      else if(y>0&&cat[p-W]!==CB)t=Math.min(23,t+1);
+      tone[p]=t;
+    }
+  }
+
+  // 5. pocos islotes de roca en la lava (fuera del piso)
+  const ir=rng(909);let placed=0;
+  for(let t=0;t<800&&placed<6;t++){
+    const w=3+Math.floor(ir()*3),h=(w>=5&&ir()<0.6)?3:2;
+    const x0=1+Math.floor(ir()*(W-w-2)),y0=17+Math.floor(ir()*(H-17-h-1));
+    let ok=true;
+    for(let y=y0-1;y<=y0+h&&ok;y++)for(let x=x0-1;x<=x0+w&&ok;x++){if(x<0||y<0||x>=W||y>=H||cat[y*W+x]!==CL)ok=false;}
+    if(!ok)continue;
+    for(let y=y0;y<y0+h;y++)for(let x=x0;x<x0+w;x++){
+      const top=y===y0,bot=y===y0+h-1;
+      if(top&&w>=4&&(x===x0||x===x0+w-1))continue;
+      const p=y*W+x;cat[p]=CI;
+      tone[p]=top?(x===x0+(w>=4?1:0)?23:22):bot?20:21;
+    }
+    placed++;
+  }
+
+  const dLava=distField(p=>cat[p]===CL,8);
+  const dRock=distField(p=>cat[p]!==CL,6);
+
+  // 6. losas de basalto: Voronoi deformado, perspectiva 3/4, más grandes en el centro
+  const sr=rng(1337),seeds=[];
+  for(let t=0;t<9000;t++){
+    const x=sr()*W,y=14+sr()*(H-14);
+    const ex=(x-120)/112,ey=(y-90)/62,e=Math.min(1,ex*ex+ey*ey),r=19-9*e;
+    let ok=true;
+    for(let i=0;i<seeds.length;i++){const s=seeds[i],dx=s.x-x,dy=(s.y-y)*1.35,m=Math.min(r,s.r);if(dx*dx+dy*dy<m*m){ok=false;break;}}
+    if(ok)seeds.push({x,y,r,e});
+  }
+  const nc=seeds.length,cell=new Int16Array(N).fill(-1);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const p=y*W+x;if(cat[p]!==CF)continue;
+    const wx=x+(vnoise(x,y,9,11)-0.5)*7,wy=y+(vnoise(x,y,9,12)-0.5)*5;
+    let best=1e9,bi=0;
+    for(let i=0;i<nc;i++){const dx=seeds[i].x-wx,dy=(seeds[i].y-wy)*1.35,d=dx*dx+dy*dy;if(d<best){best=d;bi=i;}}
+    cell[p]=bi;
+  }
+  const ctone=new Uint8Array(nc),ch=new Uint8Array(nc);
+  for(let i=0;i<nc;i++){
+    const hv=hash(i,0,901);ctone[i]=hv<0.22?3:hv<0.8?4:5;
+    const hh=hash(i,1,902);ch[i]=seeds[i].e<0.35?(hh<0.5?0:1):(hh<0.33?0:hh<0.72?1:2);
+  }
+  const pairType=(a,b)=>{const v=hash(Math.min(a,b),Math.max(a,b),903);return v<0.5?2:v<0.86?1:0;};
+  const cellAt=(x,y)=>(x<0||y<0||x>=W||y>=H||cat[y*W+x]!==CF)?-1:cell[y*W+x];
+
+  const ft=new Uint8Array(N),plain=new Uint8Array(N);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const p=y*W+x;if(cat[p]!==CF)continue;
+    const id=cell[p];let t=ctone[id],k=0;
+    const pv=vnoise(x,y,7,904);
+    if(pv>0.72)t=Math.min(6,t+1);else if(pv<0.25)t=Math.max(3,t-1);
+    const cD=cellAt(x,y+1),cR=cellAt(x+1,y);
+    let ct=0;
+    if(cD>=0&&cD!==id)ct=Math.max(ct,pairType(id,cD));
+    if(cR>=0&&cR!==id)ct=Math.max(ct,pairType(id,cR));
+    if(ct){t=ct===2?1:2;k=1;}
+    else{
+      const cU=cellAt(x,y-1),cU2=cellAt(x,y-2),cLf=cellAt(x-1,y);
+      if(cU>=0&&cU!==id){
+        if(pairType(id,cU)){const dh=ch[cU]-ch[id];if(dh>0){t=Math.max(2,t-2);k=2;}else if(dh<0){t=Math.min(6,t+1);k=3;}}
+      }else if(cU===id&&cU2>=0&&cU2!==id&&pairType(id,cU2)&&ch[cU2]-ch[id]>=2){t=Math.max(2,t-1);k=2;}
+      else if(cLf>=0&&cLf!==id&&pairType(id,cLf)&&ch[id]>ch[cLf]){t=Math.min(6,t+1);k=3;}
+      if(y+1<H&&cat[p+W]!==CF){t=Math.min(7,t+1);k=4;}
+    }
+    ft[p]=t;plain[p]=k===0?1:0;
+  }
+
+  // 7. detalles en grupos deliberados: poros, grietas cortas, guijarros, ceniza
+  const lists=[];for(let i=0;i<nc;i++)lists.push([]);
+  for(let p=0;p<N;p++)if(cat[p]===CF&&plain[p])lists[cell[p]].push(p);
+  const isP=(q,id)=>q>=0&&q<N&&cat[q]===CF&&plain[q]&&cell[q]===id;
+  const dr=rng(4242);
+  for(let i=0;i<nc;i++){
+    const L=lists[i];if(L.length<10)continue;
+    const calm=seeds[i].e<0.3?0.4:1;
+    const np=Math.floor(L.length/85*calm+dr()*0.9);
+    for(let k=0;k<np;k++){
+      const p=L[Math.floor(dr()*L.length)];
+      if(!isP(p,i)||!isP(p+W,i)||!isP(p+1,i)||!isP(p+W+1,i))continue;
+      ft[p]=Math.max(2,ft[p]-1);plain[p]=0;ft[p+W]=Math.min(6,ft[p+W]+1);plain[p+W]=0;
+      if(dr()<0.5){ft[p+1]=Math.max(2,ft[p+1]-1);plain[p+1]=0;ft[p+W+1]=Math.min(6,ft[p+W+1]+1);plain[p+W+1]=0;}
+    }
+    if(L.length>100&&dr()<0.55*calm){
+      const p0=L[Math.floor(dr()*L.length)];
+      let x=p0%W,y=(p0/W)|0;
+      const vert=dr()<0.3,s1=dr()<0.5?-1:1,len=3+Math.floor(dr()*5);
+      for(let s=0;s<len;s++){
+        if(x<0||y<0||x>=W||y>=H)break;
+        const q=y*W+x;if(!isP(q,i))break;
+        ft[q]=2;plain[q]=0;
+        if(!vert&&isP(q+W,i)&&dr()<0.5){ft[q+W]=Math.min(6,ft[q+W]+1);plain[q+W]=0;}
+        if(vert){y++;if(dr()<0.4)x+=s1;}else{x+=s1;if(dr()<0.35)y+=dr()<0.5?-1:1;}
+      }
+    }
+    const nb=dr()<0.45*calm?1+(dr()<0.35?1:0):0;
+    for(let k=0;k<nb;k++){
+      const p=L[Math.floor(dr()*L.length)];
+      if(!isP(p,i)||!isP(p+W,i))continue;
+      ft[p]=Math.min(6,ft[p]+1);plain[p]=0;ft[p+W]=Math.max(2,ft[p+W]-1);plain[p+W]=0;
+      if(isP(p+1,i)&&dr()<0.5){ft[p+1]=Math.min(6,ft[p+1]+1);plain[p+1]=0;}
+    }
+    if(seeds[i].e>0.55&&dr()<0.3){
+      const p=L[Math.floor(dr()*L.length)],x0=p%W,y0=(p/W)|0;
+      const shape=[[0,0],[1,0],[-1,1],[0,1],[1,1],[2,1]];
+      for(const [dx,dy] of shape){
+        if(dr()>0.8)continue;
+        const x=x0+dx,y=y0+dy;if(x<0||y<0||x>=W||y>=H)continue;
+        const q=y*W+x;if(!isP(q,i))continue;
+        ft[q]=dy===0?16:15;plain[q]=0;
+      }
+    }
+  }
+
+  // fisuras largas desde la orilla, tenue resto de calor junto a la lava
+  const fr=rng(5151);
+  function fissure(x,y,mx,my,len){
+    let drift=0;
+    for(let s=0;s<len;s++){
+      if(x<0||y<0||x>=W||y>=H)break;
+      const q=y*W+x;if(cat[q]!==CF)break;
+      ft[q]=(s<4&&s%2===0)?9:1;plain[q]=0;
+      const h=mx?q+W:q+1;
+      if(h<N&&cat[h]===CF&&plain[h]&&fr()<0.55){ft[h]=Math.min(6,ft[h]+1);plain[h]=0;}
+      x+=mx;y+=my;
+      if(fr()<0.4){if(fr()<0.3)drift=fr()<0.5?-1:1;if(mx)y+=drift;else x+=drift;}
+    }
+  }
+  const firstX=(y,dir)=>{if(dir>0){for(let x=0;x<W;x++)if(cat[y*W+x]===CF)return x;}else{for(let x=W-1;x>=0;x--)if(cat[y*W+x]===CF)return x;}return -1;};
+  const firstY=(x,dir)=>{if(dir>0){for(let y=0;y<H;y++)if(cat[y*W+x]===CF)return y;}else{for(let y=H-1;y>=0;y--)if(cat[y*W+x]===CF)return y;}return -1;};
+  fissure(firstX(62,1),62,1,0,22);
+  fissure(firstX(108,-1),108,-1,0,20);
+  fissure(152,firstY(152,1),0,1,18);
+  fissure(58,firstY(58,1),0,1,13);
+  fissure(98,firstY(98,-1),0,-1,16);
+
+  // 8. luz de borde rojo quemado, en grupos irregulares
+  const WARM=[8,8,8,9,9,10,11,12];
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const p=y*W+x;if(cat[p]!==CF)continue;
+    let t=ft[p];const d=dLava[p];
+    if(t<=7&&d<=5){
+      const rw=1+Math.floor(vnoise(x,y,8,905)*4.6);
+      if(d<=rw){
+        let w=WARM[t];
+        if(rw-d>=2&&w<12)w++;
+        if(d===1){w=Math.max(w,WARM[Math.min(7,t+1)]);if(vnoise(x,y,3,906)>0.64&&w<12)w++;}
+        t=w;
+      }
+    }
+    tone[p]=t;
+  }
+
+  // 9. campos estáticos de la lava
+  const heat=new Float32Array(N),fcA=new Int16Array(N),crust=new Uint8Array(N);
+  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
+    const p=y*W+x;if(cat[p]!==CL)continue;
+    const across=Math.max(RX0-x,x-RX1,RY0-y,y-RY1,0),per=perim(x,y),u=per/640;
+    heat[p]=0.6*pnoise(u*40,across/4,40,1001)+0.4*pnoise(u*96,across/2,96,1002);
+    const wob=(pnoise(u*64,across/3,64,1003)-0.5)*5;
+    fcA[p]=Math.floor(per*0.45+across*0.5+wob);
+    if(dRock[p]>=2&&heat[p]<0.58&&vnoise(x,y,5,1004)>0.63){
+      crust[p]=vnoise(x,y,2,1006)>0.5?40:39;
+      if(Math.abs(vnoise(x,y,2.5,1005)-0.5)<0.045)crust[p]=1;
+    }
+  }
+  for(let p=W;p<N;p++)if(crust[p]>=39&&crust[p-W]===0)crust[p]=41;
+
+  // fuente de reflejo naranja para muro, caras, talud e islotes
+  const rSrc=new Int32Array(N).fill(-1),rD=new Uint8Array(N);
+  for(let p=0;p<N;p++){
+    const c=cat[p];if(c!==CFACE&&c!==CB&&c!==CW&&c!==CI)continue;
+    const x=p%W,y=(p/W)|0;let bd=9,bs=-1;
+    for(let k=1;k<=3&&y+k<H;k++){const q=p+k*W;if(cat[q]===CL){bd=k;bs=q;break;}if(cat[q]===CF)break;}
+    if(c===CB){
+      for(const dir of [-1,1])for(let k=1;k<=3;k++){
+        const xx=x+dir*k;if(xx<0||xx>=W)break;
+        const q=y*W+xx;if(cat[q]===CL){if(k<bd){bd=k;bs=q;}break;}if(cat[q]===CF)break;
+      }
+    }
+    if(bs>=0){rSrc[p]=bs;rD[p]=bd;}
+  }
+
+  // burbujas y brasas con semilla fija
+  const br=rng(777),bubbles=[];
+  for(let t=0;t<4000&&bubbles.length<14;t++){
+    const p=Math.floor(br()*N);
+    if(cat[p]!==CL||dRock[p]<3||crust[p])continue;
+    const x=p%W,y=(p/W)|0;if(y<17)continue;
+    if(bubbles.some(b=>Math.abs(b.x-x)+Math.abs(b.y-y)<10))continue;
+    bubbles.push({x,y,o:Math.floor(br()*6)});
+  }
+  const er=rng(888),embers=[];
+  for(let t=0;t<4000&&embers.length<10;t++){
+    const p=Math.floor(er()*N);
+    if(cat[p]!==CL||dRock[p]<2)continue;
+    const x=p%W,y=(p/W)|0;if(y<20||y>140)continue;
+    if(embers.some(e=>Math.abs(e.x-x)+Math.abs(e.y-y)<14))continue;
+    embers.push({x,y,o:Math.floor(er()*6),dir:er()<0.5?-1:1});
+  }
+
+  STATIC={cat,tone,heat,fc:fcA,crust,dRock,rSrc,rD,bubbles,embers};
+  return STATIC;
+}
+
+/* ---------- frame (solo la lava y sus reflejos cambian) ---------- */
+const BOOST=[0,1,2,1,0,0];
+const cache=[];
+function frameBuffer(f){
+  if(cache[f])return cache[f];
+  const S=build(),N=W*H,out=new Uint8Array(S.tone),lev=new Uint8Array(N);
+  for(let p=0;p<N;p++){
+    if(S.cat[p]!==CL)continue;
+    const c=((S.fc[p]-f)%6+6)%6,cr=S.crust[p];
+    if(cr>=39){out[p]=cr;lev[p]=1;continue;}
+    if(cr===1){const L=c===2?4:(c===1||c===3)?3:2;out[p]=29+L;lev[p]=L;continue;}
+    const h=S.heat[p];
+    let L=2+(h>0.62?2:h>0.45?1:0),b=BOOST[c];
+    if(h<0.4)b>>=1;
+    L+=b;if(h>0.7&&c===2)L++;
+    const d=S.dRock[p];
+    if(d===1)L=Math.max(1,Math.min(L-1,4));else if(d===2)L=Math.min(L,5);
+    if(L>8)L=8;
+    out[p]=29+L;lev[p]=L;
+  }
+  for(let p=0;p<N;p++){
+    const s=S.rSrc[p];if(s<0)continue;
+    const v=lev[s]-2-(S.rD[p]-1)*2;
+    if(v>0)out[p]=23+Math.min(v,4);
+  }
+  const putLava=(x,y,c)=>{if(x>=0&&y>=0&&x<W&&y<H){const q=y*W+x;if(S.cat[q]===CL)out[q]=c;}};
+  for(const b of S.bubbles){
+    const s=(f+b.o)%6,x=b.x,y=b.y;
+    if(s===1)putLava(x,y,35);
+    else if(s===2){putLava(x,y,36);putLava(x,y-1,37);}
+    else if(s===3){putLava(x-1,y,35);putLava(x+1,y,35);putLava(x,y,34);putLava(x,y-1,37);putLava(x-1,y-1,36);putLava(x+1,y-1,36);}
+    else if(s===4){putLava(x,y,38);putLava(x-1,y-1,37);putLava(x+1,y-1,37);putLava(x-2,y,35);putLava(x+2,y,35);}
+    else if(s===5){putLava(x-2,y,34);putLava(x+2,y,34);putLava(x,y+1,33);}
+  }
+  const EC=[37,36,45,45,33];
+  for(const e of S.embers){
+    const s=(f+e.o)%6;if(s===5)continue;
+    const ey=e.y-s*2-(s>=3?1:0),ex=e.x+((s===2||s===3)?e.dir:0)+(s===4?e.dir:0);
+    if(ex<0||ey<0||ex>=W||ey>=H)continue;
+    const q=ey*W+ex;if(S.cat[q]===CF)continue;
+    out[q]=EC[s];
+  }
+  cache[f]=out;
+  return out;
+}
+
+/* ---------- contrato pixelArt ---------- */
+function renderFrame(index,canvas){
+  const f=((Math.floor(index)%FRAME_COUNT)+FRAME_COUNT)%FRAME_COUNT;
+  canvas=canvas||document.createElement('canvas');
+  if(canvas.width!==W)canvas.width=W;
+  if(canvas.height!==H)canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  ctx.imageSmoothingEnabled=false;
+  const buf=frameBuffer(f),img=ctx.createImageData(W,H),d=img.data;
+  for(let p=0,o=0;p<W*H;p++,o+=4){const c=buf[p]*3;d[o]=RGB[c];d[o+1]=RGB[c+1];d[o+2]=RGB[c+2];d[o+3]=255;}
+  ctx.putImageData(img,0,0);
+  return canvas;
+}
+function frameName(i){return 'caldera_basalto_f'+i+'.png';}
+function exportFrames(){
+  const out=[];
+  for(let i=0;i<FRAME_COUNT;i++){const c=renderFrame(i,document.createElement('canvas'));out.push({name:frameName(i),dataUrl:c.toDataURL('image/png')});}
+  return out;
+}
+function sheetMetadata(){
+  return{
+    image:'caldera_basalto_sheet.png',kind:'scene',
+    size:{w:W*FRAME_COUNT,h:H},frameSize:{w:W,h:H},
+    frameCount:FRAME_COUNT,frameDurationMs:FRAME_MS,loop:true,
+    frames:Array.from({length:FRAME_COUNT},(_,i)=>({name:frameName(i),index:i,x:i*W,y:0,w:W,h:H,durationMs:FRAME_MS,pivot:{x:W/2,y:H/2}})),
+    walkable:{x:RX0,y:RY0,w:RX1-RX0+1,h:RY1-RY0+1},
+    hudCover:{top:{y:0,h:16},bottom:{y:H-16,h:16}},
+    staticFloor:true,transparent:false,seed:SEED,palette:PALETTE.slice()
+  };
+}
+function exportSheet(){
+  const sheet=document.createElement('canvas');sheet.width=W*FRAME_COUNT;sheet.height=H;
+  const sc=sheet.getContext('2d');sc.imageSmoothingEnabled=false;
+  const tmp=document.createElement('canvas');
+  for(let i=0;i<FRAME_COUNT;i++){renderFrame(i,tmp);sc.drawImage(tmp,i*W,0);}
+  return{name:'caldera_basalto_sheet.png',dataUrl:sheet.toDataURL('image/png'),metadata:sheetMetadata()};
+}
+function validate(){
+  const S=build();let walkableCovered=true;
+  for(let y=RY0;y<=RY1;y++)for(let x=RX0;x<=RX1;x++)if(S.cat[y*W+x]!==CF)walkableCovered=false;
+  const f0=frameBuffer(0),used=new Set();let floorIdentical=true;
+  for(let f=0;f<FRAME_COUNT;f++){const b=frameBuffer(f);for(let p=0;p<W*H;p++){used.add(b[p]);if(S.cat[p]===CF&&b[p]!==f0[p])floorIdentical=false;}}
+  return{walkableCovered,floorIdenticalAcrossFrames:floorIdentical,paletteSize:PALETTE.length,colorsUsed:used.size};
+}
+
+window.pixelArt={
+  meta:{width:W,height:H,frameCount:FRAME_COUNT,frameDurationMs:FRAME_MS,kind:'scene'},
+  renderFrame,exportFrames,exportSheet,validate
+};
+
+/* ---------- vista previa ---------- */
+const view=document.getElementById('view'),vctx=view.getContext('2d');
+const label=document.getElementById('label'),guides=document.getElementById('guides'),playBtn=document.getElementById('play');
+const frames=Array.from({length:FRAME_COUNT},(_,i)=>renderFrame(i,document.createElement('canvas')));
+let cur=0,playing=true,acc=0,last=performance.now();
+function draw(){
+  vctx.imageSmoothingEnabled=false;
+  vctx.drawImage(frames[cur],0,0,W*4,H*4);
+  if(guides.checked){
+    vctx.fillStyle='rgba(0,0,0,0.55)';vctx.fillRect(0,0,W*4,64);vctx.fillRect(0,(H-16)*4,W*4,64);
+    vctx.strokeStyle='rgba(120,220,255,0.85)';vctx.lineWidth=2;
+    vctx.strokeRect(RX0*4+1,RY0*4+1,(RX1-RX0+1)*4-2,(RY1-RY0+1)*4-2);
+  }
+  label.textContent='frame '+cur+'/'+(FRAME_COUNT-1);
+}
+function tick(now){
+  const dt=now-last;last=now;
+  if(playing){acc+=dt;while(acc>=FRAME_MS){acc-=FRAME_MS;cur=(cur+1)%FRAME_COUNT;}}
+  draw();requestAnimationFrame(tick);
+}
+function setPlaying(v){playing=v;acc=0;playBtn.textContent=v?'❚❚ Pausa':'▶ Reproducir';}
+function step(d){setPlaying(false);cur=(cur+d+FRAME_COUNT)%FRAME_COUNT;draw();}
+function dl(name,url){const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();}
+playBtn.onclick=()=>setPlaying(!playing);
+document.getElementById('prev').onclick=()=>step(-1);
+document.getElementById('next').onclick=()=>step(1);
+guides.onchange=draw;
+document.getElementById('dlSheet').onclick=()=>{const s=exportSheet();dl(s.name,s.dataUrl);};
+document.getElementById('dlMeta').onclick=()=>{
+  const blob=new Blob([JSON.stringify(sheetMetadata(),null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);dl('caldera_basalto_sheet.json',url);setTimeout(()=>URL.revokeObjectURL(url),2000);
+};
+document.getElementById('dlFrames').onclick=()=>{exportFrames().forEach((fr,i)=>setTimeout(()=>dl(fr.name,fr.dataUrl),i*250));};
+document.getElementById('dlFrame0').onclick=()=>{dl(frameName(0),renderFrame(0,document.createElement('canvas')).toDataURL('image/png'));};
+window.addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();setPlaying(!playing);}
+  else if(e.code==='ArrowLeft')step(-1);
+  else if(e.code==='ArrowRight')step(1);
+});
+const v=validate();
+document.getElementById('info').textContent=
+  'Piso caminable x'+RX0+'..'+RX1+' y'+RY0+'..'+RY1+': '+(v.walkableCovered?'OK':'FALLA')+
+  ' · piso idéntico en 6 frames: '+(v.floorIdenticalAcrossFrames?'OK':'FALLA')+
+  ' · paleta fija '+v.paletteSize+' colores ('+v.colorsUsed+' usados) · espacio: pausa, ←/→: frames';
+requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Flamethrower Clash · 64×64 GBA OBJ effect</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  :root{--bg:#160d10;--panel:#22161a;--line:#3a262c;--ink:#f3e3c8;--dim:#a68f80;--hot:#f8a830}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;display:flex;flex-direction:column;align-items:center;padding:18px;gap:14px}
+  h1{font-size:16px;margin:0;color:var(--hot);letter-spacing:.5px}
+  header p{margin:2px 0 0;color:var(--dim)}
+  canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+  .stage{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;justify-content:center}
+  #big{width:384px;height:384px;border:1px solid var(--line)}
+  .side{display:flex;flex-direction:column;gap:10px;min-width:260px}
+  .scales{display:flex;gap:12px;align-items:flex-end}
+  .scales figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--dim)}
+  #one{width:64px;height:64px;border:1px solid var(--line)}
+  #two{width:128px;height:128px;border:1px solid var(--line)}
+  .box{background:var(--panel);border:1px solid var(--line);padding:8px 10px;border-radius:4px;white-space:pre-line}
+  .ok{color:#9fe08a}.bad{color:#ff7a6a}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center}
+  button,select{background:var(--panel);color:var(--ink);border:1px solid #5a3a40;border-radius:4px;padding:6px 10px;font:inherit;cursor:pointer}
+  button:hover,select:hover{border-color:var(--hot)}
+  input[type=range]{width:240px;accent-color:#f06820}
+  .strip-wrap{position:relative;max-width:100%;overflow-x:auto;border:1px solid var(--line);padding-bottom:4px}
+  #strip{width:2048px;height:64px;cursor:pointer}
+  #mark{position:absolute;top:0;width:64px;height:64px;outline:2px solid #f8e880;outline-offset:-2px;pointer-events:none}
+  #pal{display:flex;gap:2px;align-items:center;color:var(--dim)}
+  #pal span.sw{width:18px;height:18px;border:1px solid #000}
+</style>
+</head>
+<body>
+<header>
+  <h1>FLAMETHROWER CLASH — opposing jets collide</h1>
+  <p>Transparent sprite · 64×64 · 32 frames @ 65 ms · pivot (32,32) · 15 colors + binary alpha · 4bpp OBJ ready</p>
+</header>
+
+<div class="stage">
+  <canvas id="big" width="384" height="384"></canvas>
+  <div class="side">
+    <div class="scales">
+      <figure><canvas id="one" width="64" height="64"></canvas><figcaption>1×</figcaption></figure>
+      <figure><canvas id="two" width="128" height="128"></canvas><figcaption>2×</figcaption></figure>
+    </div>
+    <div class="box" id="info"></div>
+    <div class="box" id="checks">validating…</div>
+  </div>
+</div>
+
+<div class="controls">
+  <button id="prev" title="Previous frame (←)">◀ Prev</button>
+  <button id="play" title="Play / pause (space)">❚❚ Pause</button>
+  <button id="next" title="Next frame (→)">Next ▶</button>
+  <input id="slider" type="range" min="0" max="31" value="0">
+  <label>Preview bg
+    <select id="bg">
+      <option value="gym">Fire gym floor</option>
+      <option value="checker">Checker</option>
+      <option value="forest">Forest</option>
+      <option value="dark">Dark</option>
+    </select>
+  </label>
+</div>
+<div class="controls">
+  <button id="dlSheet">⬇ Spritesheet PNG (2048×64)</button>
+  <button id="dlMeta">⬇ Metadata JSON</button>
+  <button id="dlFrames">⬇ All frames (32 PNG)</button>
+</div>
+
+<div class="strip-wrap"><canvas id="strip" width="2048" height="64"></canvas><div id="mark"></div></div>
+<div id="pal"></div>
+
+<script>
+(() => {
+'use strict';
+
+/* ---------- constants ---------- */
+const W = 64, H = 64, FRAMES = 32, MS = 65, CX = 32, CY = 32, SEED = 0x5eed1a;
+const NAME = 'flamethrower_clash';
+
+// 15 opaque colors, every channel a multiple of 8 so BGR555 conversion is lossless.
+const PALETTE = [
+  '#380810', '#581010', '#801810', '#a82010', '#c83010',
+  '#e04818', '#f06820', '#f88828', '#f8a830', '#f8c040',
+  '#f8d858', '#f8e880', '#f8f0b0', '#f8f8d0', '#f8f8f0'
+];
+const RGB = PALETTE.map(h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16)));
+
+const PHASES = [
+  { name: 'contact',   from: 0,  to: 7 },
+  { name: 'pressure',  from: 8,  to: 19 },
+  { name: 'burst',     from: 20, to: 27 },
+  { name: 'dissipate', from: 28, to: 31 }
+];
+const phaseOf = i => PHASES.find(p => i >= p.from && i <= p.to).name;
+
+/* ---------- deterministic noise ---------- */
+function hash3(x, y, z) {
+  let h = (SEED ^ Math.imul(x, 0x27d4eb2d) ^ Math.imul(y, 0x165667b1) ^ Math.imul(z, 0x1b873593)) | 0;
+  h = Math.imul(h ^ (h >>> 15), 0x85ebca6b);
+  h = Math.imul(h ^ (h >>> 13), 0xc2b2ae35);
+  h ^= h >>> 16;
+  return (h >>> 0) / 4294967296;
+}
+const sm = v => v * v * (3 - 2 * v);
+const lerp = (a, b, t) => a + (b - a) * t;
+function vnoise(x, y, z) {
+  const xi = Math.floor(x), yi = Math.floor(y), zi = Math.floor(z);
+  const u = sm(x - xi), v = sm(y - yi), w = sm(z - zi);
+  const a = lerp(lerp(hash3(xi, yi, zi), hash3(xi + 1, yi, zi), u),
+                 lerp(hash3(xi, yi + 1, zi), hash3(xi + 1, yi + 1, zi), u), v);
+  const b = lerp(lerp(hash3(xi, yi, zi + 1), hash3(xi + 1, yi, zi + 1), u),
+                 lerp(hash3(xi, yi + 1, zi + 1), hash3(xi + 1, yi + 1, zi + 1), u), v);
+  return lerp(a, b, w);
+}
+const fbm = (x, y, z) => vnoise(x, y, z) * 0.65 + vnoise(x * 2.03 + 17.3, y * 2.03 + 5.1, z * 1.4 + 3.7) * 0.35;
+
+function mulberry32(a) {
+  return () => {
+    a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* ---------- fixed particle sets (seeded once) ---------- */
+const SPARKS = (() => {
+  const r = mulberry32(SEED + 11), out = [];
+  for (let k = 0; k < 16; k++) out.push({
+    x0: (r() - 0.5) * 2, dir: k % 2 ? 1 : -1, per: 4 + Math.floor(r() * 3),
+    ph: Math.floor(r() * 7), sp: 3.2 + r() * 1.4, drift: (r() - 0.5) * 0.9, hot: r() < 0.5
+  });
+  return out;
+})();
+
+const EMBERS = (() => {
+  const r = mulberry32(SEED + 29), out = [], n = 18;
+  for (let k = 0; k < n; k++) {
+    const survivor = k % 6 === 2;            // three embers linger into the last frame
+    const r0 = 5 + r() * 3;
+    out.push({
+      ang: (k / n) * Math.PI * 2 + (r() - 0.5) * 0.28,
+      r0, dist: Math.min(26 - r0, 13 + r() * 6),
+      delay: survivor ? 0 : Math.floor(r() * 3),
+      life: survivor ? 13 : 7 + Math.floor(r() * 4),
+      big: r() < 0.45, swirl: (r() - 0.5) * 0.05, rise: 0.05 + r() * 0.06
+    });
+  }
+  return out;
+})();
+
+const ARC_SPAWNS = [8, 10, 12, 14, 16, 18];
+const JIT = [[0, 0], [1, 0], [0, -1], [-1, 0], [0, 1], [1, -1], [-1, 1], [0, 0]];
+
+/* ---------- heat → palette ---------- */
+const TH = [0.15, 0.22, 0.30, 0.40, 0.50, 0.60, 0.70, 0.78, 0.86, 0.93, 1.00, 1.10];
+const TI = [1, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+function quant(h) {
+  if (h < TH[0]) return -1;
+  let i = 0;
+  while (i + 1 < TH.length && h >= TH[i + 1]) i++;
+  return TI[i];
+}
+
+function pressureAt(t) {
+  if (t < 8) return 0.1 + 0.2 * t / 7;
+  if (t < 20) return 0.3 + 0.7 * Math.pow((t - 8) / 11, 1.25);
+  return 1;
+}
+
+/* ---------- frame construction (pure function of t) ---------- */
+function buildFrame(t) {
+  const N = W * H, heat = new Float32Array(N);
+  const p = pressureAt(t), pre = t < 20;
+  const c = pre ? 0 : Math.min(1, (t - 20) / 7);
+  const jit = (t >= 12 && t <= 19) ? JIT[t - 12] : [0, 0];
+
+  let coreR, coreI, kx, ky;
+  if (pre) { coreR = 3.5 + 6.5 * p; coreI = 0.85 + 0.6 * p; kx = 1 - 0.28 * p; ky = 1 + 0.35 * p; }
+  else { coreR = Math.max(0, 11.5 * (1 - 1.1 * c)); coreI = 1.55 - 4.2 * c; kx = 1; ky = 1; }
+  const ryC = coreR * ky;
+
+  const jetFade = pre ? 1 : Math.max(0, 1 - (t - 19) / 4);
+  const jetStart = pre ? 0 : 3 + (t - 19) * 7;
+  const wj = 3.4 + 3 * p;
+  const Lv = Math.min(27, ryC + 3 + 11 * p);
+
+  const ringOn = t >= 20 && t <= 28;
+  const rc = ringOn ? (t - 20) / 8 : 0;
+  const ringR = 6 + 20 * (1 - Math.pow(1 - rc, 2.2));
+
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const dx = x + 0.5 - CX, dy = y + 0.5 - CY;
+    const cx = dx - jit[0], cy = dy - jit[1];
+    let h1 = 0, h2 = 0;
+    const add = v => { if (v > h1) { h2 = h1; h1 = v; } else if (v > h2) h2 = v; };
+
+    // opposing horizontal jets, tongues flowing toward the core
+    if (jetFade > 0) {
+      const u = Math.abs(dx);
+      if (u > jetStart) {
+        const side = dx < 0 ? 0 : 57.3;
+        const q = u + t * 2.6;
+        const nW = fbm(q * 0.21 + side, dy * 0.2 + side, t * 0.33) - 0.5;
+        const press = 1 + 0.45 * p * Math.max(0, 1 - u / 14);
+        const taper = 0.6 + 0.4 * Math.min(1, (31.5 - u) / 6);
+        let w = wj * (0.8 + 0.35 * (1 - u / 32)) * press * taper + nW * 4.2;
+        if (!pre) w *= Math.min(1, (u - jetStart) / 5);
+        if (w > 0.5) {
+          const a = 1 - Math.abs(dy) / w;
+          if (a > 0) {
+            let hj = 0.16 + a * (0.42 + 0.32 * (1 - u / 32) + 0.15 * p);
+            hj += (fbm(q * 0.45 + side + 40, dy * 0.55, t * 0.6) - 0.5) * 0.3;
+            if (vnoise(q * 0.11 + side + 80, dy * 0.8, t * 0.5) > 0.64) hj += 0.14;
+            add(hj * jetFade);
+          }
+        }
+      }
+    }
+
+    // jagged collision core, squeezed horizontally
+    if (coreI > 0 && coreR > 1) {
+      const rr = Math.hypot(cx / (coreR * kx), cy / (coreR * ky));
+      if (rr < 1.6) {
+        const ang = Math.atan2(cy, cx);
+        const jag = 1 + 0.55 * (fbm(Math.cos(ang) * 1.7 + 3, Math.sin(ang) * 1.7 + 7, t * 0.55) - 0.5)
+                      + 0.22 * Math.pow(Math.max(0, Math.cos(ang * 7 + t * 0.9)), 6);
+        if (rr < jag) add((0.32 + 1.15 * Math.pow(1 - rr / jag, 0.6)) * coreI);
+      }
+    }
+
+    // vertical plume squeezed out of the core
+    if (t <= 20) {
+      const v = Math.abs(cy);
+      if (v < Lv) {
+        const sv = cy < 0 ? 0 : 91.7;
+        const along = v / Lv, qv = v - t * 3.1;
+        const fan = (1.5 + 2.6 * p) + v * (0.2 + 0.14 * p);
+        const nw = (fbm(cx * 0.28 + sv, qv * 0.24 + sv, t * 0.42) - 0.5) * 3.6;
+        const wv = fan * (1 - along * along) + nw * (0.35 + along);
+        if (wv > 0.5) {
+          const a = 1 - Math.abs(cx) / wv;
+          if (a > 0) {
+            let hp = 0.16 + a * (0.72 * (1 - 0.6 * along) + 0.3 * p);
+            hp += (fbm(cx * 0.5 + sv + 20, qv * 0.5, t * 0.7) - 0.5) * 0.28;
+            add(t === 20 ? hp * 1.15 : hp);
+          }
+        }
+      }
+    }
+
+    // contracting pressure arcs in the diagonal quadrants
+    if (t >= 8 && t <= 19) {
+      const rr = Math.hypot(dx, dy), ang = Math.atan2(dy, dx);
+      for (const s0 of ARC_SPAWNS) {
+        const age = t - s0;
+        if (age < 0 || age > 3) continue;
+        const R = 26 - age * (3.4 + 1.2 * p), hw = 1.35 + age * 0.12;
+        const d = Math.abs(rr - R);
+        if (d >= hw) continue;
+        const m = Math.abs(Math.sin(2 * (ang - (s0 % 4) * 0.21)));
+        if (m <= 0.5) continue;
+        if (vnoise(Math.cos(ang) * 3 + s0, Math.sin(ang) * 3 + s0 * 0.7, s0 * 1.3) <= 0.28) continue;
+        add(0.2 + (1 - d / hw) * (0.55 + 0.12 * age + 0.15 * p) * Math.min(1, (m - 0.5) / 0.18));
+      }
+    }
+
+    // expanding petal ring that breaks apart
+    if (ringOn) {
+      const rr = Math.hypot(dx, dy);
+      if (rr < 30) {
+        const ang = Math.atan2(dy, dx);
+        const petal = Math.pow(Math.max(0, Math.cos(ang * 8 + 0.4)), 3)
+                    + 0.45 * Math.pow(Math.max(0, Math.cos(ang * 5 - 1.1)), 4);
+        const thIn = 1.3 + 2.8 * (1 - rc);
+        const thOut = Math.min(29.5 - ringR, 1.6 + 2 * (1 - rc) + petal * (1.5 + 6 * (1 - rc)));
+        const a = rr < ringR ? 1 - (ringR - rr) / thIn : 1 - (rr - ringR) / thOut;
+        if (a > 0) {
+          const gN = fbm(Math.cos(ang) * 2.3 + 30, Math.sin(ang) * 2.3 + 30, t * 0.28);
+          const gT = 0.22 + 0.38 * rc + (t >= 28 ? 0.12 : 0);
+          const gate = Math.min(1, (gN - gT) / 0.08);
+          if (gate > 0) {
+            const hr = 0.16 + a * (1.2 - 0.85 * rc) + (vnoise(dx * 0.35 + 60, dy * 0.35 + 60, t * 0.6) - 0.5) * 0.25;
+            add(hr * (0.45 + 0.55 * gate));
+          }
+        }
+      }
+    }
+
+    heat[y * W + x] = h1 + 0.12 * h2;
+  }
+
+  const idx = new Int8Array(N);
+  for (let k = 0; k < N; k++) idx[k] = quant(heat[k]);
+
+  const at = (a, x, y) => (x < 0 || y < 0 || x >= W || y >= H) ? -1 : a[y * W + x];
+
+  // fill pinholes
+  let src = idx.slice();
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (src[y * W + x] >= 0) continue;
+    const n = [at(src, x - 1, y), at(src, x + 1, y), at(src, x, y - 1), at(src, x, y + 1)];
+    if (n.every(v => v >= 0)) idx[y * W + x] = Math.min(...n);
+  }
+  // drop isolated specks
+  src = idx.slice();
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    if (src[y * W + x] < 0) continue;
+    let cnt = 0;
+    for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++)
+      if ((ox || oy) && at(src, x + ox, y + oy) >= 0) cnt++;
+    if (cnt < 2) idx[y * W + x] = -1;
+  }
+  // dark silhouette rim
+  src = idx.slice();
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+    const v = src[y * W + x];
+    if (v < 0) continue;
+    if (at(src, x - 1, y) < 0 || at(src, x + 1, y) < 0 || at(src, x, y - 1) < 0 || at(src, x, y + 1) < 0)
+      idx[y * W + x] = v >= 10 ? 3 : (v >= 6 ? 2 : 0);
+  }
+
+  drawSparks(idx, t, p, pre ? ryC : 0);
+  drawEmbers(idx, t);
+  return idx;
+}
+
+function setPx(idx, x, y, c) {
+  if (x >= 0 && y >= 0 && x < W && y < H) idx[y * W + x] = c;
+}
+
+function drawSparks(idx, t, p, ry) {
+  if (t > 19) return;
+  const n = 5 + Math.floor(p * 11);
+  for (let k = 0; k < n; k++) {
+    const s = SPARKS[k];
+    const age = (t + s.ph) % s.per;
+    const yo = ry * 0.55 + 1.5 + age * s.sp;
+    if (yo > 27) continue;
+    const xo = s.x0 * (1.5 + 3 * p) + s.drift * age;
+    const px = Math.floor(CX + xo), py = Math.floor(CY + s.dir * yo);
+    const cols = s.hot ? [14, 11, 5] : [12, 9, 4];
+    for (let j = 0; j < 3; j++) setPx(idx, px, py - s.dir * j, cols[j]);
+  }
+}
+
+const SHAPES = {
+  huge:  ['.ooo.', 'ohhmo', 'ohhmo', 'ommmo', '.ooo.'],
+  large: ['.oo.', 'ohmo', 'ommo', '.oo.'],
+  med:   ['omo', 'mhm', 'omo'],
+  tiny:  ['hm', 'mo'],
+  dot:   ['h']
+};
+const STAGES = [
+  { o: 4, m: 11, h: 14 }, { o: 3, m: 10, h: 13 }, { o: 2, m: 8, h: 12 },
+  { o: 2, m: 6, h: 10 },  { o: 1, m: 4, h: 7 },   { o: 0, m: 2, h: 5 }
+];
+
+function drawEmbers(idx, t) {
+  if (t < 21) return;
+  const tau = t - 20;
+  for (const e of EMBERS) {
+    const a = tau - e.delay;
+    if (a < 1) continue;
+    const l = a / e.life;
+    if (l >= 1) continue;
+    let shape;
+    if (l < 0.25) shape = e.big ? 'huge' : 'large';
+    else if (l < 0.5) shape = e.big ? 'large' : 'med';
+    else if (l < 0.72) shape = e.big ? 'med' : 'tiny';
+    else if (l < 0.9) shape = 'tiny';
+    else shape = 'dot';
+    const st = STAGES[Math.min(5, Math.floor(l * 6))];
+    const ang = e.ang + e.swirl * a;
+    const r = e.r0 + e.dist * (1 - Math.pow(1 - Math.min(1, a / 8), 2));
+    const rows = SHAPES[shape], sz = rows.length;
+    let x0 = Math.round(CX + Math.cos(ang) * r - sz / 2);
+    let y0 = Math.round(CY + Math.sin(ang) * r - sz / 2 - e.rise * a * a * 0.15);
+    x0 = Math.max(1, Math.min(W - 1 - sz, x0));
+    y0 = Math.max(1, Math.min(H - 1 - sz, y0));
+
+    // short motion trail toward the center while the ember is fast
+    if (a <= 3 && sz >= 3) {
+      const ex = x0 + sz / 2, ey = y0 + sz / 2, ux = Math.cos(ang), uy = Math.sin(ang);
+      setPx(idx, Math.floor(ex - ux * (sz / 2 + 0.8)), Math.floor(ey - uy * (sz / 2 + 0.8)), st.m);
+      setPx(idx, Math.floor(ex - ux * (sz / 2 + 1.9)), Math.floor(ey - uy * (sz / 2 + 1.9)), st.o);
+    }
+    for (let yy = 0; yy < sz; yy++) for (let xx = 0; xx < sz; xx++) {
+      const ch = rows[yy][xx];
+      if (ch !== '.') setPx(idx, x0 + xx, y0 + yy, st[ch]);
+    }
+  }
+}
+
+/* ---------- cache + rendering ---------- */
+const CACHE = new Array(FRAMES);
+const getFrame = i => CACHE[i] || (CACHE[i] = buildFrame(i));
+const wrap = i => (((i | 0) % FRAMES) + FRAMES) % FRAMES;
+const frameName = i => `${NAME}_${String(i).padStart(2, '0')}.png`;
+
+function frameImageData(ctx, i) {
+  const data = getFrame(i), img = ctx.createImageData(W, H), d = img.data;
+  for (let k = 0; k < W * H; k++) {
+    const c = data[k];
+    if (c < 0) continue;
+    const o = k * 4, rgb = RGB[c];
+    d[o] = rgb[0]; d[o + 1] = rgb[1]; d[o + 2] = rgb[2]; d[o + 3] = 255;
+  }
+  return img;
+}
+
+function renderFrame(index, canvas) {
+  if (canvas.width !== W) canvas.width = W;
+  if (canvas.height !== H) canvas.height = H;
+  const ctx = canvas.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  ctx.putImageData(frameImageData(ctx, wrap(index)), 0, 0);
+  return canvas;
+}
+
+function exportFrames() {
+  const c = document.createElement('canvas');
+  const out = [];
+  for (let i = 0; i < FRAMES; i++) {
+    renderFrame(i, c);
+    out.push({ name: frameName(i), dataUrl: c.toDataURL('image/png') });
+  }
+  return out;
+}
+
+function sheetCanvas() {
+  const c = document.createElement('canvas');
+  c.width = W * FRAMES; c.height = H;
+  const ctx = c.getContext('2d', { willReadFrequently: true });
+  for (let i = 0; i < FRAMES; i++) ctx.putImageData(frameImageData(ctx, i), i * W, 0);
+  return c;
+}
+
+function bbox(i) {
+  const d = getFrame(i);
+  let x0 = W, y0 = H, x1 = -1, y1 = -1;
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (d[y * W + x] >= 0) {
+    if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y;
+  }
+  return x1 < 0 ? null : { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+}
+
+const bgr555 = ([r, g, b]) => '0x' + (((b >> 3) << 10) | ((g >> 3) << 5) | (r >> 3)).toString(16).toUpperCase().padStart(4, '0');
+
+function buildMeta() {
+  return {
+    image: `${NAME}_sheet.png`,
+    kind: 'sprite',
+    size: { w: W * FRAMES, h: H },
+    frameWidth: W, frameHeight: H, frameCount: FRAMES,
+    frameDurationMs: MS, totalDurationMs: MS * FRAMES, loop: false,
+    pivot: { x: CX, y: CY },
+    alpha: 'binary (0 or 255)',
+    palette: ['transparent', ...PALETTE],
+    gbaPaletteBGR555: ['0x0000', ...RGB.map(bgr555)],
+    phases: PHASES,
+    frames: Array.from({ length: FRAMES }, (_, i) => ({
+      index: i, name: frameName(i), phase: phaseOf(i),
+      x: i * W, y: 0, w: W, h: H,
+      durationMs: MS, pivot: { x: CX, y: CY }, opaqueBounds: bbox(i)
+    }))
+  };
+}
+
+function exportSheet() {
+  return { name: `${NAME}_sheet.png`, dataUrl: sheetCanvas().toDataURL('image/png'), metadata: buildMeta() };
+}
+
+window.pixelArt = {
+  meta: { width: W, height: H, frameCount: FRAMES, frameDurationMs: MS, kind: 'sprite' },
+  renderFrame, exportFrames, exportSheet
+};
+
+/* ---------- preview UI (preview backgrounds never touch export canvases) ---------- */
+const $ = id => document.getElementById(id);
+const big = $('big'), one = $('one'), two = $('two'), strip = $('strip');
+const playBtn = $('play'), slider = $('slider'), bgSel = $('bg'), mark = $('mark');
+const work = document.createElement('canvas'); work.width = W; work.height = H;
+const comp = document.createElement('canvas'); comp.width = W; comp.height = H;
+const cctx = comp.getContext('2d');
+
+function drawBg(ctx, mode, w, h) {
+  if (mode === 'checker') {
+    for (let y = 0; y < h; y += 4) for (let x = 0; x < w; x += 4) {
+      ctx.fillStyle = ((x + y) / 4) % 2 ? '#4c4858' : '#5e5a6c';
+      ctx.fillRect(x, y, 4, 4);
+    }
+  } else if (mode === 'gym') {
+    ctx.fillStyle = '#d49a5c'; ctx.fillRect(0, 0, w, h);
+    for (let r = 0; r * 16 < h; r++) {
+      const y = r * 16;
+      ctx.fillStyle = '#a8683a'; ctx.fillRect(0, y, w, 1);
+      ctx.fillStyle = '#e4b478'; ctx.fillRect(0, y + 1, w, 1);
+      for (let x = r % 2 ? 8 : 0; x < w; x += 16) {
+        ctx.fillStyle = '#a8683a'; ctx.fillRect(x, y, 1, 16);
+        ctx.fillStyle = '#e4b478'; ctx.fillRect(x + 1, y + 2, 1, 14);
+      }
+    }
+  } else if (mode === 'forest') {
+    ctx.fillStyle = '#4a8a34'; ctx.fillRect(0, 0, w, h);
+    ctx.fillStyle = '#356a28';
+    for (let y = 0; y < h; y += 4) for (let x = 0; x < w; x += 4)
+      if (hash3(x >> 2, y >> 2, 999) < 0.35) ctx.fillRect(x, y, 4, 4);
+  } else {
+    ctx.fillStyle = '#0c0a10'; ctx.fillRect(0, 0, w, h);
+  }
+}
+
+const stats = Array.from({ length: FRAMES }, (_, i) => {
+  const d = getFrame(i), set = new Set();
+  let n = 0;
+  for (const v of d) if (v >= 0) { n++; set.add(v); }
+  return { opaque: n, colors: set.size, bounds: bbox(i) };
+});
+
+let cur = 0, playing = true, acc = 0, last = performance.now(), drawn = -1, drawnBg = '';
+
+function draw() {
+  renderFrame(cur, work);
+  drawBg(cctx, bgSel.value, W, H);
+  cctx.drawImage(work, 0, 0);
+  for (const [cv, s] of [[big, 6], [one, 1], [two, 2]]) {
+    const x = cv.getContext('2d');
+    x.imageSmoothingEnabled = false;
+    x.clearRect(0, 0, cv.width, cv.height);
+    x.drawImage(comp, 0, 0, W * s, H * s);
+  }
+  const s = stats[cur], b = s.bounds;
+  $('info').textContent =
+    `Frame ${String(cur).padStart(2, '0')} / ${FRAMES - 1}  ·  ${phaseOf(cur)}\n` +
+    `opaque px: ${s.opaque}  ·  colors: ${s.colors}\n` +
+    `bounds: ${b ? `${b.x},${b.y} ${b.w}×${b.h}` : 'empty'}\n` +
+    `${playing ? 'playing' : 'paused'} @ ${MS} ms/frame`;
+  slider.value = cur;
+  mark.style.left = (cur * W) + 'px';
+  drawn = cur; drawnBg = bgSel.value;
+}
+
+function tick(now) {
+  const dt = now - last; last = now;
+  if (playing) {
+    acc += dt;
+    if (acc > 1000) acc = 0;
+    while (acc >= MS) { acc -= MS; cur = (cur + 1) % FRAMES; }
+  }
+  if (cur !== drawn || bgSel.value !== drawnBg) draw();
+  requestAnimationFrame(tick);
+}
+
+function setPlaying(v) { playing = v; acc = 0; playBtn.textContent = v ? '❚❚ Pause' : '▶ Play'; draw(); }
+function step(d) { setPlaying(false); cur = wrap(cur + d); draw(); }
+
+playBtn.onclick = () => setPlaying(!playing);
+$('prev').onclick = () => step(-1);
+$('next').onclick = () => step(1);
+slider.oninput = () => { setPlaying(false); cur = wrap(+slider.value); draw(); };
+bgSel.onchange = draw;
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'SELECT') return;
+  if (e.code === 'Space') { e.preventDefault(); setPlaying(!playing); }
+  else if (e.key === 'ArrowLeft') step(-1);
+  else if (e.key === 'ArrowRight') step(1);
+});
+
+function download(name, href) {
+  const a = document.createElement('a');
+  a.href = href; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+$('dlSheet').onclick = () => { const s = exportSheet(); download(s.name, s.dataUrl); };
+$('dlMeta').onclick = () => {
+  const url = URL.createObjectURL(new Blob([JSON.stringify(buildMeta(), null, 2)], { type: 'application/json' }));
+  download(`${NAME}_sheet.json`, url);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+};
+$('dlFrames').onclick = () => {
+  exportFrames().forEach((f, i) => setTimeout(() => download(f.name, f.dataUrl), i * 120));
+};
+
+// filmstrip at 1× over checker, click to jump
+(() => {
+  const sc = sheetCanvas(), sctx = strip.getContext('2d');
+  drawBg(sctx, 'checker', strip.width, strip.height);
+  sctx.drawImage(sc, 0, 0);
+  strip.onclick = e => {
+    const r = strip.getBoundingClientRect();
+    setPlaying(false);
+    cur = wrap(Math.floor((e.clientX - r.left) * (strip.width / r.width) / W));
+    draw();
+  };
+
+  // validate exported sheet: size, binary alpha, color budget
+  const d = sc.getContext('2d').getImageData(0, 0, sc.width, sc.height).data;
+  const cols = new Set();
+  let alphaOk = true;
+  for (let k = 0; k < d.length; k += 4) {
+    const a = d[k + 3];
+    if (a !== 0 && a !== 255) alphaOk = false;
+    if (a === 255) cols.add((d[k] << 16) | (d[k + 1] << 8) | d[k + 2]);
+  }
+  const last = stats[FRAMES - 1].opaque;
+  const lines = [
+    [sc.width === 2048 && sc.height === 64, `sheet ${sc.width}×${sc.height}`],
+    [alphaOk, 'alpha strictly 0 / 255'],
+    [cols.size <= 15, `${cols.size} opaque colors (max 15)`],
+    [last < 40, `last frame ${last} px (almost empty)`]
+  ];
+  const box = $('checks');
+  box.textContent = '';
+  for (const [ok, txt] of lines) {
+    const div = document.createElement('div');
+    div.className = ok ? 'ok' : 'bad';
+    div.textContent = (ok ? '✓ ' : '✗ ') + txt;
+    box.appendChild(div);
+  }
+})();
+
+// palette swatches
+(() => {
+  const pal = $('pal');
+  pal.append('palette ');
+  for (const hex of PALETTE) {
+    const s = document.createElement('span');
+    s.className = 'sw'; s.style.background = hex; s.title = hex;
+    pal.appendChild(s);
+  }
+})();
+
+draw();
+requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fine shallow-water ripple overlay · 128×64 · 16 frames · ≥95% transparent</title>
+<style>
+  html,body{margin:0;background:#141917;color:#d8e8cd;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace}
+  body{padding:16px}
+  h1{font-size:15px;margin:0 0 12px;font-weight:600;color:#a4d0bd}
+  canvas{display:block;image-rendering:pixelated;image-rendering:crisp-edges}
+  .row{display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start;margin-bottom:14px}
+  .panel{background:#0d1110;border:1px solid #2a3531;padding:10px}
+  .label{color:#70b4ae;margin-bottom:6px}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  button,select{background:#245561;color:#d8e8cd;border:1px solid #489496;padding:6px 10px;font:inherit;cursor:pointer}
+  button:hover{background:#32717b}
+  #flabel{min-width:110px;color:#a4d0bd}
+  .ok{color:#a4d0bd} .bad{color:#ff8a7a}
+  .note{color:#6f8a80;max-width:900px}
+</style>
+</head>
+<body>
+<h1>Fine shallow-water ripple overlay · seamless 128×64 · 16 frames × 120 ms · 7-color palette · alpha 0/255</h1>
+
+<div class="controls">
+  <button id="play">Pause</button>
+  <button id="prev">◀ Prev</button>
+  <button id="next">Next ▶</button>
+  <span id="flabel"></span>
+  <label>backdrop
+    <select id="bg">
+      <option value="#b3b39a">sand, cool-tinted</option>
+      <option value="#d6b979">sand</option>
+      <option value="#6f9a45">forest grass</option>
+      <option value="#667a76">muted grey-teal</option>
+      <option value="checker">checker (alpha)</option>
+    </select>
+  </label>
+  <label><input type="checkbox" id="grid"> tile grid</label>
+  <button id="dlSheet">Download spritesheet PNG</button>
+  <button id="dlMeta">Download metadata JSON</button>
+  <button id="dlFrames">Download frames</button>
+</div>
+
+<div class="row">
+  <div class="panel"><div class="label">Tile ×4 (backdrop is preview only)</div><canvas id="tile" width="512" height="256"></canvas></div>
+</div>
+<div class="row">
+  <div class="panel"><div class="label">GBA-scale area 240×160 at ×3 (tiled overlay, seams inside view)</div><canvas id="rep" width="720" height="480"></canvas></div>
+</div>
+<div class="row">
+  <div class="panel"><div class="label">All frames native ×1</div><canvas id="strip" width="1072" height="140"></canvas></div>
+</div>
+
+<div class="panel">
+  <div id="check"></div>
+  <div id="cover" style="margin-top:4px"></div>
+  <div id="usage" style="margin-top:4px"></div>
+  <p class="note">Marks only, no fill: ~28 tiny broken arcs (mostly 3–6 px, max 11) that open from their centre, drift right half a pixel per frame and close again; a few dashed 1px current hairlines; four foreshortened elliptical ripples that widen and break apart; rare single-pixel glints. Every mark has a staggered 16-frame lifecycle, so the pixel count stays steady and nothing flashes. Colors: #32717b and #489496 almost everywhere, a handful of #70b4ae, one #a4d0bd pixel in one frame, #d8e8cd and the two darkest never.</p>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+const W = 128, H = 64, N = 16, MS = 120, SEED = 0x71ff1e;
+const PAL_HEX = ['#183c49','#245561','#32717b','#489496','#70b4ae','#a4d0bd','#d8e8cd'];
+const PAL = PAL_HEX.map(h => [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)]);
+const NAME = 'water_ripples_fine';
+
+const wrap = (n, m) => ((n % m) + m) % m;
+function mulberry32(a){
+  return function(){
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/* ---------- deterministic layout (stratified so marks never clump) ---------- */
+const rng = mulberry32(SEED);
+
+const ARCS = [];
+for (let i = 0; i < 32; i++){
+  if (rng() < 0.12) continue;
+  const cx = i % 8, cy = Math.floor(i / 8), r = rng();
+  const L = r < 0.7 ? 3 + Math.floor(rng() * 4) : r < 0.93 ? 7 + Math.floor(rng() * 2) : 9 + Math.floor(rng() * 3);
+  ARCS.push({
+    x: cx * 16 + Math.floor(rng() * 14), y: cy * 16 + 2 + Math.floor(rng() * 12), L,
+    bow: L >= 5 ? (rng() < 0.75 ? 1 : -1) : (rng() < 0.6 ? 1 : 0),
+    gap: L >= 6 && rng() < 0.5 ? 2 + Math.floor(rng() * (L - 4)) : -1,
+    b: (ARCS.length * 7 + Math.floor(rng() * 3)) % N,
+    glint: rng() < 0.3
+  });
+}
+
+const HAIRS = [];
+for (let i = 0; i < 6; i++){
+  HAIRS.push({x: Math.floor(rng() * W), y: Math.floor((i + 0.5) * H / 6 + (rng() - 0.5) * 4),
+              L: 8 + Math.floor(rng() * 4), brk: 3 + Math.floor(rng() * 4), b: (i * 11 + 3) % N});
+}
+
+const RINGS = [];
+for (let i = 0; i < 4; i++){
+  RINGS.push({x: Math.floor((i % 2 + 0.25 + rng() * 0.5) * 64), y: Math.floor((Math.floor(i / 2) + 0.25 + rng() * 0.5) * 32),
+              b: (i * 4 + Math.floor(rng() * 2)) % N});
+}
+// foreshortened, deliberately broken ellipse stages (<= 12 px each)
+const RING = [
+  [[0,0,3]],
+  [[-1,0,3],[1,0,3]],
+  [[-2,0,2],[-1,-1,3],[0,-1,3],[1,-1,3],[2,0,2],[-1,1,2],[1,1,2]],
+  [[-3,0,2],[-2,-1,3],[-1,-1,3],[1,-1,3],[2,-1,3],[3,0,2],[-2,1,2],[0,1,2],[1,1,2]],
+  [[-4,0,2],[-3,-1,3],[-2,-2,3],[-1,-2,3],[2,-2,2],[3,-1,3],[4,0,2],[-3,1,2],[2,2,2],[3,1,2]],
+  [[-5,0,2],[-4,-1,2],[-2,-2,2],[1,-2,2],[4,-1,2],[-4,1,2],[0,2,2],[4,1,2]],
+  [[-5,-1,2],[3,-2,2],[-3,2,2],[5,1,2]]
+];
+
+const GLINTS = [];
+for (let i = 0; i < 6; i++){
+  GLINTS.push({x: Math.floor(rng() * W), y: Math.floor(rng() * H), b: (i * 5 + 2) % N});
+}
+
+/* ---------- frame construction ---------- */
+const cache = [];
+function indices(t){
+  if (cache[t]) return cache[t];
+  const m = new Int8Array(W * H).fill(-1);
+  const put = (x, y, c) => { const p = wrap(y, H) * W + wrap(x, W); if (m[p] < c) m[p] = c; };
+
+  // dashed current hairlines, grow from their head, drift 1 px/frame
+  for (const h of HAIRS){
+    const a = wrap(t - h.b, N), env = Math.min(a, 15 - a);
+    if (env <= 0) continue;
+    const vis = Math.min(h.L, env * 2), head = h.x + a + h.L - 1;
+    for (let k = 0; k < vis; k++) if (k !== h.brk) put(head - k, h.y, 2);
+  }
+
+  // tiny arcs open from their centre, drift 0.5 px/frame, close again
+  for (const r of ARCS){
+    const a = wrap(t - r.b, N), env = Math.min(a, 15 - a);
+    if (env <= 0) continue;
+    const vis = Math.min(r.L, 2 * env - 1), start = Math.floor((r.L - vis) / 2), ox = r.x + Math.floor(a * 0.5);
+    const amp = r.L >= 8 ? 2 : 1;
+    for (let s = start; s < start + vis; s++){
+      if (s === r.gap && env >= 3) continue;
+      const dy = -r.bow * Math.floor(amp * Math.sin(Math.PI * (s + 0.5) / r.L) + 0.4);
+      let c = (env > 2 && s !== start && s !== start + vis - 1) ? 3 : 2;
+      if (r.glint && env >= 5 && s === start + 1) c = 4;
+      put(ox + s, r.y + dy, c);
+    }
+  }
+
+  // shallow elliptical ripples widen and break apart
+  for (const g of RINGS){
+    const a = wrap(t - g.b, N);
+    if (a >= RING.length) continue;
+    const cx = g.x + Math.floor(a * 0.5);
+    for (const [dx, dy, c] of RING[a]) put(cx + dx, g.y + dy, c);
+  }
+
+  // rare glints: 3-frame twinkle; a single #a4d0bd pixel once per loop
+  GLINTS.forEach((g, i) => {
+    const a = wrap(t - g.b, N);
+    if (a > 2) return;
+    put(g.x, g.y, a === 1 ? (i === 0 ? 5 : 4) : 3);
+  });
+
+  cache[t] = m;
+  return m;
+}
+
+function writeImage(img, map, ox, stride){
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++){
+    const v = map[y*W + x];
+    if (v < 0) continue;
+    const c = PAL[v], o = (y * stride + ox + x) * 4;
+    img.data[o] = c[0]; img.data[o+1] = c[1]; img.data[o+2] = c[2]; img.data[o+3] = 255;
+  }
+}
+
+function renderFrame(index, canvas){
+  const t = wrap(Math.floor(Number(index) || 0), N);
+  const c = canvas || document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  ctx.clearRect(0, 0, W, H);
+  const img = ctx.createImageData(W, H);
+  writeImage(img, indices(t), 0, W);
+  ctx.putImageData(img, 0, 0);
+  return c;
+}
+
+const frameName = i => NAME + '_' + String(i).padStart(2, '0') + '.png';
+
+function exportFrames(){
+  const out = [];
+  for (let i = 0; i < N; i++) out.push({name: frameName(i), dataUrl: renderFrame(i, document.createElement('canvas')).toDataURL('image/png')});
+  return out;
+}
+
+function transparentFraction(t){
+  let k = 0;
+  for (const v of indices(t)) if (v < 0) k++;
+  return k / (W * H);
+}
+
+function bgr555(c){
+  const v = (c[0] >> 3) | ((c[1] >> 3) << 5) | ((c[2] >> 3) << 10);
+  return '0x' + v.toString(16).padStart(4, '0');
+}
+
+function exportSheet(){
+  const c = document.createElement('canvas');
+  c.width = W * N; c.height = H;
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingEnabled = false;
+  const img = ctx.createImageData(W * N, H);
+  for (let i = 0; i < N; i++) writeImage(img, indices(i), i * W, W * N);
+  ctx.putImageData(img, 0, 0);
+  const frames = [];
+  for (let i = 0; i < N; i++){
+    frames.push({index: i, name: frameName(i), x: i * W, y: 0, w: W, h: H, durationMs: MS,
+                 pivot: {x: 0, y: 0}, transparentFraction: +transparentFraction(i).toFixed(4)});
+  }
+  return {
+    name: NAME + '_sheet.png', dataUrl: c.toDataURL('image/png'),
+    metadata: {
+      image: NAME + '_sheet.png', kind: 'sprite', type: 'seamless-water-ripple-overlay', loop: true,
+      frameWidth: W, frameHeight: H, frameCount: N, frameDurationMs: MS,
+      sheetWidth: W * N, sheetHeight: H, seed: SEED, alphaValues: [0, 255],
+      palette: PAL_HEX.slice(), gbaPaletteBGR555: PAL.map(bgr555),
+      pivotNote: 'tile origin top-left; tiles seamlessly on X and Y', frames
+    }
+  };
+}
+
+window.pixelArt = {
+  meta: {width: W, height: H, frameCount: N, frameDurationMs: MS, kind: 'sprite'},
+  palette: PAL_HEX.slice(),
+  renderFrame, exportFrames, exportSheet
+};
+
+/* ---------- preview ---------- */
+const $ = id => document.getElementById(id);
+const frames = [];
+for (let i = 0; i < N; i++) frames.push(renderFrame(i, document.createElement('canvas')));
+let cur = 0, playing = true, acc = 0, last = performance.now(), dirty = true;
+
+function backdrop(ctx, x, y, w, h){
+  const v = $('bg').value;
+  if (v !== 'checker'){ ctx.fillStyle = v; ctx.fillRect(x, y, w, h); return; }
+  for (let j = 0; j * 8 < h; j++) for (let i = 0; i * 8 < w; i++){
+    ctx.fillStyle = (i + j) % 2 ? '#888' : '#bbb';
+    ctx.fillRect(x + i * 8, y + j * 8, Math.min(8, w - i * 8), Math.min(8, h - j * 8));
+  }
+}
+
+function draw(){
+  const fc = frames[cur];
+  const tc = $('tile').getContext('2d'), rc = $('rep').getContext('2d'), sc = $('strip').getContext('2d');
+  [tc, rc, sc].forEach(c => c.imageSmoothingEnabled = false);
+  backdrop(tc, 0, 0, 512, 256);
+  tc.drawImage(fc, 0, 0, 512, 256);
+
+  const S = 3, OX = -40, OY = -20;
+  backdrop(rc, 0, 0, 720, 480);
+  for (let j = 0; j < 4; j++) for (let i = 0; i < 3; i++) rc.drawImage(fc, (OX + i * W) * S, (OY + j * H) * S, W * S, H * S);
+  if ($('grid').checked){
+    rc.fillStyle = 'rgba(255,90,80,0.7)';
+    for (let i = 1; i < 3; i++) rc.fillRect((OX + i * W) * S, 0, 1, 480);
+    for (let j = 1; j < 4; j++) rc.fillRect(0, (OY + j * H) * S, 720, 1);
+  }
+
+  sc.fillStyle = '#0d1110'; sc.fillRect(0, 0, 1072, 140);
+  for (let i = 0; i < N; i++){
+    const x = (i % 8) * 134, y = Math.floor(i / 8) * 70;
+    if (i === cur){ sc.fillStyle = '#d8e8cd'; sc.fillRect(x, y, 134, 70); }
+    backdrop(sc, x + 3, y + 3, W, H);
+    sc.drawImage(frames[i], x + 3, y + 3);
+  }
+  $('flabel').textContent = 'frame ' + String(cur).padStart(2, '0') + ' / ' + (N - 1);
+  const n = new Array(PAL.length).fill(0);
+  for (const v of indices(cur)) if (v >= 0) n[v]++;
+  $('usage').textContent = 'this frame · ' + PAL_HEX.map((h, i) => h + ' ' + n[i]).join(' · ');
+}
+
+function validate(){
+  const set = new Set(PAL.map(c => c.join(',')));
+  let bad = 0;
+  const tr = [];
+  for (let i = 0; i < N; i++){
+    const c = renderFrame(i, document.createElement('canvas'));
+    if (c.width !== W || c.height !== H) bad++;
+    const d = c.getContext('2d').getImageData(0, 0, W, H).data;
+    let k = 0;
+    for (let p = 0; p < d.length; p += 4){
+      const a = d[p+3];
+      if (a !== 0 && a !== 255) bad++;
+      if (a === 0) k++;
+      else if (!set.has(d[p] + ',' + d[p+1] + ',' + d[p+2])) bad++;
+    }
+    tr.push(100 * k / (W * H));
+  }
+  const minT = Math.min(...tr);
+  const el = $('check');
+  el.className = (bad || minT < 95) ? 'bad' : 'ok';
+  el.textContent = (bad ? 'FAIL: ' + bad + ' pixels with partial alpha, off-palette color or wrong size'
+    : 'OK: 16 frames 128×64, alpha 0/255 only, opaque pixels palette-exact') +
+    ' · min transparency ' + minT.toFixed(2) + '% ' + (minT >= 95 ? '(≥95% ✓)' : '(BELOW 95%)');
+  $('cover').textContent = 'transparent % per frame: ' + tr.map(v => v.toFixed(1)).join(' · ');
+}
+
+function step(d){ cur = wrap(cur + d, N); dirty = true; }
+function setPlaying(p){ playing = p; $('play').textContent = p ? 'Pause' : 'Play'; acc = 0; }
+function download(name, url){
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+$('play').onclick = () => setPlaying(!playing);
+$('prev').onclick = () => { setPlaying(false); step(-1); };
+$('next').onclick = () => { setPlaying(false); step(1); };
+$('bg').onchange = $('grid').onchange = () => { dirty = true; };
+$('dlSheet').onclick = () => { const s = exportSheet(); download(s.name, s.dataUrl); };
+$('dlMeta').onclick = () => {
+  const s = exportSheet();
+  const url = URL.createObjectURL(new Blob([JSON.stringify(s.metadata, null, 2)], {type: 'application/json'}));
+  download(NAME + '_sheet.json', url);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+$('dlFrames').onclick = () => { exportFrames().forEach((f, i) => setTimeout(() => download(f.name, f.dataUrl), i * 150)); };
+window.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+  if (e.code === 'Space'){ e.preventDefault(); setPlaying(!playing); }
+  else if (e.code === 'ArrowLeft'){ setPlaying(false); step(-1); }
+  else if (e.code === 'ArrowRight'){ setPlaying(false); step(1); }
+});
+
+function tick(now){
+  const dt = now - last; last = now;
+  if (playing){
+    acc += dt;
+    if (acc > MS * N) acc = 0;
+    while (acc >= MS){ acc -= MS; step(1); }
+  }
+  if (dirty){ draw(); dirty = false; }
+  requestAnimationFrame(tick);
+}
+
+validate();
+draw();
+requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

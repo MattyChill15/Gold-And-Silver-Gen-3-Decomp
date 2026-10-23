@@ -1,0 +1,114 @@
+[
+  {
+    "name": "forest",
+    "source": "Biome-Forest-V1.jpg",
+    "sha256": "989fe2f0b1c8785ee3d397599fcf731922b80d9eafee9322b30fe05c7f4c9d54",
+    "biome": 0,
+    "credit": "Oswarlin (@Oswarlin3)",
+    "adaptation": "native-size reframe and palette conversion"
+  },
+  {
+    "name": "desert",
+    "source": "biome-desert-V2.jpg",
+    "sha256": "d2e25087fa6475f33c30ae64c1ac6d375c177e9b8f6ebeaa6239ecc3a24f5436",
+    "biome": 3,
+    "credit": "Oswarlin (@Oswarlin3)",
+    "adaptation": "native-size reframe and palette conversion"
+  },
+  {
+    "name": "common",
+    "source": "Comun-Battle Arena-V1.jpeg",
+    "sha256": "645a428aca79e8b198ad59821197a091601cf3515f6e2dfd5244f80c9b68c6d6",
+    "biome": 4,
+    "credit": "Oswarlin (@Oswarlin3)",
+    "adaptation": "native-size reframe and palette conversion"
+  },
+  {
+    "name": "tallgrass",
+    "source": "Biome-Tall grass-V1.jpg",
+    "sha256": "f4b83131d52f231e157147eeba0ed37223d09cea9164ee86ca1289ec019f80f4",
+    "biome": 0,
+    "credit": "Oswarlin (@Oswarlin3)",
+    "adaptation": "native-size reframe and palette conversion"
+  },
+  {
+    "name": "beach",
+    "source": "Biome-coast-v2.jpg",
+    "sha256": "d4af22cf2d985185ded5ee54fb2473c7de09e41b11d63a5d484722988b75154a",
+    "biome": 3,
+    "credit": "Oswarlin (@Oswarlin3)",
+    "adaptation": "native-size reframe and palette conversion"
+  },
+  {
+    "name": "base",
+    "source": "base arena.jpeg",
+    "sha256": "0492d03e6327d88cbac2f0bf3b0024ac74e5df3f16e121c5d8bd2327a6e6cb6d",
+    "biome": 4,
+    "credit": "Oswarlin (@Oswarlin3)",
+    "adaptation": "native-size reframe and palette conversion"
+  },
+  {
+    "name": "roxanne",
+    "source": "Petra Gym Arena-V1.jpeg",
+    "sha256": "c588d1274c25cf9fb03f835dc6accc2cf3de645b56bab31abd63d9c37e892012",
+    "biome": 4,
+    "credit": "Oswarlin (@Oswarlin3)",
+    "adaptation": "native-size reframe and palette conversion"
+  },
+  {
+    "name": "brawly",
+    "source": "Marcial Gym Arena-V1.png",
+    "sha256": "46e5b17d6e97dece6e8fe04c3d74d627fb4ee30822cd9aa45c0bcf1030604cf9",
+    "biome": 4,
+    "credit": "Oswarlin (@Oswarlin3)",
+    "adaptation": "native-size reframe and palette conversion"
+  },
+  {
+    "name": "wattson",
+    "source": "Watsson Gym Arena-V1.png",
+    "sha256": "2930c19ebe2e637e9c11f918e2c51e8e34b16aad54991ab6461ce3e7d406f510",
+    "biome": 4,
+    "credit": "Oswarlin (@Oswarlin3)",
+    "adaptation": "native-size reframe and palette conversion"
+  },
+  {
+    "name": "flannery",
+    "source": "Candela Gym Arena-V1.jpeg",
+    "sha256": "ad1cdbebbd50fec1ca68d3a833729527ff64b300bb8ea80ab5540d0c582d8635",
+    "biome": 4,
+    "credit": "Oswarlin (@Oswarlin3)",
+    "adaptation": "native-size reframe and palette conversion"
+  },
+  {
+    "name": "norman",
+    "source": "Norman Gym Arena-V1.jpeg",
+    "sha256": "aa00f4aa62423644dc6ef26764d3e5e9e3992cacbe58abdaca82fba3eaa9913b",
+    "biome": 4,
+    "credit": "Oswarlin (@Oswarlin3)",
+    "adaptation": "native-size reframe and palette conversion"
+  },
+  {
+    "name": "winona",
+    "source": "Alana Gym Arena-V1.jpeg",
+    "sha256": "b479acac62b4bacd45a6663519b3e925acc9f84bfe5000b417ba66038e861242",
+    "biome": 4,
+    "credit": "Oswarlin (@Oswarlin3)",
+    "adaptation": "native-size reframe and palette conversion"
+  },
+  {
+    "name": "tate_liza",
+    "source": "Bito & Leti Gym Arena-V1.jpeg",
+    "sha256": "fb8345ffe27573172b9efd75823ae0e291ee8bf2a8ee6245962c878eec928424",
+    "biome": 4,
+    "credit": "Oswarlin (@Oswarlin3)",
+    "adaptation": "native-size reframe and palette conversion"
+  },
+  {
+    "name": "juan",
+    "source": "Gemini_Generated_Image_w6uydhw6uydhw6uy.jpeg",
+    "sha256": "78df1293090a711d0ccb18475cae31e2e0ed2c60ff2b340755e37708495be6bd",
+    "biome": 4,
+    "credit": "Oswarlin (@Oswarlin3)",
+    "adaptation": "native-size reframe and palette conversion"
+  }
+]

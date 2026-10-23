@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Spectral Rupture Evolution v2 — 64x64 effect sprite</title>
+<style>
+  body{margin:0;background:#120c1c;color:#d6c2fa;font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;display:flex;flex-direction:column;align-items:center;gap:12px;padding:16px}
+  h1{font-size:14px;margin:0;color:#a682e6;font-weight:normal;text-align:center}
+  canvas{image-rendering:pixelated;image-rendering:crisp-edges}
+  #view{border:1px solid #4f2783;max-width:100%}
+  #strip{border:1px solid #2e1650;max-width:100%;cursor:pointer}
+  .bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center}
+  button,select{background:#2e1650;color:#d6c2fa;border:1px solid #7c4fc0;padding:5px 10px;font:inherit;cursor:pointer}
+  button:hover,select:hover{background:#4f2783}
+  #info,#check{color:#a682e6;text-align:center}
+  #check.bad{color:#ff8a8a}
+  label{display:flex;gap:4px;align-items:center}
+</style>
+</head>
+<body>
+<h1>Gastly → Haunter · dimensional cocoon rupture v2 · 64×64 · 32f · 100ms · pivot 32,32</h1>
+<canvas id="view"></canvas>
+<div class="bar">
+  <button id="prev">◀ Prev</button>
+  <button id="play">❚❚ Pause</button>
+  <button id="next">Next ▶</button>
+  <select id="bg">
+    <option value="arena">Arena sand</option>
+    <option value="cave">Cave floor</option>
+    <option value="checker">Checker</option>
+    <option value="dark">Dark</option>
+  </select>
+  <label><input type="checkbox" id="guide" checked> safe zone</label>
+</div>
+<div id="info"></div>
+<div class="bar">
+  <button id="dlSheet">Download spritesheet PNG</button>
+  <button id="dlMeta">Download metadata JSON</button>
+  <button id="dlFrames">Download frames PNG</button>
+</div>
+<div id="check"></div>
+<canvas id="strip"></canvas>
+
+<script>
+(function(){
+'use strict';
+
+const W=64,H=64,N=32,MS=100,TAU=Math.PI*2;
+const PIVOT={x:32,y:32};
+const NAME='spectral_rupture_v2';
+// 11 opaque colors shared by every frame
+const PAL=['#120820','#28104a','#43207a','#6633ad','#9061d6','#c3a2f2','#e8dcff','#fdfbff','#17636e','#35c2c0','#a2f5ea'];
+const INK=0,DEEP=1,PURP=2,VIOL=3,LAV=4,LILAC=5,PALE=6,WHITE=7,TEALD=8,CYAN=9,CYANL=10,E=255;
+// reserved 18x24 window for the real Pokemon sprite
+const SAFE={x:23,y:20,w:18,h:24};
+const SX1=SAFE.x+SAFE.w-1,SY1=SAFE.y+SAFE.h-1;
+const PHASES=[
+  {name:'seal',from:0,to:2},
+  {name:'rise',from:3,to:7},
+  {name:'clamp',from:8,to:11},
+  {name:'tear',from:12,to:12},
+  {name:'burst',from:13,to:18},
+  {name:'curl',from:19,to:24},
+  {name:'evaporate',from:25,to:31}
+];
+// ribbon cross-section shades: o=shadow outline, c=dark core, b=body, bl=lit body, r=lit 1px rim, a=accent rim
+const SHADE={
+  DIM:{o:INK,c:INK,b:DEEP,bl:PURP,r:PURP,a:TEALD},
+  FADE:{o:INK,c:DEEP,b:PURP,bl:VIOL,r:LAV,a:TEALD},
+  NORM:{o:INK,c:DEEP,b:VIOL,bl:LAV,r:LILAC,a:CYAN},
+  WARM:{o:INK,c:PURP,b:LAV,bl:LILAC,r:PALE,a:CYANL},
+  HOT:{o:INK,c:VIOL,b:LILAC,bl:PALE,r:WHITE,a:CYANL},
+  RIFT:{o:CYAN,c:INK,b:INK,bl:DEEP,r:PALE,a:CYANL}
+};
+function dimmer(sh){return sh===SHADE.HOT?SHADE.WARM:sh===SHADE.WARM?SHADE.NORM:sh===SHADE.NORM?SHADE.FADE:SHADE.DIM;}
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const rnd=mulberry32(0x5EA1ED);
+const JAG=[];for(let i=0;i<16;i++)JAG.push(Math.round((rnd()-0.5)*2.4));
+const SA=[-90,-30,30,90,150,210].map(d=>d*Math.PI/180);
+
+// ---- indexed pixel buffer + distance-field ribbon rasterizer ----
+const BUF=new Uint8Array(W*H);
+const MF=new Float32Array(W*H),NX=new Float32Array(W*H),NY=new Float32Array(W*H),HH=new Float32Array(W*H),SS=new Float32Array(W*H);
+function frac(v){return v-Math.floor(v);}
+function tri(x){return 1-4*Math.abs(frac(x)-0.5);}
+function P(x,y,c){
+  x=Math.round(x);y=Math.round(y);
+  if(x<2||x>61||y<2||y>61)return;
+  if(x>=SAFE.x&&x<=SX1&&y>=SAFE.y&&y<=SY1)return;
+  BUF[y*W+x]=c;
+}
+function cut(x,y){
+  if(x<2||x>61||y<2||y>61)return;
+  const i=y*W+x;
+  if(BUF[i]!==E)BUF[i]=INK;
+}
+function line(x0,y0,x1,y1,c){
+  x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);
+  const dx=Math.abs(x1-x0),sx=x0<x1?1:-1,dy=-Math.abs(y1-y0),sy=y0<y1?1:-1;
+  let err=dx+dy;
+  for(;;){
+    P(x0,y0,c);
+    if(x0===x1&&y0===y1)break;
+    const e2=2*err;
+    if(e2>=dy){err+=dy;x0+=sx;}
+    if(e2<=dx){err+=dx;y0+=sy;}
+  }
+}
+function curve(fn,s0,s1,n){
+  const pts=[];
+  for(let k=0;k<=n;k++){const s=s0+(s1-s0)*k/n,p=fn(s);pts.push([p[0],p[1],p[2],p.length>3?p[3]:s]);}
+  return pts;
+}
+// pts: [x,y,halfWidth,s]; union of disks, shaded by depth and facing toward the light
+function ribbon(pts,sh,opt){
+  opt=opt||{};
+  MF.fill(99);
+  let bx0=W,by0=H,bx1=-1,by1=-1;
+  for(const p of pts){
+    const px=p[0],py=p[1],h=p[2],s=p[3];
+    if(!(h>0.3))continue;
+    const ax=Math.max(0,Math.floor(px-h-1)),bx=Math.min(W-1,Math.ceil(px+h+1));
+    const ay=Math.max(0,Math.floor(py-h-1)),by=Math.min(H-1,Math.ceil(py+h+1));
+    for(let y=ay;y<=by;y++)for(let x=ax;x<=bx;x++){
+      const dx=x-px,dy=y-py,m=Math.sqrt(dx*dx+dy*dy)-h,i=y*W+x;
+      if(m<MF[i]){MF[i]=m;NX[i]=dx;NY[i]=dy;HH[i]=h;SS[i]=s;}
+    }
+    if(ax<bx0)bx0=ax;if(bx>bx1)bx1=bx;if(ay<by0)by0=ay;if(by>by1)by1=by;
+  }
+  for(let y=by0;y<=by1;y++)for(let x=bx0;x<=bx1;x++){
+    const i=y*W+x,m=MF[i];
+    if(m>0)continue;
+    const dx=NX[i],dy=NY[i],d=Math.sqrt(dx*dx+dy*dy),h=HH[i],depth=-m;
+    let lx,ly;
+    if(opt.light){lx=opt.light[0];ly=opt.light[1];}
+    else{lx=32-x;ly=32-y;const l=Math.sqrt(lx*lx+ly*ly)||1;lx/=l;ly/=l;}
+    const dot=d>0.01?(dx*lx+dy*ly)/d:0;
+    let c;
+    if(depth<1)c=dot>0.3?((opt.acc&&opt.acc(SS[i]))?sh.a:sh.r):sh.o;
+    else if(d<1&&h>=1.9)c=sh.c;
+    else c=(dot>0.45&&depth<2)?sh.bl:sh.b;
+    P(x,y,c);
+  }
+}
+
+// ---- floor seal (broken thick ellipse band at 32,52) ----
+function seal(rx,ry,h,segs,duty,rot,sh,part,accOn){
+  for(let j=0;j<segs;j++){
+    const a0=(j+rot)/segs*TAU,a1=a0+duty/segs*TAU,back=Math.sin((a0+a1)/2)<0;
+    if(part==='back'&&!back)continue;
+    if(part==='front'&&back)continue;
+    const n=Math.ceil((a1-a0)*rx*1.5)+2;
+    const pts=curve(a=>[32+Math.cos(a)*rx,52+Math.sin(a)*ry,h*(0.45+0.55*Math.sin(Math.PI*(a-a0)/(a1-a0)))],a0,a1,n);
+    const acc=(accOn&&!back&&j%2===0)?(s=>{const u=(s-a0)/(a1-a0);return u>0.35&&u<0.6;}):null;
+    ribbon(pts,back?dimmer(sh):sh,{light:[0,-1],acc});
+  }
+}
+const SEAL=[[10,3.5,0.95,4,0.55,'FADE'],[14,4.5,1.15,5,0.6,'FADE'],[18,5.5,1.3,5,0.62,'NORM']];
+function sealParams(f){
+  if(f<=2)return SEAL[f];
+  if(f<=11)return[20,6,1.4,6,0.66,'NORM'];
+  return[17,5,1.4,6,0.5,'WARM'];
+}
+
+// ---- stage 0: smoke puffs ----
+const PUFF=[{a:0.35,b:0},{a:2.8,b:1},{a:1.5,b:2},{a:0.9,b:3},{a:2.2,b:4},{a:-0.2,b:5},{a:3.35,b:4}];
+function puffs(f){
+  const sp=sealParams(f);
+  PUFF.forEach((p,k)=>{
+    const age=f-p.b;
+    if(age<0||age>4)return;
+    const x=32+Math.cos(p.a)*sp[0]*0.9,y=52+Math.sin(p.a)*sp[1]-age*2.2,r=2.3-age*0.4;
+    ribbon([[x,y,r,0],[x+(k%2?1.6:-1.6),y+1,r*0.7,0]],SHADE.FADE,{light:[0,-1]});
+  });
+}
+
+// ---- stage 1: outer smoke wisps rising from the floor ----
+const WISP_H=[0,0,0,8,14,20,24,26];
+function wisp(side,f){
+  const Hs=WISP_H[f];
+  if(!Hs)return;
+  const pts=curve(u=>{const v=u*Hs;return[32+side*(21+2*Math.sin(v*0.3-f*0.9)+Math.max(0,v-12)*0.35),50-v,0.5+1.7*Math.pow(1-u,0.8)];},0,1,Math.ceil(Hs*2)+2);
+  ribbon(pts,SHADE.FADE,{light:[-side*0.6,-0.8]});
+  const t=pts[pts.length-1];
+  ribbon([[t[0]+side*0.5,t[1]-1.2,1.7,1]],SHADE.FADE,{light:[0,-1]});
+}
+
+// ---- stage 1-2: main tendrils rise along the cocoon path and clamp shut ----
+const COC={3:[-1.13,-0.7,17],4:[-1.13,-0.2,17],5:[-1.13,0.3,17],6:[-1.13,0.75,17],7:[-1.13,1.15,17],8:[-1.35,1.62,17],9:[-1.6,1.6,16.5],10:[-1.6,1.6,16],11:[-1.6,1.6,15],12:[-1.27,1.27,16]};
+function cocoonGeom(f,th){
+  let wob;
+  if(f<=8)wob=1.3*Math.sin(th*4-f*1.1);
+  else if(f===9)wob=1.0*Math.sin(th*5-f*1.3);
+  else if(f===10)wob=1.4*Math.sin(th*6+f*2.3);
+  else if(f===11)wob=1.6*Math.sin(th*7-f*2.1);
+  else wob=1.2*Math.sin(th*6+f);
+  return wob;
+}
+function cocoonHalf(side,f){
+  const [t0,t1,rx]=COC[f],shift=f===12?2:0;
+  const sh=f<=4?SHADE.FADE:f===12?SHADE.WARM:SHADE.NORM;
+  const n=Math.ceil((t1-t0)*28)+4;
+  const pts=curve(th=>{
+    const u=(th-t0)/(t1-t0),wob=cocoonGeom(f,th);
+    let h;
+    if(f<=8)h=0.6+2.0*Math.pow(1-u,0.7);
+    else{
+      h=1.6+1.0*Math.cos(th);
+      if(f===12)h*=0.55+0.45*Math.min(1,(1-Math.abs(u*2-1))*4);
+    }
+    return[32+side*((rx+wob)*Math.cos(th)+shift),33-(th>0?28:21)*Math.sin(th),h];
+  },t0,t1,n);
+  ribbon(pts,sh,{});
+}
+const CRACK=[[0.95,-1],[-0.55,1],[0.25,1],[-1.05,-1],[1.25,1],[-0.15,-1]];
+function cracks(f){
+  const count=f===10?2:f===11?4:6,col=f===10?LILAC:f===11?CYAN:CYANL,rx=COC[f][2],shift=f===12?2:0;
+  for(let k=0;k<count;k++){
+    const [th,side]=CRACK[k],wob=cocoonGeom(f,th);
+    const cx=32+side*((rx+wob)*Math.cos(th)+shift),cy=33-(th>0?28:21)*Math.sin(th);
+    let nx=side*Math.cos(th),ny=-Math.sin(th);const l=Math.sqrt(nx*nx+ny*ny)||1;nx/=l;ny/=l;
+    line(cx-nx*3,cy-ny*3,cx+nx*2,cy+ny*2,col);
+    P(cx+nx*1-ny*1.5,cy+ny*1+nx*1.5,col);
+  }
+}
+function rifts(){
+  const top=[],bot=[];
+  for(let y=3;y<=19;y++)top.push([32+JAG[y&15]*0.8,y,0.3+2.3*(y-3)/16,(y-3)/16]);
+  for(let y=44;y<=60;y++)bot.push([32+JAG[y&15]*0.8,y,0.3+2.3*(60-y)/16,(60-y)/16]);
+  ribbon(top,SHADE.RIFT,{});
+  ribbon(bot,SHADE.RIFT,{});
+}
+
+// ---- architectural claw arcs flanking the cocoon ----
+const CLAW={7:[0.55,26.5,19,0,'FADE'],8:[0.85,26,18,0.35,'NORM'],9:[1,25,17,0.75,'NORM'],10:[1,25,17,1,'NORM'],11:[1,24,16.5,1.05,'NORM'],12:[1,26.5,19,0.8,'WARM']};
+function claw(side,f){
+  const c=CLAW[f];
+  if(!c)return;
+  const [span,mid,tip,tal,shn]=c,sh=SHADE[shn];
+  const ax=v=>32+side*(tip+(mid-tip)*(1-v*v)),ay=v=>32+v*21;
+  const ext=span+0.16,endH=1.2+1.4*Math.max(0,1-span*span);
+  const arm=curve(v=>{
+    const av=Math.abs(v);
+    if(av>span){const e=(av-span)/(ext-span);return[ax(v),ay(v),endH*(1-e)+0.25];}
+    return[ax(v),ay(v),1.2+1.4*Math.max(0,1-v*v)];
+  },-ext,ext,90);
+  ribbon(arm,sh,{});
+  // segment joints cut through the arm band
+  for(const v of[-0.75,-0.3,0.3,0.75]){
+    if(Math.abs(v)>=span)continue;
+    const cx=Math.round(ax(v)),cy=Math.round(ay(v));
+    for(let j=-3;j<=3;j++)cut(cx+j,cy);
+  }
+  if(tal<=0)return;
+  for(const tv of[-0.5,0,0.5]){
+    if(Math.abs(tv)>=span)continue;
+    const rx0=ax(tv)-side*1.5,ry0=ay(tv),len=7*tal,hook=(tv===0?1.2:-tv*6)*tal;
+    ribbon([[ax(tv)-side*0.6,ry0,2.0,0]],sh,{});
+    const pts=curve(s=>[rx0-side*len*s,ry0+hook*s*s,0.25+1.9*Math.pow(1-s,0.9)],0,1,Math.ceil(len*2.5)+3);
+    ribbon(pts,sh,{acc:f>=11?(s=>s>0.7):null});
+  }
+}
+
+function buildup(f){
+  const sp=sealParams(f),ssh=SHADE[sp[5]],rot=f*0.12;
+  seal(sp[0],sp[1],sp[2],sp[3],sp[4],rot,ssh,'back',false);
+  if(f<=8)puffs(f);
+  if(f>=3&&f<=7){wisp(-1,f);wisp(1,f);}
+  if(f>=3){cocoonHalf(-1,f);cocoonHalf(1,f);}
+  if(f>=10)cracks(f);
+  if(f===12)rifts();
+  if(f>=7){claw(-1,f);claw(1,f);}
+  seal(sp[0],sp[1],sp[2],sp[3],sp[4],rot,ssh,'front',f>=9);
+}
+
+// ---- stage 3: broken rings + six tapering shards that curl and evaporate ----
+function brokenRing(R,h,segs,duty,rot,sh,accOn){
+  for(let j=0;j<segs;j++){
+    const a0=(j+rot)/segs*TAU,a1=a0+duty/segs*TAU,n=Math.ceil((a1-a0)*R*1.6)+2;
+    const pts=curve(a=>{const r=R+tri(a*14/TAU);return[32+Math.cos(a)*r,32+Math.sin(a)*r,h*(0.5+0.5*Math.sin(Math.PI*(a-a0)/(a1-a0)))];},a0,a1,n);
+    ribbon(pts,sh,{acc:(accOn&&j%2===0)?(s=>{const u=(s-a0)/(a1-a0);return u>0.4&&u<0.6;}):null});
+  }
+}
+// [r0, length, baseHalfWidth, curl, erodedStart, keepFraction, shade]
+const SHT={
+  13:[12.5,8,3.2,0,0,1,'HOT'],14:[14,13,3.0,0.1,0,1,'HOT'],15:[15,13.5,2.9,0.35,0,1,'WARM'],
+  16:[15.5,13,2.7,0.8,0,1,'WARM'],17:[16,12.5,2.5,1.4,0,1,'NORM'],18:[16.5,12,2.3,2.0,0,1,'NORM'],
+  19:[17,11.5,2.2,2.6,0.05,1,'NORM'],20:[17.5,11,2.0,3.1,0.1,1,'NORM'],21:[18,10.5,1.9,3.5,0.18,1,'FADE'],
+  22:[18.5,10,1.8,3.9,0.26,1,'FADE'],23:[19,9.5,1.7,4.2,0.34,0.8,'FADE'],24:[19.5,9,1.6,4.5,0.42,0.7,'FADE'],
+  25:[20,8.5,1.5,4.7,0.5,0.62,'DIM'],26:[20.5,8,1.4,4.9,0.56,0.55,'DIM'],27:[21,7.5,1.3,5.0,0.62,0.5,'DIM'],
+  28:[21.5,7,1.2,5.1,0.68,0.45,'DIM'],29:[22,6.5,1.1,5.2,0.74,0.4,'DIM']
+};
+function shard(i,f,draw){
+  const [r0,L,hb,k,s0,keep,shn]=SHT[f],a=SA[i];
+  const dy=f>18?-(f-18)*0.45*(Math.sin(a)<-0.9?0:1):0;
+  let x=32+Math.cos(a)*r0,y=32+Math.sin(a)*r0+dy;
+  const n=Math.max(8,Math.ceil(L*2.5)),ds=L/n,pts=[];
+  for(let j=0;j<=n;j++){
+    const s=j/n;
+    if(j>0){const hd=a+k*Math.pow(s,1.6);x+=Math.cos(hd)*ds;y+=Math.sin(hd)*ds;}
+    if(s<s0)continue;
+    const u=(s-s0)/(1-s0);
+    if(keep<1&&frac(u*3.2-f*0.25+i*0.37)>keep)continue;
+    pts.push([x,y,hb*Math.min(1,0.55+u*3)*Math.pow(1-u,0.8)+0.2,s]);
+  }
+  if(draw&&pts.length)ribbon(pts,SHADE[shn],{acc:(f>=14&&f<=18)?(s=>s>0.8):null});
+  return[x,y];
+}
+function burst(f){
+  const R1={13:[20,1.5,7,0.82,'HOT'],14:[23,1.4,7,0.7,'HOT'],15:[25.5,1.2,7,0.55,'WARM'],16:[27,0.9,7,0.35,'NORM']}[f];
+  if(R1)brokenRing(R1[0],R1[1],R1[2],R1[3],0.2+f*0.06,SHADE[R1[4]],false);
+  const R2={16:[19,1.0,5,0.55,'NORM'],17:[21.5,1.0,5,0.45,'NORM'],18:[24,0.9,5,0.3,'FADE']}[f];
+  if(R2)brokenRing(R2[0],R2[1],R2[2],R2[3],-f*0.07,SHADE[R2[4]],f<=17);
+  for(let i=0;i<6;i++)shard(i,f,true);
+  if(f===13||f===14){
+    for(let k=0;k<6;k++){
+      const a=SA[k]+Math.PI/6,ca=Math.cos(a),sa=Math.sin(a);
+      if(f===13){line(32+ca*16,32+sa*16,32+ca*20,32+sa*20,CYANL);P(32+ca*21,32+sa*21,PALE);}
+      else line(32+ca*21,32+sa*21,32+ca*23,32+sa*23,CYAN);
+    }
+  }
+}
+function residue(f){
+  if(f>=20){
+    const g=f-20;
+    seal(22-g*0.6,6.5-g*0.25,1.3-g*0.06,6,0.68-g*0.05,f*0.12,f<=24?SHADE.FADE:SHADE.DIM,'all',false);
+  }
+  if(f<=29)for(let i=0;i<6;i++){if(f===29&&i%2===0)continue;shard(i,f,true);}
+  if(f>=23){
+    for(let i=0;i<6;i++){
+      if((i+f)%2)continue;
+      const t=shard(i,Math.min(f,29),false),a=SA[i];
+      const r=Math.max(0.75,1.5-(f-23)*0.12);
+      const py=Math.max(4,t[1]-2-(f-23)*0.8);
+      ribbon([[t[0]+Math.cos(a)*2.5,py,r,0]],f<26?SHADE.FADE:SHADE.DIM,{light:[0,-1]});
+    }
+  }
+}
+
+const CACHE=new Array(N);
+function frameBuf(i){
+  i=((i%N)+N)%N;
+  if(CACHE[i])return CACHE[i];
+  BUF.fill(E);
+  if(i<=12)buildup(i);
+  else if(i<=18)burst(i);
+  else if(i<=30)residue(i);
+  CACHE[i]=BUF.slice();
+  return CACHE[i];
+}
+// blit indexed buffer as integer fillRect runs; no transforms, no smoothing
+function drawFrame(ctx,i,ox,oy){
+  const b=frameBuf(i);
+  ctx.setTransform(1,0,0,1,0,0);
+  ctx.globalAlpha=1;ctx.globalCompositeOperation='source-over';
+  ctx.imageSmoothingEnabled=false;
+  for(let y=0;y<H;y++){
+    let x=0;
+    while(x<W){
+      const c=b[y*W+x];
+      if(c===E){x++;continue;}
+      let x2=x+1;
+      while(x2<W&&b[y*W+x2]===c)x2++;
+      ctx.fillStyle=PAL[c];
+      ctx.fillRect(ox+x,oy+y,x2-x,1);
+      x=x2;
+    }
+  }
+}
+function pad(i){return String(i).padStart(2,'0');}
+function phaseOf(i){return PHASES.find(p=>i>=p.from&&i<=p.to).name;}
+
+const pixelArt={
+  meta:{width:W,height:H,frameCount:N,frameDurationMs:MS,kind:'sprite'},
+  palette:PAL.slice(),
+  renderFrame(index,canvas){
+    if(canvas.width!==W)canvas.width=W;
+    if(canvas.height!==H)canvas.height=H;
+    const ctx=canvas.getContext('2d');
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.clearRect(0,0,W,H);
+    drawFrame(ctx,index,0,0);
+    return canvas;
+  },
+  exportFrames(){
+    const out=[];
+    for(let i=0;i<N;i++){
+      const c=document.createElement('canvas');
+      pixelArt.renderFrame(i,c);
+      out.push({name:NAME+'_'+pad(i)+'.png',dataUrl:c.toDataURL('image/png')});
+    }
+    return out;
+  },
+  exportSheet(){
+    const c=document.createElement('canvas');
+    c.width=W*N;c.height=H;
+    const ctx=c.getContext('2d');
+    ctx.clearRect(0,0,c.width,c.height);
+    for(let i=0;i<N;i++)drawFrame(ctx,i,i*W,0);
+    const name=NAME+'_sheet.png';
+    const metadata={
+      image:name,kind:'sprite',
+      size:{w:W*N,h:H},
+      frameWidth:W,frameHeight:H,frameCount:N,frameDurationMs:MS,
+      pivot:{x:PIVOT.x,y:PIVOT.y},
+      safeZone:{x:SAFE.x,y:SAFE.y,w:SAFE.w,h:SAFE.h},
+      bounds:{min:2,max:61},
+      palette:PAL.slice(),
+      phases:PHASES.map(p=>({...p})),
+      frames:Array.from({length:N},(_,i)=>({
+        index:i,name:NAME+'_'+pad(i),phase:phaseOf(i),
+        x:i*W,y:0,w:W,h:H,duration:MS,pivot:{x:PIVOT.x,y:PIVOT.y}
+      }))
+    };
+    return {name,dataUrl:c.toDataURL('image/png'),metadata};
+  }
+};
+window.pixelArt=pixelArt;
+
+// ---------------- preview UI (never touches export canvases) ----------------
+const SC=6;
+const view=document.getElementById('view'),vctx=view.getContext('2d');
+view.width=W*SC;view.height=H*SC;
+const spr=document.createElement('canvas');spr.width=W;spr.height=H;
+const strip=document.getElementById('strip'),sctx=strip.getContext('2d');
+const STS=2,COLS=8;
+strip.width=W*STS*COLS;strip.height=H*STS*(N/COLS);
+const info=document.getElementById('info'),check=document.getElementById('check');
+const playBtn=document.getElementById('play');
+let cur=0,playing=true,bgMode='arena',guide=true,acc=0,last=0;
+
+const BG={};
+(function makeBgs(){
+  const mk=fn=>{const c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');fn(x);return c;};
+  BG.arena=mk(x=>{
+    x.fillStyle='#d9c48f';x.fillRect(0,0,W,H);
+    x.fillStyle='#c8b07a';
+    for(let y=0;y<H;y++)for(let i=0;i<W;i++)if(((i*7+y*13)%23)===0)x.fillRect(i,y,1,1);
+    x.fillStyle='#efe2b8';x.fillRect(0,54,W,1);
+  });
+  BG.cave=mk(x=>{
+    x.fillStyle='#4a4a52';x.fillRect(0,0,W,H);
+    x.fillStyle='#3d3d45';
+    for(let y=0;y<H;y++)for(let i=0;i<W;i++)if(((i*5+y*11)%19)===0)x.fillRect(i,y,2,1);
+  });
+  BG.checker=mk(x=>{for(let y=0;y<H;y+=4)for(let i=0;i<W;i+=4){x.fillStyle=((i+y)/4)%2?'#3a3046':'#2c2436';x.fillRect(i,y,4,4);}});
+  BG.dark=mk(x=>{x.fillStyle='#16101f';x.fillRect(0,0,W,H);});
+})();
+
+function show(){
+  pixelArt.renderFrame(cur,spr);
+  vctx.setTransform(1,0,0,1,0,0);
+  vctx.imageSmoothingEnabled=false;
+  vctx.drawImage(BG[bgMode],0,0,W*SC,H*SC);
+  vctx.drawImage(spr,0,0,W*SC,H*SC);
+  if(guide){
+    vctx.save();
+    vctx.strokeStyle='rgba(53,194,192,0.7)';vctx.setLineDash([6,4]);vctx.lineWidth=1;
+    vctx.strokeRect(SAFE.x*SC+0.5,SAFE.y*SC+0.5,SAFE.w*SC-1,SAFE.h*SC-1);
+    vctx.strokeStyle='rgba(253,251,255,0.25)';vctx.setLineDash([2,4]);
+    vctx.strokeRect(2*SC+0.5,2*SC+0.5,60*SC-1,60*SC-1);
+    vctx.fillStyle='rgba(253,251,255,0.6)';vctx.fillRect(PIVOT.x*SC-1,PIVOT.y*SC-1,3,3);
+    vctx.restore();
+  }
+  info.textContent='frame '+pad(cur)+' / '+(N-1)+' · '+phaseOf(cur)+' · '+(playing?'playing':'paused')+' · '+MS+'ms';
+  drawStrip();
+}
+function drawStrip(){
+  sctx.setTransform(1,0,0,1,0,0);
+  sctx.imageSmoothingEnabled=false;
+  for(let i=0;i<N;i++){
+    const cx=(i%COLS)*W*STS,cy=Math.floor(i/COLS)*H*STS;
+    sctx.drawImage(BG.checker,cx,cy,W*STS,H*STS);
+    pixelArt.renderFrame(i,spr);
+    sctx.drawImage(spr,cx,cy,W*STS,H*STS);
+    if(i===cur){sctx.strokeStyle='#35c2c0';sctx.lineWidth=2;sctx.strokeRect(cx+1,cy+1,W*STS-2,H*STS-2);}
+  }
+  pixelArt.renderFrame(cur,spr);
+}
+function step(d){cur=((cur+d)%N+N)%N;show();}
+function setPlaying(p){playing=p;playBtn.textContent=p?'❚❚ Pause':'▶ Play';acc=0;show();}
+function loop(ts){
+  if(!last)last=ts;
+  const dt=ts-last;last=ts;
+  if(playing){acc+=dt;let moved=false;while(acc>=MS){acc-=MS;cur=(cur+1)%N;moved=true;}if(moved)show();}
+  requestAnimationFrame(loop);
+}
+function download(name,url){const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();}
+
+document.getElementById('prev').onclick=()=>{setPlaying(false);step(-1);};
+document.getElementById('next').onclick=()=>{setPlaying(false);step(1);};
+playBtn.onclick=()=>setPlaying(!playing);
+document.getElementById('bg').onchange=e=>{bgMode=e.target.value;show();};
+document.getElementById('guide').onchange=e=>{guide=e.target.checked;show();};
+document.getElementById('dlSheet').onclick=()=>{const s=pixelArt.exportSheet();download(s.name,s.dataUrl);};
+document.getElementById('dlMeta').onclick=()=>{
+  const s=pixelArt.exportSheet();
+  const url=URL.createObjectURL(new Blob([JSON.stringify(s.metadata,null,2)],{type:'application/json'}));
+  download(NAME+'_sheet.json',url);
+  setTimeout(()=>URL.revokeObjectURL(url),2000);
+};
+document.getElementById('dlFrames').onclick=()=>{
+  pixelArt.exportFrames().forEach((fr,i)=>setTimeout(()=>download(fr.name,fr.dataUrl),i*150));
+};
+strip.onclick=e=>{
+  const r=strip.getBoundingClientRect();
+  const x=(e.clientX-r.left)*strip.width/r.width,y=(e.clientY-r.top)*strip.height/r.height;
+  const i=Math.floor(y/(H*STS))*COLS+Math.floor(x/(W*STS));
+  if(i>=0&&i<N){setPlaying(false);cur=i;show();}
+};
+window.addEventListener('keydown',e=>{
+  if(e.key===' '){e.preventDefault();setPlaying(!playing);}
+  else if(e.key==='ArrowLeft'){setPlaying(false);step(-1);}
+  else if(e.key==='ArrowRight'){setPlaying(false);step(1);}
+});
+
+// self-check of the exported sheet: palette, binary alpha, bounds, safe zone, brightness window, empty last frame
+(function validate(){
+  const c=document.createElement('canvas');c.width=W*N;c.height=H;
+  const ctx=c.getContext('2d');
+  for(let i=0;i<N;i++)drawFrame(ctx,i,i*W,0);
+  const d=ctx.getImageData(0,0,W*N,H).data;
+  const hot=new Set([PALE,WHITE,CYANL].map(k=>parseInt(PAL[k].slice(1),16)));
+  const colors=new Set();let badAlpha=0,outside=0,inSafe=0,lastPx=0,hotOut=0,total=0;
+  for(let p=0;p<d.length;p+=4){
+    const a=d[p+3];
+    if(a!==0&&a!==255)badAlpha++;
+    if(a!==255)continue;
+    total++;
+    const rgb=(d[p]<<16)|(d[p+1]<<8)|d[p+2];
+    colors.add(rgb);
+    const idx=p/4,gx=idx%(W*N),y=Math.floor(idx/(W*N)),x=gx%W,fi=Math.floor(gx/W);
+    if(x<2||x>61||y<2||y>61)outside++;
+    if(x>=SAFE.x&&x<=SX1&&y>=SAFE.y&&y<=SY1)inSafe++;
+    if(fi===N-1)lastPx++;
+    if(hot.has(rgb)&&(fi<12||fi>18))hotOut++;
+  }
+  const ok=colors.size<=15&&badAlpha===0&&outside===0&&inSafe===0&&lastPx===0&&hotOut===0;
+  check.className=ok?'':'bad';
+  check.textContent='export check: '+colors.size+' opaque colors · non-binary alpha: '+badAlpha+
+    ' · outside 2..61: '+outside+' · in safe zone: '+inSafe+' · bright px outside f12-18: '+hotOut+
+    ' · last frame px: '+lastPx+' · total px: '+total+(ok?' · OK':' · FAIL');
+})();
+
+show();
+requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Protect Perfect Parry vs Hyper Beam — 64x64 GBA VFX</title>
+<style>
+  :root{--bg:#10141c;--panel:#1a2130;--ink:#d8e6f0;--dim:#7d8ea3;--acc:#2bc2b6;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.4 ui-monospace,Menlo,Consolas,monospace;}
+  header{padding:12px 18px;border-bottom:1px solid #253046}
+  header h1{margin:0;font-size:15px;letter-spacing:.5px}
+  header p{margin:4px 0 0;color:var(--dim)}
+  main{display:flex;flex-wrap:wrap;gap:18px;padding:18px}
+  .panel{background:var(--panel);border:1px solid #253046;border-radius:6px;padding:12px}
+  .panel h2{margin:0 0 8px;font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:1px}
+  canvas{image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+  #viewWrap{width:384px;height:384px}
+  #view{width:384px;height:384px}
+  #gba{width:480px;height:320px;background:#000}
+  .checker{background-color:#2a3242;background-image:
+    linear-gradient(45deg,#3a4458 25%,transparent 25%,transparent 75%,#3a4458 75%),
+    linear-gradient(45deg,#3a4458 25%,transparent 25%,transparent 75%,#3a4458 75%);
+    background-size:24px 24px;background-position:0 0,12px 12px}
+  .black{background:#000}
+  .sand{background:#d9b877}
+  .grass{background:#4f8a3c}
+  .forest{background:#3e6b2c}
+  .controls{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;align-items:center}
+  button,select{background:#253046;color:var(--ink);border:1px solid #34425e;border-radius:4px;padding:5px 9px;font:inherit;cursor:pointer}
+  button:hover{border-color:var(--acc)}
+  #info{margin-top:8px;color:var(--dim);min-height:1.4em}
+  #grid{width:1024px;height:640px;cursor:pointer}
+  #gridWrap{max-width:100%;overflow:auto}
+  .sw{display:inline-block;width:18px;height:18px;border:1px solid #000;margin-right:2px;vertical-align:middle}
+  #verify{margin-top:8px;color:var(--dim)}
+  label{color:var(--dim)}
+</style>
+</head>
+<body>
+<header>
+  <h1>PROTECT — absorbs Hyper Beam · 64×64 transparent VFX · 40 frames @ 70 ms</h1>
+  <p>0–7 deploy/breathe · 8–15 absorb beam (intact shield, curling wavefronts) · 16–23 beam disintegrates, shield dissipates · 24–31 Hyper Beam charge orb · 32–39 Hyper Beam ray (origin 4,32 → 60,32). 14 opaque colors + transparent.</p>
+</header>
+<main>
+  <section class="panel">
+    <h2>Sprite (6×)</h2>
+    <div id="viewWrap" class="checker"><canvas id="view" width="64" height="64"></canvas></div>
+    <div class="controls">
+      <button id="prev">◀ prev</button>
+      <button id="play">⏸ pause</button>
+      <button id="next">next ▶</button>
+      <label>bg <select id="bgSel">
+        <option value="checker">checker</option>
+        <option value="black">black</option>
+        <option value="forest">forest</option>
+        <option value="sand">sand</option>
+        <option value="grass">grass</option>
+      </select></label>
+    </div>
+    <div class="controls">
+      <button id="dlSheet">⬇ spritesheet PNG</button>
+      <button id="dlMeta">⬇ metadata JSON</button>
+      <button id="dlFrames">⬇ frames PNG</button>
+    </div>
+    <div id="info"></div>
+    <div id="palette" style="margin-top:8px"></div>
+    <div id="verify"></div>
+  </section>
+  <section class="panel">
+    <h2>GBA context 240×160 (2×, preview only — not exported)</h2>
+    <canvas id="gba" width="240" height="160"></canvas>
+    <div class="controls"><label><input type="checkbox" id="foot" checked> show character footprint x22..42 y20..50</label></div>
+    <div id="gbaNote" style="margin-top:6px;color:var(--dim)"></div>
+  </section>
+  <section class="panel" style="flex-basis:100%">
+    <h2>All frames (click to select)</h2>
+    <div id="gridWrap"><canvas id="grid" class="checker" width="512" height="320"></canvas></div>
+  </section>
+</main>
+<script>
+(() => {
+'use strict';
+const W = 64, H = 64, FRAMES = 40, DUR = 70;
+const PI = Math.PI, TAU = PI * 2;
+
+// ---- shared palette (index 0 = transparent) ----
+const T=0,OUT=1,JD=2,TL=3,CY=4,LC=5,IC=6,WH=7,PY=8,GD=9,AM=10,OR=11,RD=12,BL=13,SK=14;
+const PAL = [null,
+  '#0a2430', // 1 deep outline
+  '#11544f', // 2 jade shadow
+  '#1b8479', // 3 teal
+  '#2bc2b6', // 4 cyan
+  '#7cecdc', // 5 light cyan
+  '#d4fff7', // 6 ice
+  '#ffffff', // 7 white
+  '#fff0a0', // 8 pale yellow
+  '#ffcb30', // 9 gold
+  '#f5961c', // 10 amber
+  '#dd5418', // 11 orange
+  '#962a14', // 12 ember red
+  '#28689a', // 13 steel facet
+  '#8ccfff'  // 14 sky reflection
+];
+const PAL_NAMES = ['transparent','outline','jade_shadow','teal','cyan','light_cyan','ice','white','pale_yellow','gold','amber','orange','ember_red','steel_facet','sky_reflection'];
+const RGB = PAL.map(h => h ? [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)] : null);
+
+const PHASES = [
+  {name:'deploy_breathe',         from:0,  to:7},
+  {name:'absorb_under_beam',      from:8,  to:15},
+  {name:'disintegrate_dissipate', from:16, to:23},
+  {name:'hyper_beam_charge',      from:24, to:31},
+  {name:'hyper_beam_ray',         from:32, to:39}
+];
+const PIVOT = {x:32, y:36};
+const BEAM_PIVOT = {x:4, y:32};
+
+// ---- pixel buffer ----
+const B = new Uint8Array(W * H);
+let clipY0 = 0, clipY1 = H - 1;
+function rng(a){ return function(){ a|=0; a=a+0x6D2B79F5|0; let t=Math.imul(a^a>>>15,1|a); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296; }; }
+function hash(p,salt){ let h=(p*374761393+salt*668265263)|0; h=Math.imul(h^(h>>>13),1274126177); h^=h>>>16; return (h>>>0)%100; }
+function P(x,y,c){ x=Math.round(x); y=Math.round(y); if(x<0||y<clipY0||x>=W||y>clipY1) return; B[y*W+x]=c; }
+function L(x0,y0,x1,y1,c){
+  x0=Math.round(x0); y0=Math.round(y0); x1=Math.round(x1); y1=Math.round(y1);
+  const dx=Math.abs(x1-x0), dy=-Math.abs(y1-y0), sx=x0<x1?1:-1, sy=y0<y1?1:-1;
+  let e=dx+dy;
+  for(;;){ P(x0,y0,c); if(x0===x1&&y0===y1) break; const e2=2*e; if(e2>=dy){e+=dy;x0+=sx;} if(e2<=dx){e+=dx;y0+=sy;} }
+}
+function LP(a,b,c){ L(a.x,a.y,b.x,b.y,c); }
+// draw into an isolated layer, then keep only keep% of its pixels (deterministic pixel-removal fade)
+function layer(fn,keep,salt){
+  if(keep>=100){ fn(); return; }
+  if(keep<=0) return;
+  const saved=B.slice(); B.fill(T); fn();
+  for(let p=0;p<B.length;p++) if(B[p]&&hash(p,salt)<keep) saved[p]=B[p];
+  B.set(saved);
+}
+function tri(a,b,c,col,pat){
+  const ar=(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x); if(Math.abs(ar)<0.01) return;
+  const sg=Math.sign(ar);
+  const x0=Math.floor(Math.min(a.x,b.x,c.x)), x1=Math.ceil(Math.max(a.x,b.x,c.x));
+  const y0=Math.floor(Math.min(a.y,b.y,c.y)), y1=Math.ceil(Math.max(a.y,b.y,c.y));
+  for(let y=y0;y<=y1;y++) for(let x=x0;x<=x1;x++){
+    const w0=((b.x-a.x)*(y-a.y)-(b.y-a.y)*(x-a.x))*sg;
+    const w1=((c.x-b.x)*(y-b.y)-(c.y-b.y)*(x-b.x))*sg;
+    const w2=((a.x-c.x)*(y-c.y)-(a.y-c.y)*(x-c.x))*sg;
+    if(w0>=0&&w1>=0&&w2>=0&&(!pat||pat(x,y))) P(x,y,col);
+  }
+}
+function star(x,y,len,c0,c1,c2){
+  P(x,y,c0);
+  for(let i=1;i<=len;i++){ const c=i===len?c2:c1; P(x+i,y,c); P(x-i,y,c); P(x,y+i,c); P(x,y-i,c); }
+}
+function ray(cx,cy,ang,r0,len,colAt){
+  const dx=Math.cos(ang), dy=Math.sin(ang);
+  for(let i=0;i<len;i++) P(cx+dx*(r0+i), cy+dy*(r0+i), colAt(i/Math.max(1,len-1),i));
+}
+
+// ---- shield geometry ----
+const NV = 12;
+function light(a){ return Math.cos(a + 3*PI/4); } // 1 = upper-left
+function sv(cx,cy,a,s,sq,dr){
+  const sx=Math.cos(a), sy=Math.sin(a);
+  const rx=19*s+dr, ry=21*s+dr;
+  const x=sx*rx*(1+sq*0.22*(1-Math.abs(sy)));
+  let y=sy*ry;
+  if(sy<0){ y*=1-sq*(-sy); y+=sq*7*Math.pow(-sy,8); }
+  return {x:cx+x, y:cy+y};
+}
+function drawShield(o){
+  const cx=o.cx??32, cy=o.cy??36, s=o.s??1, sq=o.sq??0, mode=o.mode||'calm';
+  const V=[],R1=[],O=[],I=[],A=[];
+  for(let k=0;k<NV;k++){
+    const a=-PI/2+k*TAU/NV; A.push(a);
+    V.push(sv(cx,cy,a,s,sq,0)); R1.push(sv(cx,cy,a,s,sq,-1)); O.push(sv(cx,cy,a,s,sq,1));
+    I.push(sv(cx,cy,a+PI/NV,s*0.76,sq,0));
+  }
+  const gap=o.gaps||(()=>false);
+  const top=a=>-Math.sin(a);
+  if(o.facets!==false){
+    // glassy reflection dither on upper-left facets
+    for(let k=0;k<NV;k++){
+      const k2=(k+1)%NV, am=A[k]+PI/NV;
+      if(!gap(k)&&light(am)>0.8) tri(V[k],V[k2],I[k],SK,(x,y)=>((x&1)===0&&(y&1)===0));
+    }
+    // facet spokes
+    for(let k=0;k<NV;k++){
+      if(gap(k)) continue;
+      const lk=light(A[k]);
+      let c=lk>0.45?CY:lk>-0.35?TL:BL;
+      if(mode==='impact'&&top(A[k])>0.45) c=AM;
+      LP(V[k],I[k],c); LP(V[k],I[(k+NV-1)%NV],c);
+    }
+    // inner facet ring
+    for(let k=0;k<NV;k++){
+      if(gap(k)) continue;
+      LP(I[k],I[(k+1)%NV],light(A[k]+PI/NV)>0.1?TL:BL);
+    }
+  }
+  // outline
+  if(!o.noOutline){
+    for(let k=0;k<NV;k++){
+      if(gap(k)) continue;
+      const k2=(k+1)%NV, am=A[k]+PI/NV, l=light(am), tp=top(am);
+      let oc=l>0.55?JD:OUT;
+      if(mode==='impact'&&tp>0.05) oc=tp>0.5?OR:RD;
+      if(mode==='flash') oc=AM;
+      LP(O[k],O[k2],oc);
+    }
+  }
+  // inner rim
+  if(mode!=='cue'&&!o.thin){
+    for(let k=0;k<NV;k++){
+      if(gap(k)) continue;
+      const k2=(k+1)%NV, am=A[k]+PI/NV, l=light(am), tp=top(am);
+      let ic=l>0.3?CY:l>-0.3?TL:BL;
+      if(mode==='impact'&&tp>0.05) ic=tp>0.4?GD:AM;
+      if(mode==='flash') ic=GD;
+      LP(R1[k],R1[k2],ic);
+    }
+  }
+  // main rim
+  for(let k=0;k<NV;k++){
+    if(gap(k)) continue;
+    const k2=(k+1)%NV, am=A[k]+PI/NV, l=light(am), tp=top(am);
+    let mc=l>0.55?IC:l>0.1?LC:l>-0.4?CY:TL;
+    if(mode==='cue') mc=WH;
+    if(mode==='impact'&&tp>0.05) mc=tp>0.75?WH:tp>0.4?PY:GD;
+    if(mode==='flash') mc=tp>-0.2?WH:PY;
+    if(o.glint!=null&&mode==='calm'){
+      if(k===o.glint) mc=WH;
+      else if(k===(o.glint+1)%NV||k===(o.glint+NV-1)%NV) mc=IC;
+    }
+    LP(V[k],V[k2],mc);
+  }
+  // crystal specks
+  if(o.facets!==false&&(mode==='calm'||mode==='cue')){
+    for(const k of [10,11]){
+      const m={x:V[k].x+(I[k].x-V[k].x)*0.35, y:V[k].y+(I[k].y-V[k].y)*0.35};
+      P(m.x,m.y,WH); P(m.x+1,m.y,IC);
+    }
+  }
+  if(o.glint!=null){
+    const k=o.glint, k2=(k+1)%NV;
+    star((V[k].x+V[k2].x)/2,(V[k].y+V[k2].y)/2,2,WH,IC,LC);
+  }
+  return {V,I,A};
+}
+function brokenRing(cx,cy,r,ry,c1,c2,seed,phase,thick){
+  const g=rng(seed), gaps=[];
+  const ng=4+Math.floor(g()*3);
+  for(let i=0;i<ng;i++) gaps.push({c:g()*TAU, w:0.12+g()*0.28});
+  const steps=Math.ceil(TAU*r*1.4);
+  for(let i=0;i<steps;i++){
+    const a=i/steps*TAU;
+    let skip=false;
+    for(const q of gaps){ let d=Math.abs(((a-q.c-phase)%TAU+TAU)%TAU); d=Math.min(d,TAU-d); if(d<q.w){skip=true;break;} }
+    if(skip) continue;
+    if(thick) P(cx+Math.cos(a)*(r-1), cy+Math.sin(a)*(ry-1), c2);
+    P(cx+Math.cos(a)*r, cy+Math.sin(a)*ry, c1);
+  }
+}
+
+// ---- fixed-seed procedural tables ----
+const PARTS = (() => {
+  const r=rng(7373), out=[];
+  for(let k=0;k<44;k++) out.push({a:r()*TAU, r0:12+r()*16, ph:r(), sp:(r()-0.5)*1.6});
+  return out;
+})();
+const GRAINS = (() => {
+  const r=rng(8484), out=[];
+  for(let k=0;k<48;k++) out.push({
+    s:k%2?1:-1, th0:k<8?0.08+r()*0.35:0.3+r()*2.1, d0:2+r()*4,
+    om:0.03+r()*0.04, up:0.35+r()*0.45, ph:r()*TAU, rho:1+r()*1.5, life:r()
+  });
+  return out;
+})();
+
+// ---- phase 1: deploy + breathing (0..7) ----
+function deploy(f){
+  const cx=32, cy=36;
+  if(f===0){
+    drawShield({s:0.38, mode:'cue', facets:false});
+    for(let k=0;k<8;k++){
+      const a=k*PI/4+0.2;
+      P(cx+Math.cos(a)*14, cy+Math.sin(a)*15, CY);
+      P(cx+Math.cos(a)*12, cy+Math.sin(a)*13, LC);
+    }
+    star(cx,cy,3,WH,IC,LC);
+  } else if(f===1){
+    drawShield({s:0.72, mode:'calm', facets:false});
+    for(let k=0;k<8;k++){
+      const a=k*PI/4+PI/8;
+      ray(cx,cy,a,17,3,t=>t<0.5?IC:CY);
+    }
+    star(cx,cy-15,2,WH,IC,LC);
+  } else if(f===2){
+    drawShield({s:1.07, mode:'calm'});
+    const pts=[[-PI*0.75,25],[-PI*0.25,25],[PI*0.8,24],[PI*0.2,24]];
+    for(const [a,r] of pts) star(cx+Math.cos(a)*r, cy+Math.sin(a)*r, 1, IC, CY, CY);
+  } else if(f===3){
+    drawShield({s:1, mode:'cue'});
+    const t=sv(cx,cy,-PI/2,1,0,0);
+    star(t.x,t.y,3,WH,PY,GD);
+  } else {
+    const b=f-4;
+    drawShield({s:1+[0,0.03,0.05,0.03][b], mode:'calm', glint:[10,11,0,1][b]});
+    for(let i=0;i<6;i++){
+      const side=i%2?1:-1;
+      const x=cx+side*(15+(i*3)%5), y=52-((b*4+i*7)%28);
+      P(x,y,i%3===0?IC:LC);
+      if(i===b) { P(x,y-1,WH); P(x,y+1,CY); }
+    }
+  }
+}
+
+// ---- shared absorption pieces (8..23) ----
+// Global absorb timeline: frame 8 -> tg 0 ... frame 23 -> tg 15.
+const PULSES=[1,3.5,6];          // wavefront launch times
+const RIPPLES=[1,3,5,7,9,11];    // concentric shock ripple launch times
+function goldColumn(seed,y0,y1,hw,phase,pointed,fray){
+  const r=rng(seed), tiers=[WH,PY,GD,AM,OR];
+  for(let y=Math.max(0,y0);y<=y1;y++){
+    const pulse=(((y-phase)%8)+8)%8;
+    let w=hw+(pulse===0?1:0);
+    if(pointed&&y>y1-5) w=Math.max(1,Math.round(hw*Math.sqrt((y1-y+1)/6)));
+    const frayRow=fray&&y<y0+5;
+    if(frayRow) w=Math.max(0,Math.round(hw*(y-y0)/5));
+    const shift=pulse===0?1:0;
+    for(let x=32-w;x<=31+w;x++){
+      if(frayRow&&r()<0.45) continue;
+      const d=Math.abs(x-31.5)/(w+0.5);
+      const tier=d<0.2?0:d<0.42?1:d<0.66?2:d<0.86?3:4;
+      P(x,y,tiers[Math.max(0,tier-shift)]);
+    }
+    if(w<1) continue;
+    const jl=r(), jr=r();
+    if(jl<0.5) P(32-w-1,y,OR); if(jl<0.15) P(32-w-2,y,RD);
+    if(jr<0.5) P(31+w+1,y,OR); if(jr<0.15) P(31+w+2,y,RD);
+  }
+  const lo=Math.max(0,y0+(fray?5:0));
+  for(let k=0;k<3;k++){
+    const sx=32+Math.round((r()*2-1)*hw*0.5), sy=y0+((phase+k*9)%Math.max(1,y1-y0+6))-3;
+    for(let j=0;j<5;j++){ const yy=sy+j; if(yy>=lo&&yy<=y1-2) P(sx,yy,WH); }
+  }
+  if(pointed){ P(31,y1+1,WH); P(32,y1+1,WH); P(31,y1+2,PY); P(32,y1+2,PY); }
+}
+function contactLens(topY,hw,u,scale){
+  for(let dy=-1;dy<=1;dy++){
+    const hwid=Math.round((hw+4-Math.abs(dy)*3+(u%2))*scale), y=topY+dy;
+    if(hwid<1) continue;
+    for(let x=Math.round(31.5-hwid);x<=Math.round(31.5+hwid);x++){
+      const d=Math.abs(x-31.5)/hwid;
+      P(x,y,d<0.35?WH:d<0.7?PY:d<0.92?GD:AM);
+    }
+  }
+}
+function tangentFrame(cx,cy,a,s,sq,dr){
+  const p=sv(cx,cy,a,1,sq,dr), q=sv(cx,cy,a+s*0.04,1,sq,dr);
+  let tx=q.x-p.x, ty=q.y-p.y; const tl=Math.hypot(tx,ty)||1; tx/=tl; ty/=tl;
+  let nx=p.x-cx, ny=p.y-cy; const nl=Math.hypot(nx,ny)||1; nx/=nl; ny/=nl;
+  return {p,tx,ty,nx,ny};
+}
+// one pair of curling wavefronts flowing from the top rim around both sides
+function wave(cx,cy,sq,age,seed,tg){
+  const phi=0.25+age*0.5; if(phi>3.05) return;
+  const body=Math.min(phi-0.05,1.0);
+  const r=rng(seed+tg*13);
+  for(const s of [-1,1]){
+    for(let th=phi-body;th<=phi;th+=0.03){
+      const f=(th-(phi-body))/body, hgt=Math.round(1+3*f*f), a=-PI/2+s*th;
+      for(let d=2;d<=2+hgt;d++){
+        const p=sv(cx,cy,a,1,sq,d);
+        let c;
+        if(d===2) c=f>0.5?LC:CY;
+        else if(d===2+hgt) c=f>0.8?WH:f>0.45?PY:GD;
+        else c=f>0.6?GD:AM;
+        P(p.x,p.y,c);
+      }
+    }
+    // curling crest at the leading edge
+    const tf=tangentFrame(cx,cy,-PI/2+s*phi,s,sq,4);
+    const C={x:tf.p.x+tf.tx, y:tf.p.y+tf.ty};
+    let prev=null;
+    for(let i=0;i<=10;i++){
+      const t=i/10, psi=PI/2-t*1.7*PI, rho=2.6*(1-0.5*t);
+      const pt={x:C.x+rho*(Math.cos(psi)*tf.tx+Math.sin(psi)*tf.nx), y:C.y+rho*(Math.cos(psi)*tf.ty+Math.sin(psi)*tf.ny)};
+      if(prev) LP(prev,pt,t<0.3?WH:t<0.6?IC:LC);
+      prev=pt;
+    }
+    // leading edge separates into glowing grains with spiral trails
+    for(let j=0;j<6;j++){
+      const gth=phi+0.14+j*0.11+r()*0.05, gd=4+j*0.9+r()*2;
+      if(gth>3.1) continue;
+      const cyan=j%3===2;
+      for(let m=2;m>=0;m--){
+        const p=sv(cx,cy,-PI/2+s*(gth-m*0.07),1,sq,gd-m*m*0.5);
+        const c=m===0?(cyan?IC:(j%2?PY:WH)):m===1?(cyan?LC:GD):(cyan?CY:AM);
+        P(p.x,p.y,c);
+      }
+    }
+  }
+}
+function shockRings(tg,fade){
+  const cols=[IC,LC,CY,TL,JD,JD];
+  for(let k=0;k<RIPPLES.length;k++){
+    const age=tg-RIPPLES[k]; if(age<0||age>5) continue;
+    const Rr=25+age*3.5;
+    layer(()=>brokenRing(32,36,Rr,Rr*1.1,cols[age],cols[Math.min(5,age+1)],900+k*31,age*0.3*(k%2?1:-1),age<2),
+      100-age*12-fade, 60+k);
+  }
+}
+function surfaceRipples(cx,cy,topY,tg,keepBase){
+  const cols=[IC,LC,CY,TL];
+  for(let k=0;k<RIPPLES.length;k++){
+    const age=tg-RIPPLES[k]; if(age<0||age>3) continue;
+    const rho=3+age*4.5, steps=Math.ceil(TAU*rho*1.2);
+    layer(()=>{
+      for(let i=0;i<steps;i++){
+        const a=i/steps*TAU, x=cx+Math.cos(a)*rho, y=topY+1+Math.sin(a)*rho*0.8;
+        const e=((x-cx)/19)**2+((y-cy)/21)**2;
+        if(e>0.6&&e<0.88) P(x,y,cols[age]);
+      }
+    }, keepBase-age*10, 50+k);
+  }
+}
+
+// ---- phase 2: shield absorbs the beam (8..15) ----
+const AB_SQ =[0,0.05,0.08,0.07,0.09,0.08,0.09,0.08];
+const AB_JIT=[0,0,1,0,-1,0,0,0];
+const AB_HW =[7,8,8,9,9,9,9,8];
+function absorb(u){
+  const tg=u, sq=AB_SQ[u], hw=AB_HW[u], cx=32+AB_JIT[u], cy=36, contact=u>=1;
+  const topY=Math.round(sv(cx,cy,-PI/2,1,sq,1).y);
+  if(contact) shockRings(tg,0);
+  drawShield({cx,cy,s:1,sq,mode:contact?'impact':'calm',glint:contact?undefined:11});
+  if(contact) surfaceRipples(cx,cy,topY,tg,100);
+  if(contact) PULSES.forEach((st,k)=>{ const age=tg-st; if(age>=0) wave(cx,cy,sq,age,1300+k*19,tg); });
+  goldColumn(2000+u*17,0,contact?topY:Math.round(topY*0.5),hw,u*5,!contact,false);
+  if(contact) contactLens(topY,hw,u,1);
+}
+
+// ---- phase 3: beam disintegrates, shield dissipates (16..23) ----
+const DS_SQ=[0.06,0.03,0.01,0,0,0,0,0];
+const DS_SHIELD_KEEP=[100,100,100,92,74,52,30,12];
+const DS_HEAD =[[WH,PY],[WH,PY],[PY,GD],[PY,GD],[GD,AM],[GD,AM],[AM,OR],[AM,OR]];
+const DS_TRAIL=[[GD,AM],[GD,AM],[GD,AM],[AM,OR],[AM,OR],[OR,RD],[OR,RD],[RD,RD]];
+function dissipate(v){
+  const tg=8+v, cx=32, cy=36, sq=DS_SQ[v];
+  const topY=Math.round(sv(cx,cy,-PI/2,1,sq,1).y);
+  shockRings(tg,v*6);
+  layer(()=>drawShield({cx,cy,s:1,sq,mode:v===0?'impact':'calm',facets:v<3,thin:v>=4,noOutline:v>=5,glint:v===2?11:undefined}),
+    DS_SHIELD_KEEP[v], 4321);
+  if(v<3) surfaceRipples(cx,cy,topY,tg,80-v*20);
+  if(v<2) layer(()=>PULSES.forEach((st,k)=>{ const age=tg-st; if(age>=0) wave(cx,cy,sq,age,1300+k*19,tg); }), v===0?65:30, 777);
+  if(v===0){ goldColumn(2600,topY-11,topY,6,tg*5,false,true); contactLens(topY,6,v,0.7); }
+  // gold grains spiral sideways, then rise and evaporate pixel by pixel
+  const alive=1-v/8.5, tailN=v<3?2:v<5?1:0, tau=v+1;
+  for(let i=0;i<GRAINS.length;i++){
+    const q=GRAINS[i]; if(q.life>alive) continue;
+    const pos=t=>{
+      const b=sv(cx,cy,-PI/2+q.s*(q.th0+q.om*t*1.6),1,0,q.d0+t*1.1);
+      return {x:b.x+Math.cos(t*1.4+q.ph)*q.rho, y:b.y+Math.sin(t*1.4+q.ph)*q.rho-q.up*t*t*0.45};
+    };
+    for(let m=tailN;m>=1;m--){ const p=pos(tau-m*0.35); P(p.x,p.y,DS_TRAIL[v][m-1]); }
+    const p=pos(tau); P(p.x,p.y,DS_HEAD[v][i%2]);
+  }
+}
+
+// ---- phase 4: Hyper Beam charge orb (24..31) ----
+const ORB=[0.7,1.3,2,2.8,3.6,4.4,5.2,6];
+function charge(u){
+  const cx=32, cy=32, R=ORB[u];
+  if(u<6){
+    const rr=18-u*1.8, steps=Math.round(rr*TAU);
+    for(let i=0;i<steps;i++){ if((i+u)%4) continue; const a=i/steps*TAU; P(cx+Math.cos(a)*rr, cy+Math.sin(a)*rr, u<3?OR:AM); }
+  }
+  const t=u/8, n=Math.min(PARTS.length,14+u*4);
+  for(let i=0;i<n;i++){
+    const p=PARTS[i], q=(t*1.5+p.ph)%1;
+    const rA=qq=>R+1.5+p.r0*(1-qq*qq), aA=qq=>p.a+(1-qq)*p.sp;
+    const pt=qq=>({x:cx+Math.cos(aA(qq))*rA(qq), y:cy+Math.sin(aA(qq))*rA(qq)});
+    const r=rA(q);
+    if(q>0.1){ const b=pt(q-0.1); P(b.x,b.y,r<10?AM:OR); }
+    if(q>0.05){ const b=pt(q-0.05); P(b.x,b.y,r<10?GD:AM); }
+    const h=pt(q); P(h.x,h.y,r<R+5?WH:r<11?PY:r<19?GD:AM);
+  }
+  const g=rng(9000+u*101), cnt=Math.min(8,2+u), acol=[PY,GD,GD,AM,AM,OR,OR,RD];
+  for(let k=0;k<cnt;k++){
+    const base=k*TAU/cnt+u*0.4+g()*0.3, segs=2+Math.floor(u/2)+(k&1), curv=(k%2?1:-1)*0.18;
+    let prev=null;
+    for(let j=0;j<=segs;j++){
+      const r=R+2+j*2.2, ang=base+curv*j+(j>0?(j%2?0.16:-0.16):0);
+      const pt={x:cx+Math.cos(ang)*r, y:cy+Math.sin(ang)*r};
+      if(prev) LP(prev,pt,acol[Math.min(7,j)]);
+      prev=pt;
+    }
+  }
+  const ext=Math.ceil(R)+2;
+  for(let y=cy-ext;y<=cy+ext;y++) for(let x=cx-ext;x<=cx+ext;x++){
+    const dx=x-cx, dy=y-cy, d=Math.hypot(dx,dy);
+    let c;
+    if(d<=R*0.55+0.3) c=WH;
+    else if(d<=R*0.85+0.3) c=PY;
+    else if(d<=R+0.3) c=dx+dy>0?AM:GD;
+    else if(d<=R+1.2) c=dx+dy>R*0.3?OR:AM;
+    else continue;
+    if(R>=3&&Math.hypot(dx+1,dy+1)<=R*0.45) c=WH;
+    P(x,y,c);
+  }
+  if(R>=2){
+    const steps=24;
+    for(let i=0;i<steps;i++){ if((i+u)%3) continue; const a=i/steps*TAU; P(cx+Math.cos(a)*(R+2.5), cy+Math.sin(a)*(R+2.5), OR); }
+  }
+  if(u>=3){
+    const len=3+(u-3)*3;
+    for(let k=0;k<4;k++) ray(cx,cy,k*PI/2,R+2,len,f=>f<0.4?WH:f<0.75?PY:f<0.95?GD:AM);
+    const dl=Math.max(2,Math.round(len*0.5));
+    for(let k=0;k<4;k++) ray(cx,cy,k*PI/2+PI/4,R+1.5,dl,f=>f<0.5?PY:GD);
+  }
+}
+
+// ---- phase 5: continuous Hyper Beam ray (32..39) ----
+// Origin x4,y32 -> end x60,y32, travelling +x. Rows clipped to y17..47 (max 31 px thick).
+const HB={x0:4, x1:60, cy:32, half:15};
+const HB_HEAD =[26,50,60,60,60,60,58,56];
+const HB_AMP  =[0.3,0.7,1.2,1.4,1.2,1.4,0.9,0.5];
+const HB_BASE =[3,5,7,7,7,7,5,2];
+const HB_MUZ  =[3,5,6,6,6,6,4,2];
+const HB_SPIKE=[4,8,10,9,11,9,5,2];
+const HB_FORKS=[1,3,5,5,6,5,3,0];
+const HB_SPARK=[2,5,7,7,8,7,12,16];
+function hyper(u){
+  const cy=HB.cy, x0=HB.x0, head=HB_HEAD[u], r=rng(12000+u*97);
+  clipY0=cy-HB.half; clipY1=cy+HB.half;
+  // column profile
+  const Hs=new Array(W).fill(null);
+  for(let x=x0+2;x<=head-2;x++){
+    const k=x-x0;
+    const wave=Math.sin(x*0.33-u*1.9)*HB_AMP[u]+Math.sin(x*0.13+u*0.8)*HB_AMP[u]*0.6;
+    let h=HB_BASE[u]+Math.round(wave);
+    const pulse=u>=1&&u<=5&&((((x-u*6)%11)+11)%11)===0;
+    if(pulse) h+=1;
+    if(k<10) h+=Math.round((10-k)*0.3*(HB_MUZ[u]/6));
+    const tt=head-x; if(tt<6) h=Math.min(h,Math.round(1+tt*0.9));
+    if(u===6&&((x*13+7)%9)<2) continue;
+    if(u===7&&(Math.floor((x+2)/5)%2)) continue;
+    Hs[x]={h:Math.max(1,h), pulse};
+  }
+  const hAt=x=>(Hs[x]?Hs[x].h:0);
+  // shock crescents travelling downstream
+  if(u>=1&&u<=6){
+    for(let k=0;k<2;k++){
+      const travel=(u*6+k*13)%26, xc=10+travel;
+      if(xc>head-4) continue;
+      const ry=hAt(xc)+4+travel*0.15, col=travel<9?PY:travel<18?GD:AM;
+      for(let i=0;i<=24;i++){
+        const a=-PI/2+i/24*PI, x=xc+Math.cos(a)*2, y=cy+Math.sin(a)*ry;
+        if(Math.abs(y-cy)>hAt(Math.round(x))+1) P(x,y,col);
+      }
+    }
+  }
+  // body
+  const tiers=[WH,PY,GD,AM];
+  for(let x=0;x<W;x++){
+    const e=Hs[x]; if(!e) continue;
+    const h=e.h;
+    const hc0=u===7?-1:Math.round(h*0.3), hc1=Math.round(h*0.55), hc2=Math.round(h*0.8);
+    const shift=e.pulse?1:0;
+    for(let dy=-h;dy<=h;dy++){
+      const ad=Math.abs(dy);
+      const t=ad<=hc0?0:ad<=hc1?1:ad<=hc2?2:3;
+      P(x,cy+dy,tiers[Math.max(0,t-shift)]);
+    }
+    if(r()<0.6) P(x,cy-h-1,OR);
+    if(r()<0.6) P(x,cy+h+1,OR);
+    if(r()<0.12) P(x,cy-h-2,RD);
+    if(r()<0.12) P(x,cy+h+2,RD);
+  }
+  // segmented amber filaments braided through the core
+  if(u>=1&&u<=6){
+    for(let f=0;f<2;f++){
+      for(let x=0;x<W;x++){
+        const e=Hs[x]; if(!e||e.h<3) continue;
+        if(((((x-u*5+f*4)%9)+9)%9)>=6) continue;
+        const hc1=Math.round(e.h*0.55);
+        P(x,cy+Math.round(Math.sin(x*0.42+u*1.3+f*PI)*hc1*0.85),AM);
+      }
+    }
+  }
+  // gold lightning forks off the edges
+  for(let k=0;k<HB_FORKS[u];k++){
+    const span=head-x0-18; if(span<=0) break;
+    const x=x0+12+Math.floor(r()*span), e=Hs[x];
+    const s=r()<0.5?-1:1, segs=3+Math.floor(r()*2);
+    if(!e) continue;
+    let px=x, py=cy+s*(e.h+1);
+    for(let j=0;j<segs;j++){
+      const nx=px+(j%2?-1:2)+Math.round(r()*2), ny=py+s*(2+Math.floor(r()*2));
+      L(px,py,nx,ny,j===segs-1?PY:GD);
+      if(j===1){ const bx=nx+2+Math.round(r()*2), by=ny+s; L(nx,ny,bx,by,AM); P(bx,by,GD); }
+      px=nx; py=ny;
+    }
+    P(px,py,WH);
+  }
+  // flaring muzzle
+  const mr=HB_MUZ[u], mx=x0+1, sp=HB_SPIKE[u];
+  if(u>=1&&u<=5){
+    for(let i=0;i<=28;i++){
+      const a=i/28*TAU; if(Math.abs(Math.atan2(Math.sin(a),Math.cos(a)))<0.6) continue;
+      if((i+u)%3===0) continue;
+      P(mx+2+Math.cos(a)*5, cy+Math.sin(a)*(mr+5), u<=2?PY:GD);
+    }
+  }
+  for(const s of [-1,1]){
+    for(let i=0;i<sp;i++){
+      const y=cy+s*(mr+1+i), f=i/sp;
+      if(i<3){ P(mx-1,y,GD); P(mx+1,y,GD); }
+      P(mx,y,f<0.3?WH:f<0.6?PY:f<0.85?GD:AM);
+    }
+    ray(mx,cy,s*0.55,mr+1,Math.round(sp*0.6),f=>f<0.4?PY:f<0.8?GD:AM);
+    ray(mx,cy,PI-s*0.8,mr,3,f=>f<0.5?GD:AM);
+  }
+  for(let dy=-mr-1;dy<=mr+1;dy++) for(let dx=-3;dx<=3;dx++){
+    const e=(dx/2.6)*(dx/2.6)+(dy/(mr+0.6))*(dy/(mr+0.6));
+    const c=e<=0.3?WH:e<=0.6?PY:e<=0.85?GD:e<=1.15?AM:0;
+    if(c&&!(u===7&&c===WH)) P(mx+dx,cy+dy,c);
+  }
+  // hot tip
+  if(u<=6){
+    const tx=head, tr=u===6?2:3+(u%2);
+    for(let dy=-tr;dy<=tr;dy++) for(let dx=-tr;dx<=tr;dx++){
+      const d=Math.abs(dx)+Math.abs(dy); if(d>tr) continue;
+      P(tx-1+dx,cy+dy,d<=tr-2?WH:d<=tr-1?PY:GD);
+    }
+    P(tx+tr,cy,PY);
+    for(const s of [-1,1]){
+      ray(tx,cy,s*0.6,tr,3,f=>f<0.5?GD:AM);
+      ray(tx-1,cy,PI-s*0.5,tr+1,4,f=>f<0.5?GD:OR);
+    }
+  }
+  // sparse outward sparks
+  for(let k=0;k<HB_SPARK[u];k++){
+    const x=x0+6+Math.floor(r()*Math.max(1,head-x0-8));
+    const s=r()<0.5?-1:1;
+    const dy=(hAt(x)||2)+2+Math.floor(r()*7)+(u>=6?(u-5)*3:0);
+    const y=cy+s*dy;
+    if(k%3===0) P(x-1,y,k%2?AM:OR);
+    P(x,y,[GD,AM,OR,PY][k%4]);
+  }
+}
+
+// ---- frame assembly ----
+function drawFrame(i){
+  if(i<8) deploy(i); else if(i<16) absorb(i-8); else if(i<24) dissipate(i-16); else if(i<32) charge(i-24); else hyper(i-32);
+}
+function phaseOf(i){ return PHASES.find(p=>i>=p.from&&i<=p.to).name; }
+function frameImage(index){
+  const i=((index%FRAMES)+FRAMES)%FRAMES;
+  B.fill(T);
+  clipY0=0; clipY1=H-1;
+  drawFrame(i);
+  clipY0=0; clipY1=H-1;
+  const img=new ImageData(W,H);
+  for(let p=0;p<W*H;p++){
+    const c=B[p]; if(!c) continue;
+    const q=RGB[c];
+    img.data[p*4]=q[0]; img.data[p*4+1]=q[1]; img.data[p*4+2]=q[2]; img.data[p*4+3]=255;
+  }
+  return img;
+}
+function renderFrame(index,canvas){
+  canvas=canvas||document.createElement('canvas');
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  ctx.imageSmoothingEnabled=false;
+  ctx.clearRect(0,0,W,H);
+  ctx.putImageData(frameImage(index),0,0);
+  return canvas;
+}
+const frameName=i=>`protect_parry_${String(i).padStart(2,'0')}.png`;
+function exportFrames(){
+  const out=[];
+  for(let i=0;i<FRAMES;i++){ const c=renderFrame(i,document.createElement('canvas')); out.push({name:frameName(i), dataUrl:c.toDataURL('image/png')}); }
+  return out;
+}
+function framePivot(i){ return i>=32?{...BEAM_PIVOT}:{...PIVOT}; }
+function frameCenter(i){ return i>=24?{x:32,y:32}:{x:32,y:36}; }
+function sheetMetadata(){
+  return {
+    image:'protect_parry_hyperbeam_sheet.png',
+    size:{w:W*FRAMES,h:H},
+    frameWidth:W, frameHeight:H, frameCount:FRAMES, frameDurationMs:DUR, loop:true, kind:'sprite',
+    layout:'horizontal',
+    footprint:{x:22,y:20,w:21,h:31},
+    phases:PHASES.map(p=>({...p})),
+    shield:{
+      center:{x:32,y:36}, incomingDirection:'from top (-y); rotate to actual attack direction',
+      absorb:{from:8,to:15, note:'shield intact; beam absorbed into curling wavefronts, grains and ripples; no reflection'},
+      dissipate:{from:16,to:23, note:'gold energy disintegrates into rising particles; cyan ripples and shield contour fade by pixel removal'}
+    },
+    beam:{
+      frames:{from:32,to:39},
+      subPhases:[{name:'grow',from:32,to:33},{name:'sustain',from:34,to:37},{name:'dissolve',from:38,to:39}],
+      origin:{x:HB.x0,y:HB.cy}, end:{x:HB.x1,y:HB.cy}, direction:'+x',
+      maxThickness:32, occupiedRows:{y0:HB.cy-HB.half,y1:HB.cy+HB.half},
+      muzzleRegion:{x0:0,x1:14}, stretchableSpan:{x0:16,x1:52}, tipRegion:{x0:53,x1:63},
+      affine:'scale along x from origin pivot, rotate about origin for 8 directions'
+    },
+    palette:{transparentIndex:0, opaqueCount:PAL.length-1,
+      colors:PAL.map((h,i)=>({index:i, name:PAL_NAMES[i], hex:h||null, alpha:h?255:0}))},
+    frames:Array.from({length:FRAMES},(_,i)=>({
+      index:i, name:frameName(i), phase:phaseOf(i),
+      rect:{x:i*W,y:0,w:W,h:H}, durationMs:DUR,
+      pivot:framePivot(i), effectCenter:frameCenter(i)
+    }))
+  };
+}
+function exportSheet(){
+  const c=document.createElement('canvas'); c.width=W*FRAMES; c.height=H;
+  const ctx=c.getContext('2d'); ctx.imageSmoothingEnabled=false;
+  for(let i=0;i<FRAMES;i++) ctx.putImageData(frameImage(i),i*W,0);
+  const metadata=sheetMetadata();
+  return {name:metadata.image, dataUrl:c.toDataURL('image/png'), metadata};
+}
+
+window.pixelArt = {
+  meta:{width:W, height:H, frameCount:FRAMES, frameDurationMs:DUR, kind:'sprite',
+    pivot:{...PIVOT}, beamPivot:{...BEAM_PIVOT}, phases:PHASES.map(p=>({...p})),
+    palette:PAL.slice(1), transparentIndex:0},
+  renderFrame, exportFrames, exportSheet
+};
+
+// ---- preview UI (separate canvases; exports never see these backgrounds) ----
+const view=document.getElementById('view'), viewWrap=document.getElementById('viewWrap');
+const gba=document.getElementById('gba'), gctx=gba.getContext('2d');
+const grid=document.getElementById('grid'), grctx=grid.getContext('2d');
+const info=document.getElementById('info'), playBtn=document.getElementById('play');
+const footChk=document.getElementById('foot'), gbaNote=document.getElementById('gbaNote');
+gctx.imageSmoothingEnabled=false; grctx.imageSmoothingEnabled=false;
+
+const gbaBg=(()=>{
+  const c=document.createElement('canvas'); c.width=240; c.height=160;
+  const x=c.getContext('2d'), r=rng(31337);
+  x.fillStyle='#4c7a2e'; x.fillRect(0,0,240,160);
+  for(let i=0;i<70;i++){
+    const bx=(r()*240)|0, by=(r()*160)|0, rr=4+((r()*10)|0);
+    x.fillStyle=r()<0.5?'#3a6224':'#6a9a3a';
+    for(let yy=-rr;yy<=rr;yy++) for(let xx=-rr;xx<=rr;xx++) if(xx*xx+yy*yy<=rr*rr&&r()<0.8) x.fillRect(bx+xx,by+yy,1,1);
+  }
+  for(let i=0;i<30;i++){
+    const bx=(r()*240)|0, by=(r()*160)|0, rr=3+((r()*6)|0);
+    x.fillStyle='#a88a58';
+    for(let yy=-rr;yy<=rr;yy++) for(let xx=-rr*2;xx<=rr*2;xx++) if(xx*xx/4+yy*yy<=rr*rr&&r()<0.6) x.fillRect(bx+xx,by+yy,1,1);
+  }
+  for(let i=0;i<900;i++){ x.fillStyle=r()<0.5?'#2e521c':'#8cbc4a'; x.fillRect((r()*240)|0,(r()*160)|0,1,1); }
+  return c;
+})();
+
+let cur=0, playing=true, acc=0, last=performance.now();
+function show(){
+  renderFrame(cur,view);
+  gctx.imageSmoothingEnabled=false;
+  gctx.clearRect(0,0,240,160);
+  gctx.drawImage(gbaBg,0,0);
+  if(cur>=32){
+    gctx.drawImage(view,20-BEAM_PIVOT.x,56-BEAM_PIVOT.y);
+    gctx.drawImage(view,20-BEAM_PIVOT.x*2,112-BEAM_PIVOT.y,W*2,H);
+    gbaNote.textContent='beam: 1× at origin (20,56) and 2× lengthwise affine stretch at origin (20,112)';
+  } else {
+    const ox=120-PIVOT.x, oy=96-PIVOT.y;
+    if(footChk.checked){
+      gctx.fillStyle='#e8f0d0';
+      for(let x=22;x<=42;x+=2){ gctx.fillRect(ox+x,oy+20,1,1); gctx.fillRect(ox+x,oy+50,1,1); }
+      for(let y=20;y<=50;y+=2){ gctx.fillRect(ox+22,oy+y,1,1); gctx.fillRect(ox+42,oy+y,1,1); }
+    }
+    gctx.drawImage(view,ox,oy);
+    gbaNote.textContent=cur>=8&&cur<24?'shield absorbs beam arriving from top (game rotates to attack direction)':'';
+  }
+  info.textContent=`frame ${String(cur).padStart(2,'0')}/${FRAMES-1} · ${phaseOf(cur)} · ${DUR} ms · pivot ${framePivot(cur).x},${framePivot(cur).y}`;
+}
+function drawGrid(){
+  grctx.clearRect(0,0,512,320);
+  const tmp=document.createElement('canvas');
+  for(let i=0;i<FRAMES;i++){ renderFrame(i,tmp); grctx.drawImage(tmp,(i%8)*64,Math.floor(i/8)*64); }
+}
+function tick(now){
+  const dt=now-last; last=now;
+  if(playing){
+    acc+=dt; if(acc>1000) acc=0;
+    let changed=false;
+    while(acc>=DUR){ acc-=DUR; cur=(cur+1)%FRAMES; changed=true; }
+    if(changed) show();
+  }
+  requestAnimationFrame(tick);
+}
+function dl(name,url){ const a=document.createElement('a'); a.href=url; a.download=name; document.body.appendChild(a); a.click(); a.remove(); }
+
+document.getElementById('prev').onclick=()=>{ playing=false; playBtn.textContent='▶ play'; cur=(cur+FRAMES-1)%FRAMES; show(); };
+document.getElementById('next').onclick=()=>{ playing=false; playBtn.textContent='▶ play'; cur=(cur+1)%FRAMES; show(); };
+playBtn.onclick=()=>{ playing=!playing; playBtn.textContent=playing?'⏸ pause':'▶ play'; acc=0; };
+document.getElementById('bgSel').onchange=e=>{ viewWrap.className=e.target.value; grid.className=e.target.value; };
+footChk.onchange=show;
+document.getElementById('dlSheet').onclick=()=>{ const s=exportSheet(); dl(s.name,s.dataUrl); };
+document.getElementById('dlMeta').onclick=()=>{
+  const blob=new Blob([JSON.stringify(sheetMetadata(),null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob); dl('protect_parry_hyperbeam_sheet.json',url); setTimeout(()=>URL.revokeObjectURL(url),2000);
+};
+document.getElementById('dlFrames').onclick=()=>{ exportFrames().forEach((f,i)=>setTimeout(()=>dl(f.name,f.dataUrl),i*120)); };
+grid.onclick=e=>{
+  const r=grid.getBoundingClientRect();
+  const fx=Math.floor((e.clientX-r.left)/r.width*8), fy=Math.floor((e.clientY-r.top)/r.height*5);
+  cur=Math.max(0,Math.min(FRAMES-1,fy*8+fx)); playing=false; playBtn.textContent='▶ play'; show();
+};
+
+document.getElementById('palette').innerHTML='palette: '+PAL.slice(1).map((h,i)=>`<span class="sw" title="${i+1} ${PAL_NAMES[i+1]} ${h}" style="background:${h}"></span>`).join('');
+(function verify(){
+  const used=new Set(); let partial=0, beamOut=0, centerPx=0;
+  for(let i=0;i<FRAMES;i++){
+    const d=frameImage(i).data;
+    for(let p=0;p<d.length;p+=4){
+      const a=d[p+3];
+      if(a===255){
+        used.add(`${d[p]},${d[p+1]},${d[p+2]}`);
+        const y=Math.floor(p/4/W), x=(p/4)%W;
+        if(i>=32&&(y<HB.cy-HB.half||y>HB.cy+HB.half)) beamOut++;
+        if(i>=8&&i<24&&x>=26&&x<=38&&y>=28&&y<=46) centerPx++;
+      } else if(a!==0) partial++;
+    }
+  }
+  document.getElementById('verify').textContent=`check: ${used.size}/${PAL.length-1} opaque colors used (limit 15) · partial-alpha pixels: ${partial} · beam pixels outside 31-row band: ${beamOut} · opaque px in shield core (frames 8–23): ${centerPx} · native ${W}×${H}, sheet ${W*FRAMES}×${H}`;
+})();
+
+drawGrid();
+show();
+requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>

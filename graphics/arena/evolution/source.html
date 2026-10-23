@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GBA Evolution VFX · 64×64 · 32 frames</title>
+<style>
+  :root{--bg:#0f1417;--panel:#172024;--line:#2a3a3e;--ink:#d6e6e2;--gold:#f2b43a;--teal:#34c6b4}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:13px/1.45 ui-monospace,Menlo,Consolas,monospace;display:flex;flex-direction:column;align-items:center;padding:16px 12px 40px}
+  h1{font-size:15px;margin:0 0 2px;color:var(--gold);letter-spacing:.5px}
+  header p{margin:0 0 12px;color:#8fa9a4}
+  .stage{border:2px solid var(--line);background:#000;line-height:0}
+  #view{width:512px;height:512px;image-rendering:pixelated;image-rendering:crisp-edges;display:block}
+  .controls{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;margin:10px 0 0;max-width:1080px}
+  button,select{background:var(--panel);color:var(--ink);border:1px solid var(--line);padding:5px 10px;font:inherit;cursor:pointer;border-radius:3px}
+  button:hover,select:hover{border-color:var(--teal)}
+  #lbl{min-width:290px;display:inline-block;color:#bfe9df}
+  input[type=range]{width:220px;accent-color:var(--gold)}
+  #report{background:var(--panel);border:1px solid var(--line);padding:8px 10px;margin:12px 0 0;max-width:1080px;white-space:pre-wrap;color:#a9cfc7}
+  #strip{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;max-width:1080px;margin-top:12px}
+  #strip div{position:relative;line-height:0}
+  #strip canvas{width:128px;height:128px;image-rendering:pixelated;image-rendering:crisp-edges;background:#1a2428;border:1px solid transparent;cursor:pointer}
+  #strip canvas.on{border-color:var(--gold)}
+  #strip span{position:absolute;left:3px;top:3px;font-size:10px;line-height:1;color:#6f8c87}
+</style>
+</head>
+<body>
+<header>
+  <h1>Pokémon evolution overlay VFX — 64×64 · 32 frames @ 100 ms · pivot (32,40)</h1>
+  <p>Transparent overlay for PMD Charmeleon → Charizard. Preview background is display-only; exports are alpha-clean.</p>
+</header>
+<div class="stage"><canvas id="view" width="512" height="512"></canvas></div>
+<div class="controls">
+  <button id="first" title="First frame">⏮</button>
+  <button id="prev" title="Previous frame (←)">◀ Prev</button>
+  <button id="play" title="Pause / play (Space)">❚❚ Pause</button>
+  <button id="next" title="Next frame (→)">Next ▶</button>
+  <input type="range" id="scrub" min="0" max="31" value="0" step="1">
+  <span id="lbl"></span>
+</div>
+<div class="controls">
+  <label>Background
+    <select id="bg">
+      <option value="dark">Dark</option>
+      <option value="arena">Arena teal</option>
+      <option value="checker">Checker</option>
+    </select>
+  </label>
+  <label><input type="checkbox" id="guides"> Guides</label>
+  <button id="dlSheet">Download spritesheet PNG</button>
+  <button id="dlMeta">Download metadata JSON</button>
+  <button id="dlFrames">Download frame PNGs</button>
+</div>
+<pre id="report">validating…</pre>
+<div id="strip"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- Contract constants ---------- */
+const W=64, H=64, FRAMES=32, MS=100, PIVOT={x:32,y:40}, TAU=Math.PI*2;
+
+/* Shared palette: index order == draw priority (brighter wins). 13 opaque colours. */
+const PAL=['',
+  '#0b2830', // 1 DT0 deepest teal
+  '#4e2410', // 2 BR  ember brown
+  '#135a5c', // 3 DT  dark teal
+  '#9a4818', // 4 AM  amber
+  '#1f8f86', // 5 TL  teal
+  '#d8802a', // 6 OG  deep gold
+  '#34c6b4', // 7 TQ  turquoise
+  '#f2b43a', // 8 GD  gold
+  '#86f0dc', // 9 AQ  bright aqua
+  '#ffd97a', //10 CR  pale gold
+  '#cffcf0', //11 PA  pale aqua
+  '#fff1c8', //12 WW  warm white
+  '#fffdf3'  //13 WH  hot warm-white
+];
+const DT0=1,BR=2,DT=3,AM=4,TL=5,OG=6,TQ=7,GD=8,AQ=9,CR=10,PA=11,WW=12,WH=13;
+const RGB=PAL.map(h=>h?[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)]:null);
+
+const PHASES=[
+  {from:0, to:7, name:'Rise & swirl'},
+  {from:8, to:15,name:'Ribbons & crown'},
+  {from:16,to:19,name:'Radial shatter'},
+  {from:20,to:27,name:'Wings, sparks & orbit'},
+  {from:28,to:31,name:'Settle & fade'}
+];
+
+/* ---------- Deterministic randomness ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function hash(x,y,s){let h=(x*374761393+y*668265263+s*1442695041)|0;h=Math.imul(h^(h>>>13),1274126177);h^=h>>>16;return (h>>>0)/4294967296;}
+const fr01=v=>((v%1)+1)%1;
+
+/* ---------- Pixel buffer & primitives ---------- */
+let B=new Uint8Array(W*H);
+let LX0=2,LX1=61,LY0=2,LY1=56;
+function main(){LX0=2;LX1=61;LY0=2;LY1=56;}     // non-ground art box
+function ground(){LX0=2;LX1=61;LY0=36;LY1=60;}  // foreshortened ground ring band
+
+function px(x,y,c){
+  if(!c)return;
+  x=Math.round(x); y=Math.round(y);
+  if(x<LX0||x>LX1||y<LY0||y>LY1)return;
+  const i=y*W+x;
+  if(c>B[i])B[i]=c;
+}
+function line(x0,y0,x1,y1,c){
+  x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);
+  const dx=Math.abs(x1-x0),sx=x0<x1?1:-1,dy=-Math.abs(y1-y0),sy=y0<y1?1:-1;
+  let e=dx+dy;
+  for(;;){px(x0,y0,c);if(x0===x1&&y0===y1)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx;}if(e2<=dx){e+=dx;y0+=sy;}}
+}
+function plus(x,y,core,arm){x=Math.round(x);y=Math.round(y);px(x,y,core);px(x-1,y,arm);px(x+1,y,arm);px(x,y-1,arm);px(x,y+1,arm);}
+function star(x,y,len,core,mid,edge){
+  x=Math.round(x);y=Math.round(y);px(x,y,core);
+  for(let k=1;k<=len;k++){const c=k===1?mid:edge;px(x-k,y,c);px(x+k,y,c);px(x,y-k,c);px(x,y+k,c);}
+}
+function diamond(x,y,r,core,mid,edge){
+  x=Math.round(x);y=Math.round(y);
+  for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){
+    const d=Math.abs(dx)+Math.abs(dy); if(d>r)continue;
+    let c=d===r?edge:(r>=2&&d>=r-1?mid:core);
+    if(r===0)c=core;
+    px(x+dx,y+dy,c);
+  }
+}
+function diamondHollow(x,y,r,core,edge){
+  x=Math.round(x);y=Math.round(y);px(x,y,core);
+  for(let dy=-r;dy<=r;dy++)for(let dx=-r;dx<=r;dx++){if(Math.abs(dx)+Math.abs(dy)===r)px(x+dx,y+dy,edge);}
+}
+/* Tapered pointed ray: cols=[base core, mid core, tip core, side] */
+function ray(cx,cy,ang,r0,r1,w0,cols){
+  const len=r1-r0; if(len<=0)return;
+  const ca=Math.cos(ang),sa=Math.sin(ang);
+  for(let r=r0;r<=r1+0.01;r+=0.5){
+    const k=(r-r0)/len, x=cx+ca*r, y=cy+sa*r;
+    px(x,y,k>0.8?cols[2]:(k>0.35?cols[1]:cols[0]));
+    const w=w0*(1-k);
+    if(w>=0.6){const n=Math.round(w);for(let j=1;j<=n;j++){px(x-sa*j,y+ca*j,cols[3]);px(x+sa*j,y-ca*j,cols[3]);}}
+  }
+}
+/* Unique rounded ellipse points; fn(x,y,angle,front) — front = lower half, nearer the viewer */
+function ellipse(cx,cy,rx,ry,fn){
+  const n=Math.max(16,Math.round((rx+ry)*4)), seen=new Set();
+  for(let i=0;i<n;i++){
+    const a=i/n*TAU, x=Math.round(cx+Math.cos(a)*rx), y=Math.round(cy+Math.sin(a)*ry), k=y*W+x;
+    if(seen.has(k))continue; seen.add(k); fn(x,y,a,Math.sin(a)>=0);
+  }
+}
+function boxDist(cx,cy,a){
+  const ca=Math.cos(a),sa=Math.sin(a);let d=1e9;
+  if(ca>1e-6)d=Math.min(d,(61-cx)/ca); if(ca<-1e-6)d=Math.min(d,(2-cx)/ca);
+  if(sa>1e-6)d=Math.min(d,(56-cy)/sa); if(sa<-1e-6)d=Math.min(d,(2-cy)/sa);
+  return d;
+}
+function bez(p0,p1,p2,p3,s){const u=1-s;return u*u*u*p0+3*u*u*s*p1+3*u*s*s*p2+s*s*s*p3;}
+
+/* ---------- Seeded particle sets (fixed seed) ---------- */
+const R=mulberry32(0xE70117);
+const RISE=[];for(let i=0;i<28;i++)RISE.push({a:i/28*TAU+(R()-0.5)*0.3,s:i%4,h:8+R()*20,gold:R()<0.3,big:R()<0.25});
+const MOTE=[];for(let i=0;i<10;i++)MOTE.push({off:R()*38,a:R()*TAU,r:15+R()*5,sp:0.35+R()*0.3,gold:R()<0.4});
+const SH=[];for(let i=0;i<16;i++)SH.push({a:-Math.PI/2+i/16*TAU+(R()-0.5)*0.16,f:[1,0.52,0.8,0.46][i%4]*(0.86+R()*0.14)});
+const SPK=[];for(let i=0;i<18;i++)SPK.push({a:-Math.PI/2+(i+0.5)/18*TAU+(R()-0.5)*0.2,v:0.6+R()*0.4,sz:R()<0.35?3:2,gold:R()<0.35,ph:R()});
+const WSP=[];for(let i=0;i<22;i++){const sg=i%2?1:-1;WSP.push({s:20+(i%3),x0:32+sg*(2+R()*6),y0:26+R()*8,vx:sg*(1.1+R()*1.5),vy:-(1.8+R()*1.6),land:47+Math.floor(R()*7),big:R()<0.3});}
+const ORB=[];for(let i=0;i<7;i++)ORB.push({a:i/7*TAU+R()*0.4,r:17+R()*6,yc:26+R()*10,sp:0.42+R()*0.2,end:28+(i%4)});
+const TW=[];for(let i=0;i<8;i++){const sg=i%2?1:-1;TW.push({x:32+sg*(13+R()*12),y:8+R()*34,s:26+(i%3)});}
+
+/* ---------- Phase A: ground ellipse & rising swirl (0–8) ---------- */
+function groundGlow(t){
+  if(t>8)return; ground();
+  const b=t<3?0.35+t*0.3:Math.max(0,0.95-(t-2)*0.16);
+  ellipse(32,49,24,8,(x,y,a,fr)=>{
+    const d=fr01(a/TAU*22+t*0.3); if(d>0.12+0.5*b)return;
+    let c=fr?(b>0.7?TQ:(b>0.4?TL:DT)):(b>0.6?DT:DT0);
+    if(fr&&d<0.07&&b>0.6)c=AQ;
+    px(x,y,c);
+  });
+  if(t>=1&&t<=6){
+    const rx=21-t*2, ry=Math.max(2,Math.round(rx*0.34));
+    ellipse(32,49,rx,ry,(x,y,a,fr)=>{if(fr01(a/TAU*12-t*0.4)>0.3)return;px(x,y,fr?TL:DT0);});
+  }
+  main();
+}
+function riseParticles(t){
+  for(const p of RISE){
+    const age=t-p.s; if(age<0||age>5)continue;
+    const pos=ag=>{const k=ag/5,ang=p.a+ag*0.55,rx=24*(1-k)+12*k;
+      return [32+Math.cos(ang)*rx,49+Math.sin(ang)*rx*0.34-p.h*(0.35*k+0.65*k*k),Math.sin(ang)>=0];};
+    const [x,y,fr]=pos(age);
+    if(age<=1)ground(); else main();
+    if(age===0){px(x,y,fr?TQ:TL);if(fr)px(x,y-1,p.gold?CR:AQ);main();continue;}
+    const [x1,y1]=pos(age-0.5),[x2,y2]=pos(age-1);
+    const head=p.gold?(fr?CR:OG):(fr?AQ:TL), trail=p.gold?(fr?GD:AM):(fr?TQ:DT), tail=p.gold?AM:DT;
+    line(x2,y2,x1,y1,tail); line(x1,y1,x,y,trail);
+    if(p.big&&fr)plus(x,y,WW,head); else px(x,y,head);
+    main();
+  }
+}
+
+/* ---------- Helix strands → energy ribbons (3–15) ---------- */
+const HEL=[0,0,0,4,9,14,19,24,28,30,32,34,35,36,37,38];
+function helix(t){
+  const Hh=HEL[t]||0; if(!Hh)return;
+  const ribbon=t>=8, wide=t>=10;
+  const squeeze=t>=13?1-(t-12)*0.14:1;       // anticipation: coil tightens before the burst
+  const spreadA=t<8?(8-t)*0.8:0;               // swirl inward
+  for(let s=0;s<2;s++){
+    const gold=s===1;
+    const cCore=gold?CR:AQ,cEdge=gold?GD:TQ,cOut=gold?OG:TL,cBack=gold?AM:DT;
+    let prev=null,last=null;
+    for(let h=0;h<=Hh;h++){
+      const Rr=(13-h*0.12+spreadA)*squeeze, ph=h*0.27+t*0.8+s*Math.PI;
+      const sn=Math.sin(ph),cs=Math.cos(ph), x=32+sn*Rr, y=48-h, front=cs>=-0.15;
+      if(front){
+        const pulse=fr01((h-t*4.5)/14)<2.5/14;
+        const core=pulse?WH:cCore;
+        if(prev)line(prev[0],prev[1],x,y,core); else px(x,y,core);
+        if(ribbon){const o=sn>=0?1:-1;px(x+o,y,cEdge);if(wide&&cs>0.55){px(x-o,y,cEdge);px(x+2*o,y,cOut);}}
+      }else if(h%2===0)px(x,y,cBack);
+      prev=[x,y]; last=[x,y,front];
+    }
+    const [hx,hy,hf]=last;
+    if(hf){if(t<8)plus(hx,hy,WH,cCore); else star(hx,hy,2,WH,cCore,cEdge);}
+    else plus(hx,hy,cOut,cBack);
+  }
+}
+function motes(t){
+  if(t<5||t>15)return;
+  for(let i=0;i<MOTE.length;i++){
+    if(i>=(t-4)*2)continue;
+    const m=MOTE[i];
+    const P=tt=>{const h=(m.off+tt*3.2)%38,a=m.a+tt*m.sp;return [32+Math.sin(a)*m.r*(1-h/70),50-h,Math.cos(a)>=0,h];};
+    const [x,y,fr,h]=P(t),[x1,y1,,h1]=P(t-0.4);
+    if(y<6)continue;
+    if(fr){if(h1<h)line(x1,y1,x,y,m.gold?GD:TQ);px(x,y,m.gold?CR:PA);}
+    else{if(h1<h)px(x1,y1,DT);px(x,y,m.gold?AM:TL);}
+  }
+}
+
+/* ---------- Crown of pointed rays opening (9–15) ---------- */
+function crown(t){
+  if(t<9||t>15)return;
+  const cx=32,cy=30,spread=0.22+(t-9)*0.15,rin=11+(t-9)*0.7;
+  for(let i=0;i<7;i++){
+    const order=Math.abs(i-3),appear=9+order; if(t<appear)continue;
+    const age=t-appear,full=order%2===0?12:8,len=Math.min(full,3+age*3.2);
+    const ang=-Math.PI/2+((i-3)/3)*spread;
+    ray(cx,cy,ang,rin,rin+len,1.4,[GD,CR,WH,order%2?TQ:TL]);
+    px(cx+Math.cos(ang)*(rin-1.5),cy+Math.sin(ang)*(rin-1.5),order%2?TL:OG);
+    if(age===1)plus(cx+Math.cos(ang)*(rin+len+1),cy+Math.sin(ang)*(rin+len+1),WH,PA);
+  }
+}
+
+/* ---------- Radial shatter + diamond sparks (16–22) ---------- */
+function shatter(t){
+  if(t<16||t>22)return;
+  const cx=32,cy=31,age=t-16;
+  if(age<=3){
+    for(let i=0;i<SH.length;i++){
+      const r=SH[i],L=Math.floor((boxDist(cx,cy,r.a)-1)*r.f),big=r.f>0.7,ca=Math.cos(r.a),sa=Math.sin(r.a);
+      if(age===0){
+        ray(cx,cy,r.a,4,L,big?1.8:1.1,[WH,WW,CR,big?AQ:TQ]);
+      }else if(age===1){
+        for(let d=6;d<=L;d+=0.5){
+          if(Math.floor((d+i*1.7)/4)%2!==0)continue;
+          const k=d/L; px(cx+ca*d,cy+sa*d,k>0.85?WH:(k>0.5?PA:AQ));
+          if(big&&k<0.6)px(cx+ca*d-sa,cy+sa*d+ca,TL);
+        }
+      }else if(age===2){
+        for(let d=Math.ceil(L*0.55);d<=L;d+=0.5){
+          if(((d+i*2.3)%5)>=2)continue;
+          px(cx+ca*d,cy+sa*d,d>L-1.5?PA:TQ);
+        }
+      }else if(big){
+        px(cx+ca*L,cy+sa*L,TL); px(cx+ca*(L-1),cy+sa*(L-1),DT);
+      }
+    }
+  }
+  if(age===0){
+    star(cx,cy,3,WH,WH,WW);
+    for(let k=0;k<12;k++){const a=k/12*TAU+0.26;px(cx+Math.cos(a)*6,cy+Math.sin(a)*6,PA);}
+  }else if(age===1){
+    for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){
+      if(Math.abs(dx)+Math.abs(dy)!==4||hash(dx,dy,3)<0.45)continue;
+      px(cx+dx,cy+dy,(dx+dy)%2?AQ:PA);
+    }
+    px(cx,cy,WW);
+  }
+  for(const s of SPK){
+    const rr=Math.min(4+s.v*[2,9,15,19,22,24,25][age],boxDist(cx,cy,s.a)-s.sz-1);
+    const x=cx+Math.cos(s.a)*rr, y=cy+Math.sin(s.a)*rr+(s.gold&&age>=3?(age-2)*(age-2)*0.5:0);
+    const core=s.gold?WW:WH, mid=s.gold?CR:AQ, edge=s.gold?OG:TL;
+    if(age===0){if(s.ph<0.5)px(x,y,WW);}
+    else if(age===1)diamond(x,y,s.sz,core,mid,edge);
+    else if(age===2){if(s.ph<0.45)diamondHollow(x,y,s.sz,core,mid); else diamond(x,y,s.sz,core,mid,edge);}
+    else if(age===3)diamond(x,y,s.sz-1,core,mid,edge);
+    else if(age===4){if(s.ph>0.3)plus(x,y,mid,edge);}
+    else if(age===5){if(s.ph>0.5)px(x,y,edge);}
+    else if(s.ph>0.75)px(x,y,s.gold?BR:DT);
+  }
+}
+/* ---------- Ground shock-ring (16–21) ---------- */
+function shock(t){
+  if(t<16||t>21)return; ground();
+  const i=t-16,rx=[9,17,24,29,29,29][i],ry=[3,6,8,10,10,10][i];
+  if(i<=3){
+    const duty=i<3?1.01:0.62;
+    ellipse(32,49,rx,ry,(x,y,a,fr)=>{if(fr01(a/TAU*26)>duty)return;px(x,y,fr?(i<2?WH:(i<3?PA:AQ)):(i<2?AQ:TQ));});
+    if(i>=1)ellipse(32,49,rx-2,Math.max(2,ry-1),(x,y,a,fr)=>{if(!fr&&fr01(a/TAU*20)>0.5)return;px(x,y,fr?TQ:TL);});
+    if(i>=2)ellipse(32,49,rx-5,Math.max(2,ry-2),(x,y,a,fr)=>{if(fr01(a/TAU*18+i*0.3)>0.35)return;px(x,y,fr?TL:DT);});
+    if(i===1||i===2){
+      let n=0;
+      ellipse(32,49,rx,ry,(x,y,a,fr)=>{n++;if(!fr||hash(n,i,17)>0.16)return;px(x,y-1,AQ);px(x,y-2,i===1?PA:TQ);if(i===2)px(x,y-3,TL);});
+    }
+  }else{
+    const duty=i===4?0.3:0.12;
+    ellipse(32,49,rx,ry,(x,y,a,fr)=>{if(fr01(a/TAU*26+i*0.2)>duty)return;px(x,y,fr?TL:DT);});
+  }
+  main();
+}
+
+/* ---------- Wing-like arcs unfolding (20–27) ---------- */
+const WF={20:.45,21:.66,22:.85,23:.97,24:1,25:1,26:1,27:1};
+const WU={20:.42,21:.68,22:.88,23:1,24:1,25:1,26:1,27:1};
+const WV={20:0,21:0,22:0,23:0,24:.14,25:.34,26:.56,27:.78};
+function wingPt(sg,k,f,s){
+  const sc=1-k*0.14;
+  return [32+sg*bez(3,20*f*sc,30*f*sc,22*f*sc,s), bez(38+k,44+k,26+k*2,8+k*5+(1-f)*12,s)];
+}
+function wings(t){
+  if(t<20||t>27)return;
+  const f=WF[t],u=WU[t],v=WV[t],drop=t>=24?(t-23)*0.11:0,cool=t>=26;
+  for(const sg of [-1,1]){
+    for(let k=2;k>=0;k--){
+      const uk=Math.min(u,1-k*0.08); if(uk<=v)continue;
+      const N=48,pts=[];
+      for(let j=0;j<=N;j++){const s=v+(uk-v)*j/N;pts.push([s,...wingPt(sg,k,f,s)]);}
+      for(let j=1;j<pts.length;j++){
+        const [s,x,y]=pts[j],[,x0,y0]=pts[j-1];
+        if(drop&&hash(Math.round(x),Math.round(y),31+k)<drop)continue;
+        let tx=x-x0,ty=y-y0;const L=Math.hypot(tx,ty)||1;tx/=L;ty/=L;
+        const nx=sg>0?-ty:ty, ny=sg>0?tx:-tx;   // outward normal
+        if(k===0){
+          const flow=fr01(s*9-t*1.1);
+          const core=cool?(flow<0.3?PA:AQ):((flow<0.28||s>uk-0.06)?WH:(flow<0.55?WW:CR));
+          line(x0,y0,x,y,core);
+          if(s>0.18&&s<0.85){px(x+nx,y+ny,cool?TQ:GD);px(x-nx,y-ny,cool?TL:TQ);}
+          if(s>0.35&&s<0.75&&j%6===0)px(x+nx*2,y+ny*2,cool?TL:OG);
+        }else if(k===1){
+          line(x0,y0,x,y,cool?TQ:AQ);
+          if(s>0.25&&s<0.8)px(x-nx,y-ny,TL);
+        }else if(j%2===0)px(x,y,cool?DT:TL);
+      }
+      if(k===0){
+        for(const fs of [0.4,0.53,0.66,0.79]){
+          if(fs<v||fs>uk)continue;
+          const [x,y]=wingPt(sg,0,f,fs);
+          if(drop&&hash(Math.round(x),Math.round(y),9)<drop)continue;
+          const ln=fs<0.6?3:2;
+          for(let q=1;q<=ln;q++)px(x-sg*Math.round(q*0.5),y+q,q===ln?TL:TQ);
+        }
+        if(t<=23){const [x,y]=wingPt(sg,0,f,uk);star(x,y,t<=22?2:1,WH,CR,GD);}
+      }
+    }
+  }
+}
+
+/* ---------- Warm sparks fly out then fall (20–29) ---------- */
+const G=0.9;
+function landAge(p){const a=0.5*G,b=p.vy,c=p.y0-p.land;return (-b+Math.sqrt(b*b-4*a*c))/(2*a);}
+function warm(t){
+  if(t<20||t>29)return;
+  for(const p of WSP){
+    const age=t-p.s; if(age<0)continue;
+    const tl=landAge(p); if(age>tl+2.2)continue;
+    const P=a=>{const aa=Math.max(0,Math.min(a,tl));return [p.x0+p.vx*aa,p.y0+p.vy*aa+0.5*G*aa*aa];};
+    const [x,y]=P(age); if(x<4||x>59)continue;
+    if(age>=tl){
+      const k=age-tl;
+      if(k<1)plus(x,p.land,CR,OG); else if(k<2)px(x,p.land,GD); else px(x,p.land,AM);
+      continue;
+    }
+    const vyNow=p.vy+G*age,[x1,y1]=P(age-0.4),[x2,y2]=P(age-0.8);
+    if(age>0.5)line(x2,y2,x1,y1,vyNow<0?AM:BR);
+    line(x1,y1,x,y,OG);
+    if(vyNow<0){if(p.big)star(x,y,1,WH,CR,GD); else plus(x,y,WW,GD);}
+    else{px(x,y,CR);if(p.big)px(x,y-1,GD);}
+  }
+}
+
+/* ---------- Remnants orbit, twinkles, settle ring (21–30) ---------- */
+function orbit(t){
+  if(t<21||t>30)return;
+  for(let i=0;i<ORB.length;i++){
+    const o=ORB[i]; if(t>o.end)continue;
+    const pos=tt=>{let r=o.r,yc=o.yc;if(tt>27){const k=tt-27;r*=Math.max(0.3,1-k*0.16);yc+=k*2.2;}
+      const a=o.a+tt*o.sp;return [32+Math.cos(a)*r,yc+Math.sin(a)*r*0.32,Math.sin(a)>=0];};
+    const [x,y,fr]=pos(t),[x1,y1]=pos(t-0.35),[x2,y2]=pos(t-0.7);
+    if(t===21){plus(x,y,PA,TQ);continue;}
+    if(fr){
+      line(x2,y2,x1,y1,TL); line(x1,y1,x,y,TQ); px(x,y,i%3===0?WW:AQ);
+      if(i%2===0&&t%2===0)plus(x,y,PA,AQ);
+    }else{line(x1,y1,x,y,DT);px(x,y,TL);}
+  }
+}
+function twinkles(t){
+  if(t<26||t>30)return;
+  for(const w of TW){
+    const k=t-w.s; if(k<0||k>2)continue;
+    if(k===0)star(w.x,w.y,2,WH,PA,TQ); else if(k===1)plus(w.x,w.y,AQ,TL); else px(w.x,w.y,TL);
+  }
+}
+const SETTLE=[.1,.2,.3,.34,.3,.24,.16,.1,.05];
+function settle(t){
+  if(t<22||t>30)return; ground();
+  const duty=SETTLE[t-22];
+  ellipse(32,49,27,9,(x,y,a,fr)=>{if(fr01(a/TAU*28-t*0.25)>duty)return;px(x,y,fr?(duty>0.25?TQ:TL):(duty>0.2?DT:DT0));});
+  main();
+}
+function dissolve(t){
+  const keep=[0.7,0.42,0.18][t-28];
+  for(let i=0;i<B.length;i++){if(B[i]&&hash(i%W,(i/W)|0,4242)>keep)B[i]=0;}
+}
+
+/* ---------- Frame composition ---------- */
+function compose(t){
+  B=new Uint8Array(W*H);
+  if(t===31)return B;           // final frame: fully transparent
+  main();
+  groundGlow(t); if(t<=8)riseParticles(t);
+  helix(t); motes(t); crown(t);
+  shatter(t); shock(t);
+  settle(t); wings(t); warm(t); orbit(t); twinkles(t);
+  if(t>=28)dissolve(t);
+  return B;
+}
+const CACHE=[];
+function norm(i){return ((Math.floor(Number(i)||0)%FRAMES)+FRAMES)%FRAMES;}
+function getBuf(t){return CACHE[t]||(CACHE[t]=compose(t));}
+function toImageData(t){
+  const buf=getBuf(t),id=new ImageData(W,H),d=id.data;
+  for(let i=0;i<W*H;i++){const c=buf[i];if(!c)continue;const rgb=RGB[c];d[i*4]=rgb[0];d[i*4+1]=rgb[1];d[i*4+2]=rgb[2];d[i*4+3]=255;}
+  return id;
+}
+
+/* ---------- Public API ---------- */
+function renderFrame(index,canvas){
+  const t=norm(index);
+  if(!canvas)canvas=document.createElement('canvas');
+  if(canvas.width!==W)canvas.width=W;
+  if(canvas.height!==H)canvas.height=H;
+  const ctx=canvas.getContext('2d');
+  ctx.imageSmoothingEnabled=false;
+  ctx.putImageData(toImageData(t),0,0);
+  return canvas;
+}
+function frameName(i){return 'evolution_vfx_'+String(i).padStart(2,'0')+'.png';}
+function exportFrames(){
+  const cv=document.createElement('canvas'),out=[];
+  for(let i=0;i<FRAMES;i++){renderFrame(i,cv);out.push({name:frameName(i),dataUrl:cv.toDataURL('image/png')});}
+  return out;
+}
+function exportSheet(){
+  const cv=document.createElement('canvas');cv.width=W*FRAMES;cv.height=H;
+  const ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=false;
+  for(let i=0;i<FRAMES;i++)ctx.putImageData(toImageData(i),i*W,0);
+  const name='evolution_vfx_sheet.png';
+  const metadata={
+    image:name,kind:'sprite',size:{w:W*FRAMES,h:H},frameWidth:W,frameHeight:H,
+    frameCount:FRAMES,frameDurationMs:MS,loop:false,pivot:{x:PIVOT.x,y:PIVOT.y},
+    groundRing:{cx:32,cy:49,rxMax:29,ryMax:10},
+    safeArea:{nonGround:{x0:2,y0:2,x1:61,y1:56}},
+    palette:PAL.slice(1),phases:PHASES,
+    frames:Array.from({length:FRAMES},(_,i)=>({name:frameName(i),index:i,rect:{x:i*W,y:0,w:W,h:H},durationMs:MS,pivot:{x:PIVOT.x,y:PIVOT.y}}))
+  };
+  return {name,dataUrl:cv.toDataURL('image/png'),metadata};
+}
+function validate(){
+  const cv=document.createElement('canvas'),colors=new Set(),keys=new Set(),perFrame=[];
+  let badAlpha=0,oob=0,dup=0,lastEmpty=true;
+  for(let i=0;i<FRAMES;i++){
+    renderFrame(i,cv);
+    const d=cv.getContext('2d').getImageData(0,0,W,H).data;let n=0;
+    for(let p=0;p<W*H;p++){
+      const a=d[p*4+3];if(a===0)continue;if(a!==255)badAlpha++;n++;
+      colors.add((d[p*4]<<16)|(d[p*4+1]<<8)|d[p*4+2]);
+      const x=p%W,y=(p/W)|0;if(x<2||x>61||y<2||y>60)oob++;
+    }
+    const key=getBuf(i).join('');if(keys.has(key))dup++;keys.add(key);
+    if(i===FRAMES-1&&n>0)lastEmpty=false;perFrame.push(n);
+  }
+  return {opaqueColors:colors.size,semiTransparentPixels:badAlpha,outOfBoundsPixels:oob,duplicateFrames:dup,lastFrameTransparent:lastEmpty,pixelsPerFrame:perFrame};
+}
+
+window.pixelArt={
+  meta:Object.freeze({width:W,height:H,frameCount:FRAMES,frameDurationMs:MS,kind:'sprite',pivot:{x:PIVOT.x,y:PIVOT.y}}),
+  palette:PAL.slice(1),
+  renderFrame,exportFrames,exportSheet,validate
+};
+
+/* ---------- Preview UI (display only) ---------- */
+const view=document.getElementById('view'),vctx=view.getContext('2d');
+const frameCv=document.createElement('canvas');frameCv.width=W;frameCv.height=H;
+const S=512/W;
+const $=id=>document.getElementById(id);
+let cur=0,playing=true,acc=0,last=null;
+
+function paintBg(){
+  const mode=$('bg').value;
+  if(mode==='arena'){
+    vctx.fillStyle='#4a7672';vctx.fillRect(0,0,512,512);
+    vctx.fillStyle='#3f6764';
+    for(let y=0;y<H;y+=8){vctx.fillRect(0,y*S,512,S);const off=(y/8)%2?8:0;for(let x=off;x<W;x+=16)vctx.fillRect(x*S,y*S,S,8*S);}
+    vctx.fillStyle='#56837e';
+    for(let i=0;i<40;i++){const x=(i*37)%W,y=(i*23+5)%H;vctx.fillRect(x*S,y*S,S,S);}
+  }else if(mode==='checker'){
+    for(let y=0;y<H;y+=4)for(let x=0;x<W;x+=4){vctx.fillStyle=((x+y)/4)%2?'#2a2f33':'#3a4146';vctx.fillRect(x*S,y*S,4*S,4*S);}
+  }else{vctx.fillStyle='#0d1215';vctx.fillRect(0,0,512,512);}
+}
+function drawGuides(){
+  vctx.fillStyle='rgba(255,90,170,0.55)';
+  vctx.fillRect(2*S,2*S,60*S,1);vctx.fillRect(2*S,57*S-1,60*S,1);
+  vctx.fillRect(2*S,2*S,1,55*S);vctx.fillRect(62*S-1,2*S,1,55*S);
+  vctx.fillStyle='rgba(255,90,170,0.35)';
+  for(let i=0;i<120;i++){const a=i/120*TAU;vctx.fillRect(Math.round(32+Math.cos(a)*29)*S+S/2-1,Math.round(49+Math.sin(a)*10)*S+S/2-1,2,2);}
+  vctx.fillStyle='#ff5aaa';
+  vctx.fillRect(PIVOT.x*S-12,PIVOT.y*S+S/2-1,24+S,2);vctx.fillRect(PIVOT.x*S+S/2-1,PIVOT.y*S-12,2,24+S);
+}
+function phaseOf(t){return PHASES.find(p=>t>=p.from&&t<=p.to).name;}
+const thumbs=[];
+function show(){
+  renderFrame(cur,frameCv);
+  paintBg();
+  vctx.imageSmoothingEnabled=false;
+  vctx.drawImage(frameCv,0,0,512,512);
+  if($('guides').checked)drawGuides();
+  $('lbl').textContent='Frame '+String(cur).padStart(2,'0')+' / '+(FRAMES-1)+' · '+phaseOf(cur)+(playing?'':' · paused');
+  $('scrub').value=cur;
+  thumbs.forEach((c,i)=>c.classList.toggle('on',i===cur));
+}
+function go(i){cur=norm(i);acc=0;show();}
+function setPlaying(p){playing=p;$('play').textContent=p?'❚❚ Pause':'▶ Play';show();}
+
+const strip=$('strip');
+for(let i=0;i<FRAMES;i++){
+  const wrap=document.createElement('div'),c=document.createElement('canvas'),s=document.createElement('span');
+  renderFrame(i,c);s.textContent=String(i).padStart(2,'0');
+  c.title='Frame '+i+' · '+phaseOf(i);
+  c.addEventListener('click',()=>{setPlaying(false);go(i);});
+  wrap.appendChild(c);wrap.appendChild(s);strip.appendChild(wrap);thumbs.push(c);
+}
+
+function download(name,url){const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();}
+$('first').onclick=()=>{setPlaying(false);go(0);};
+$('prev').onclick=()=>{setPlaying(false);go(cur-1);};
+$('next').onclick=()=>{setPlaying(false);go(cur+1);};
+$('play').onclick=()=>setPlaying(!playing);
+$('scrub').oninput=e=>{setPlaying(false);go(+e.target.value);};
+$('bg').onchange=show;$('guides').onchange=show;
+$('dlSheet').onclick=()=>{const s=exportSheet();download(s.name,s.dataUrl);};
+$('dlMeta').onclick=()=>{
+  const s=exportSheet(),url=URL.createObjectURL(new Blob([JSON.stringify(s.metadata,null,2)],{type:'application/json'}));
+  download('evolution_vfx_sheet.json',url);setTimeout(()=>URL.revokeObjectURL(url),1000);
+};
+$('dlFrames').onclick=()=>{exportFrames().forEach((f,i)=>setTimeout(()=>download(f.name,f.dataUrl),i*120));};
+document.addEventListener('keydown',e=>{
+  if(e.target.tagName==='SELECT'||e.target.tagName==='INPUT')return;
+  if(e.code==='Space'){e.preventDefault();setPlaying(!playing);}
+  else if(e.key==='ArrowLeft'){setPlaying(false);go(cur-1);}
+  else if(e.key==='ArrowRight'){setPlaying(false);go(cur+1);}
+});
+
+function tick(ts){
+  if(last===null)last=ts;
+  const dt=ts-last;last=ts;
+  if(playing){
+    acc+=dt;if(acc>1000)acc=MS;
+    if(acc>=MS){const steps=Math.floor(acc/MS);acc-=steps*MS;cur=(cur+steps)%FRAMES;show();}
+  }
+  requestAnimationFrame(tick);
+}
+
+const rep=validate();
+$('report').textContent=
+  'Validation · opaque colours used: '+rep.opaqueColors+' (palette '+(PAL.length-1)+', limit 15)'+
+  ' · semi-transparent px: '+rep.semiTransparentPixels+
+  ' · out-of-bounds px: '+rep.outOfBoundsPixels+
+  ' · duplicate frames: '+rep.duplicateFrames+
+  ' · last frame transparent: '+rep.lastFrameTransparent+
+  '\nPixels per frame: '+rep.pixelsPerFrame.join(' ');
+show();
+requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
