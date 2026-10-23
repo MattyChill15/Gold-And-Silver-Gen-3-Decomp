@@ -1,4 +1,5 @@
 #include "global.h"
+#include "realtime_arena.h"
 #include "overworld.h"
 #include "battle_pyramid.h"
 #include "battle_setup.h"
@@ -1886,6 +1887,7 @@ void CB2_Overworld(void)
         SetFieldVBlankCallback();
         return;
     }
+    RealtimeArena_PracticeTick();
 }
 
 void SetMainCallback1(MainCallback cb)

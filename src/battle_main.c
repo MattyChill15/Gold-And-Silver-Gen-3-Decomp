@@ -9,6 +9,7 @@
 #include "battle_hold_effects.h"
 #include "battle_interface.h"
 #include "battle_main.h"
+#include "realtime_arena.h"
 #include "battle_message.h"
 #include "battle_pyramid.h"
 #include "battle_scripts.h"
@@ -3087,6 +3088,7 @@ void BeginBattleIntroDummy(void)
 
 void BeginBattleIntro(void)
 {
+    RealtimeArena_ResetBattle();
     BattleStartClearSetData();
     gBattleCommunication[1] = 0;
     gBattleStruct->eventState.battleIntro = 0;
@@ -4254,6 +4256,12 @@ static void HandleTurnActionSelectionState(void)
     s32 i;
 
     bool32 reverseBattlerLogicOrder = RandomPercentage(RNG_AI_REVERSE_BATTLER_LOGIC_ORDER, GetConfig(AI_REVERSE_BATTLER_LOGIC_ORDER_CHANCE)) && IsDoubleBattle();
+
+    // Arena: take over only at a clean turn boundary, never mid-selection.
+    if (gBattleCommunication[0] == STATE_TURN_START_RECORD
+        && gBattleCommunication[1] == STATE_TURN_START_RECORD
+        && RealtimeArena_TryStart())
+        return;
 
     gBattleCommunication[ACTIONS_CONFIRMED_COUNT] = 0;
     for (enum BattlerId battlerIndex = 0; battlerIndex < gBattlersCount; battlerIndex++)
@@ -5939,8 +5947,58 @@ static void WaitForEvoSceneToFinish(void)
         gBattleMainFunc = TryEvolvePokemon;
 }
 
+static void WaitForRealtimeArenaReturn(void)
+{
+    extern const u8 BattleScript_RealtimeArenaFaint[];
+    if (gMain.callback2 != BattleMainCB2 || gPaletteFade.active)
+        return;
+    if (gRealtimeArenaRestoringFaint)
+    {
+        gRealtimeArenaRestoringFaint = FALSE;
+        gCurrentTurnActionNumber = 0;
+        gBattlerByTurnOrder[0] = gBattlerAttacker;
+        gBattlerByTurnOrder[1] = gBattlerTarget;
+        gActionsByTurnOrder[0] = B_ACTION_EXEC_SCRIPT;
+        gActionsByTurnOrder[1] = B_ACTION_NOTHING_FAINTED;
+        gActionsByTurnOrder[2] = B_ACTION_FINISHED;
+        gCurrentActionFuncId = B_ACTION_EXEC_SCRIPT;
+        gBattleResources->battleScriptsStack->size = 0;
+        gBattleStruct->eventState.faintedAction = 0;
+        gBattlescriptCurrInstr = BattleScript_RealtimeArenaFaint;
+        gBattleMainFunc = RunTurnActionsFunctions;
+    }
+    else
+    {
+        // Johto port: a Bag/Party request returns to the native action menu,
+        // where the player opens Bag or POKeMON with the stock UI.
+        gArenaMenuRequest = 0;
+        gBattleMainFunc = HandleTurnActionSelectionState;
+    }
+}
+
+void RealtimeArena_ResumeBattle(bool8 fainted)
+{
+    gBattleMainFunc = WaitForRealtimeArenaReturn;
+}
+
+void RealtimeArena_FinishCapture(void)
+{
+    gBattleOutcome = B_OUTCOME_CAUGHT;
+    gCurrentActionFuncId = B_ACTION_FINISHED;
+    gBattleMainFunc = HandleEndTurn_FinishBattle;
+}
+
+void RealtimeArena_ShowResultUi(void)
+{
+    // Johto port keeps native result text (no quiet-result script hooks).
+    gRealtimeArenaQuietResult = FALSE;
+}
+
 static void ReturnFromBattleToOverworld(void)
 {
+    if (gArenaResultTelemetry.started)
+        gArenaResultTelemetry.elapsed = gMain.vblankCounter1 - gArenaResultTelemetry.started;
+    gRealtimeArenaQuietResult = FALSE;
     if (!(gBattleTypeFlags & BATTLE_TYPE_LINK))
     {
         CalculatePlayerPartyCount();
