@@ -2,7 +2,7 @@
 @ D2: Misty object in the player's house is shown only for Show before SJ1.
 ArenaStory_MistyOnTransition::
 	setflag FLAG_ARENA_HIDE_MISTY
-	goto_if_set FLAG_SHOW_SJ1, ArenaStory_SJ7_Ret
+	goto_if_set FLAG_ARENA_SHOW_SJ1, ArenaStory_SJ7_Ret
 	callnative ArenaStory_GetStoryline
 	goto_if_ne VAR_RESULT, ARENA_STORYLINE_SHOW, ArenaStory_SJ7_Ret
 	clearflag FLAG_ARENA_HIDE_MISTY
@@ -11,7 +11,7 @@ ArenaStory_MistyOnTransition::
 ArenaStory_SJ7_Pre::
 	callnative ArenaStory_GetStoryline
 	goto_if_ne VAR_RESULT, ARENA_STORYLINE_SHOW, ArenaStory_SJ7_Ret
-	goto_if_set FLAG_SHOW_SJ7_LOSS, ArenaStory_SJ7_Rematch
+	goto_if_set FLAG_ARENA_SHOW_SJ7_LOSS, ArenaStory_SJ7_Rematch
 	msgbox ArenaStory_SJ7_T0, MSGBOX_DEFAULT
 	cleartrainerflag TRAINER_WHITNEY_1
 	setflag FLAG_ARENA_NO_WHITEOUT
@@ -21,7 +21,7 @@ ArenaStory_SJ7_Pre::
 	cleartrainerflag TRAINER_WHITNEY_1
 	msgbox ArenaStory_SJ7_T1, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ7_T2, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ7_LOSS
+	setflag FLAG_ARENA_SHOW_SJ7_LOSS
 	release
 	end
 ArenaStory_SJ7_Rematch::
@@ -37,7 +37,7 @@ ArenaStory_SJ7_Badge::
 	callnative ArenaStory_GetStoryline
 	goto_if_ne VAR_RESULT, ARENA_STORYLINE_SHOW, ArenaStory_SJ7_Ret
 	msgbox ArenaStory_SJ7_T5, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ7
+	setflag FLAG_ARENA_SHOW_SJ7
 	return
 ArenaStory_SJ7_T0:
 	.string "Whitney:\nMiltank! Rollout!$"
@@ -63,7 +63,7 @@ ArenaStory_J1_0::
 	msgbox ArenaStory_J1_T5, MSGBOX_DEFAULT
 	msgbox ArenaStory_J1_T6, MSGBOX_DEFAULT
 	msgbox ArenaStory_J1_T7, MSGBOX_DEFAULT
-	setflag FLAG_CH_J1
+	setflag FLAG_ARENA_CHIEF_J1
 	releaseall
 	end
 .endif
@@ -79,7 +79,7 @@ ArenaStory_J2_1::
 	msgbox ArenaStory_J2_T5, MSGBOX_DEFAULT
 	msgbox ArenaStory_J2_T6, MSGBOX_DEFAULT
 	msgbox ArenaStory_J2_T7, MSGBOX_DEFAULT
-	setflag FLAG_CH_J2
+	setflag FLAG_ARENA_CHIEF_J2
 	releaseall
 	end
 .endif
@@ -94,7 +94,7 @@ ArenaStory_J3_2::
 	msgbox ArenaStory_J3_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_J3_T5, MSGBOX_DEFAULT
 	msgbox ArenaStory_J3_T6, MSGBOX_DEFAULT
-	setflag FLAG_CH_J3
+	setflag FLAG_ARENA_CHIEF_J3
 	releaseall
 	end
 .endif
@@ -110,7 +110,7 @@ ArenaStory_J4_3::
 	msgbox ArenaStory_J4_T5, MSGBOX_DEFAULT
 	msgbox ArenaStory_J4_T6, MSGBOX_DEFAULT
 	msgbox ArenaStory_J4_T7, MSGBOX_DEFAULT
-	setflag FLAG_CH_J4
+	setflag FLAG_ARENA_CHIEF_J4
 	releaseall
 	end
 .endif
@@ -128,7 +128,7 @@ ArenaStory_J5_4::
 	msgbox ArenaStory_J5_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_J5_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_J5_T5, MSGBOX_DEFAULT
-	setflag FLAG_CH_J5
+	setflag FLAG_ARENA_CHIEF_J5
 	releaseall
 	end
 .endif
@@ -143,7 +143,7 @@ ArenaStory_J6_5::
 	msgbox ArenaStory_J6_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_J6_T5, MSGBOX_DEFAULT
 	msgbox ArenaStory_J6_T6, MSGBOX_DEFAULT
-	setflag FLAG_CH_J6
+	setflag FLAG_ARENA_CHIEF_J6
 	releaseall
 	end
 .endif
@@ -157,7 +157,7 @@ ArenaStory_J7_6::
 	msgbox ArenaStory_J7_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_J7_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_J7_T5, MSGBOX_DEFAULT
-	setflag FLAG_CH_J7
+	setflag FLAG_ARENA_CHIEF_J7
 	releaseall
 	end
 .endif
@@ -175,7 +175,7 @@ ArenaStory_J8_7::
 	msgbox ArenaStory_J8_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_J8_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_J8_T5, MSGBOX_DEFAULT
-	setflag FLAG_CH_J8
+	setflag FLAG_ARENA_CHIEF_J8
 	releaseall
 	end
 .endif
@@ -185,7 +185,7 @@ ArenaStory_J8_8::
 	lockall
 	msgbox ArenaStory_J8_T6, MSGBOX_DEFAULT
 	msgbox ArenaStory_J8_T7, MSGBOX_DEFAULT
-	setflag FLAG_CH_J8_DELIVERY
+	setflag FLAG_ARENA_CHIEF_J8_DELIVERY
 	releaseall
 	end
 .endif
@@ -199,7 +199,7 @@ ArenaStory_J9_9::
 	msgbox ArenaStory_J9_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_J9_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_J9_T5, MSGBOX_DEFAULT
-	setflag FLAG_CH_J9
+	setflag FLAG_ARENA_CHIEF_J9
 	releaseall
 	end
 .endif
@@ -217,7 +217,7 @@ ArenaStory_J10_10::
 	cleartrainerflag TRAINER_ARENA_STORY
 	trainerbattle_no_intro TRAINER_ARENA_STORY, ArenaStory_Text_Lose
 	msgbox ArenaStory_J10_T5, MSGBOX_DEFAULT
-	setflag FLAG_CH_J10
+	setflag FLAG_ARENA_CHIEF_J10
 	releaseall
 	end
 .endif
@@ -231,7 +231,7 @@ ArenaStory_J11_11::
 	msgbox ArenaStory_J11_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_J11_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_J11_T5, MSGBOX_DEFAULT
-	setflag FLAG_CH_J11
+	setflag FLAG_ARENA_CHIEF_J11
 	releaseall
 	end
 .endif
@@ -248,7 +248,7 @@ ArenaStory_J12_12::
 	trainerbattle_no_intro TRAINER_ARENA_STORY, ArenaStory_Text_Lose
 	msgbox ArenaStory_J12_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_J12_T4, MSGBOX_DEFAULT
-	setflag FLAG_CH_J12
+	setflag FLAG_ARENA_CHIEF_J12
 	releaseall
 	end
 .endif
@@ -267,7 +267,7 @@ ArenaStory_J13_13::
 	trainerbattle_no_intro TRAINER_ARENA_STORY, ArenaStory_Text_Lose
 	msgbox ArenaStory_J13_T5, MSGBOX_DEFAULT
 	msgbox ArenaStory_J13_T6, MSGBOX_DEFAULT
-	setflag FLAG_CH_J13
+	setflag FLAG_ARENA_CHIEF_J13
 	releaseall
 	end
 .endif
@@ -282,7 +282,7 @@ ArenaStory_J14_14::
 	msgbox ArenaStory_J14_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_J14_T5, MSGBOX_DEFAULT
 	msgbox ArenaStory_J14_T6, MSGBOX_DEFAULT
-	setflag FLAG_CH_J14
+	setflag FLAG_ARENA_CHIEF_J14
 	releaseall
 	end
 .endif
@@ -292,7 +292,7 @@ ArenaStory_J15_15::
 	lockall
 	msgbox ArenaStory_J15_T0, MSGBOX_DEFAULT
 	msgbox ArenaStory_J15_T1, MSGBOX_DEFAULT
-	setflag FLAG_CH_J15A
+	setflag FLAG_ARENA_CHIEF_J15A
 	releaseall
 	end
 .endif
@@ -305,7 +305,7 @@ ArenaStory_J15_16::
 	msgbox ArenaStory_J15_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_J15_T5, MSGBOX_DEFAULT
 	msgbox ArenaStory_J15_T6, MSGBOX_DEFAULT
-	setflag FLAG_CH_J15
+	setflag FLAG_ARENA_CHIEF_J15
 	releaseall
 	end
 .endif
@@ -322,11 +322,11 @@ ArenaStory_J16_17::
 	special ArenaStory_PrepBattle
 	cleartrainerflag TRAINER_ARENA_STORY
 	trainerbattle_no_intro TRAINER_ARENA_STORY, ArenaStory_Text_Lose
-	setflag FLAG_CH_J16_WON
+	setflag FLAG_ARENA_CHIEF_J16_WON
 ArenaStory_J16_17_skip:
 	msgbox ArenaStory_J16_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_J16_T4, MSGBOX_DEFAULT
-	setflag FLAG_CH_J16
+	setflag FLAG_ARENA_CHIEF_J16
 	releaseall
 	end
 .endif
@@ -344,7 +344,7 @@ ArenaStory_J17_18::
 	msgbox ArenaStory_J17_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_J17_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_J17_T5, MSGBOX_DEFAULT
-	setflag FLAG_CH_J17
+	setflag FLAG_ARENA_CHIEF_J17
 	releaseall
 	end
 .endif
@@ -358,8 +358,8 @@ ArenaStory_J18_19::
 	msgbox ArenaStory_J18_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_J18_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_J18_T5, MSGBOX_DEFAULT
-	setflag FLAG_CH2_CHIEF_DONE
-	setflag FLAG_CH_J18
+	setflag FLAG_ARENA_CHIEF_CH2_DONE
+	setflag FLAG_ARENA_CHIEF_J18
 	releaseall
 	end
 .endif
@@ -378,7 +378,7 @@ ArenaStory_SJ1_20::
 .if FNPC_ENABLE_NPC_FOLLOWERS
 	setfollowernpc 3, FNPC_ALL
 .endif
-	setflag FLAG_SHOW_SJ1
+	setflag FLAG_ARENA_SHOW_SJ1
 	releaseall
 	end
 .endif
@@ -392,7 +392,7 @@ ArenaStory_SJ2_21::
 	msgbox ArenaStory_SJ2_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ2_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ2_T5, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ2
+	setflag FLAG_ARENA_SHOW_SJ2
 	releaseall
 	end
 .endif
@@ -403,7 +403,7 @@ ArenaStory_SJ3_22::
 	msgbox ArenaStory_SJ3_T0, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ3_T1, MSGBOX_DEFAULT
 	givemon SPECIES_CHIKORITA, 5
-	setflag FLAG_SHOW_SJ3A
+	setflag FLAG_ARENA_SHOW_SJ3A
 	releaseall
 	end
 .endif
@@ -414,7 +414,7 @@ ArenaStory_SJ3_23::
 	msgbox ArenaStory_SJ3_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ3_T3, MSGBOX_DEFAULT
 	givemon SPECIES_CYNDAQUIL, 6
-	setflag FLAG_SHOW_SJ3B
+	setflag FLAG_ARENA_SHOW_SJ3B
 	releaseall
 	end
 .endif
@@ -425,7 +425,7 @@ ArenaStory_SJ3_24::
 	msgbox ArenaStory_SJ3_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ3_T5, MSGBOX_DEFAULT
 	givemon SPECIES_TOTODILE, 7
-	setflag FLAG_SHOW_SJ3C
+	setflag FLAG_ARENA_SHOW_SJ3C
 	releaseall
 	end
 .endif
@@ -440,7 +440,7 @@ ArenaStory_SJ4_25::
 	msgbox ArenaStory_SJ4_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ4_T5, MSGBOX_DEFAULT
 	givemon SPECIES_HERACROSS, 9
-	setflag FLAG_SHOW_SJ4
+	setflag FLAG_ARENA_SHOW_SJ4
 	releaseall
 	end
 .endif
@@ -461,7 +461,7 @@ ArenaStory_SJ5_26::
 ArenaStory_SJ5_26_c:
 	clearflag FLAG_SET_SHINY
 	msgbox ArenaStory_SJ5_T4, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ5
+	setflag FLAG_ARENA_SHOW_SJ5
 	releaseall
 	end
 .endif
@@ -485,7 +485,7 @@ ArenaStory_SJ6_28::
 	msgbox ArenaStory_SJ6_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ6_T5, MSGBOX_DEFAULT
 	special ArenaStory_CharizardToLiza
-	setflag FLAG_SHOW_SJ6
+	setflag FLAG_ARENA_SHOW_SJ6
 	special ArenaStory_LoadReturn
 	releaseall
 	goto_if_eq VAR_RESULT, FALSE, ArenaStory_SJ6_28_w0
@@ -504,7 +504,7 @@ ArenaStory_SJ8_29::
 	msgbox ArenaStory_SJ8_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ8_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ8_T4, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ8
+	setflag FLAG_ARENA_SHOW_SJ8
 	releaseall
 	end
 .endif
@@ -517,7 +517,7 @@ ArenaStory_SJ9_30::
 	msgbox ArenaStory_SJ9_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ9_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ9_T4, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ9
+	setflag FLAG_ARENA_SHOW_SJ9
 	releaseall
 	end
 .endif
@@ -528,7 +528,7 @@ ArenaStory_SJ10_31::
 	msgbox ArenaStory_SJ10_T0, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ10_T1, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ10_T2, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ10A
+	setflag FLAG_ARENA_SHOW_SJ10A
 	releaseall
 	end
 .endif
@@ -538,7 +538,7 @@ ArenaStory_SJ10_32::
 	lockall
 	msgbox ArenaStory_SJ10_T3, MSGBOX_DEFAULT
 	giveitem ITEM_SECRET_POTION
-	setflag FLAG_SHOW_SJ10B
+	setflag FLAG_ARENA_SHOW_SJ10B
 	releaseall
 	end
 .endif
@@ -549,7 +549,7 @@ ArenaStory_SJ10_33::
 	removeitem ITEM_SECRET_POTION
 	msgbox ArenaStory_SJ10_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ10_T5, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ10
+	setflag FLAG_ARENA_SHOW_SJ10
 	releaseall
 	end
 .endif
@@ -583,7 +583,7 @@ ArenaStory_SJ11_35::
 	trainerbattle_no_intro TRAINER_ARENA_STORY, ArenaStory_Text_Lose
 	msgbox ArenaStory_SJ11_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ11_T5, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ11
+	setflag FLAG_ARENA_SHOW_SJ11
 	special ArenaStory_LoadReturn
 	releaseall
 	goto_if_eq VAR_RESULT, FALSE, ArenaStory_SJ11_35_w0
@@ -601,7 +601,7 @@ ArenaStory_SJ12_36::
 	msgbox ArenaStory_SJ12_T1, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ12_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ12_T3, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ12
+	setflag FLAG_ARENA_SHOW_SJ12
 	releaseall
 	end
 .endif
@@ -641,8 +641,8 @@ ArenaStory_SJ13_38::
 	trainerbattle_no_intro TRAINER_ARENA_STORY, ArenaStory_Text_Lose
 	msgbox ArenaStory_SJ13_T5, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ13_T6, MSGBOX_DEFAULT
-	setflag FLAG_P2_END
-	setflag FLAG_SHOW_SJ13
+	setflag FLAG_ARENA_SHOW_P2_END
+	setflag FLAG_ARENA_SHOW_SJ13
 	special ArenaStory_LoadReturn
 	releaseall
 	goto_if_eq VAR_RESULT, FALSE, ArenaStory_SJ13_38_w0
@@ -661,7 +661,7 @@ ArenaStory_SJ14_39::
 	msgbox ArenaStory_SJ14_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ14_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ14_T4, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ14
+	setflag FLAG_ARENA_SHOW_SJ14
 	releaseall
 	end
 .endif
@@ -673,7 +673,7 @@ ArenaStory_SJ15_40::
 	msgbox ArenaStory_SJ15_T1, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ15_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ15_T3, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ15_1
+	setflag FLAG_ARENA_SHOW_SJ15_1
 	releaseall
 	end
 .endif
@@ -685,7 +685,7 @@ ArenaStory_SJ15_41::
 	msgbox ArenaStory_SJ15_T1, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ15_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ15_T3, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ15_2
+	setflag FLAG_ARENA_SHOW_SJ15_2
 	releaseall
 	end
 .endif
@@ -697,7 +697,7 @@ ArenaStory_SJ15_42::
 	msgbox ArenaStory_SJ15_T1, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ15_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ15_T3, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ15_3
+	setflag FLAG_ARENA_SHOW_SJ15_3
 	releaseall
 	end
 .endif
@@ -709,7 +709,7 @@ ArenaStory_SJ15_43::
 	msgbox ArenaStory_SJ15_T1, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ15_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ15_T3, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ15_4
+	setflag FLAG_ARENA_SHOW_SJ15_4
 	releaseall
 	end
 .endif
@@ -721,7 +721,7 @@ ArenaStory_SJ15_44::
 	msgbox ArenaStory_SJ15_T1, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ15_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ15_T3, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ15_5
+	setflag FLAG_ARENA_SHOW_SJ15_5
 	releaseall
 	end
 .endif
@@ -733,7 +733,7 @@ ArenaStory_SJ15_45::
 	msgbox ArenaStory_SJ15_T1, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ15_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ15_T3, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ15_6
+	setflag FLAG_ARENA_SHOW_SJ15_6
 	releaseall
 	end
 .endif
@@ -745,7 +745,7 @@ ArenaStory_SJ15_46::
 	msgbox ArenaStory_SJ15_T1, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ15_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ15_T3, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ15_7
+	setflag FLAG_ARENA_SHOW_SJ15_7
 	releaseall
 	end
 .endif
@@ -768,7 +768,7 @@ ArenaStory_SJ16_47::
 	cleartrainerflag TRAINER_ARENA_STORY
 	trainerbattle_no_intro TRAINER_ARENA_STORY, ArenaStory_Text_Lose
 	msgbox ArenaStory_SJ16_T3, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ16
+	setflag FLAG_ARENA_SHOW_SJ16
 	releaseall
 	end
 .endif
@@ -782,7 +782,7 @@ ArenaStory_SJ17_48::
 	waitstate
 	msgbox ArenaStory_SJ17_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ17_T3, MSGBOX_DEFAULT
-	setflag FLAG_SHOW_SJ17
+	setflag FLAG_ARENA_SHOW_SJ17
 	releaseall
 	end
 .endif
@@ -796,8 +796,8 @@ ArenaStory_SJ18_49::
 	msgbox ArenaStory_SJ18_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ18_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ18_T5, MSGBOX_DEFAULT
-	setflag FLAG_CH2_SHOW_DONE
-	setflag FLAG_SHOW_SJ18
+	setflag FLAG_ARENA_SHOW_CH2_DONE
+	setflag FLAG_ARENA_SHOW_SJ18
 	releaseall
 	end
 

@@ -68,3 +68,8 @@ Branch `arena` (local only). Commits: ed44097d (copy), dbdee09e (overlay compile
 - Emerald has no storyline setting yet (3-value change for FR/Emerald still pending).
 
 ### Playtest: tools/arena/playtest_johto.py -> 25/25 PASS (.arena-dev/pt/results/playtest-results.json)
+
+## 2026-10-23 10:50 AZ: P1 scenes pass, real flag names
+- Placeholder flags renamed: FLAG_CH_Jn -> FLAG_ARENA_CHIEF_Jn, FLAG_SHOW_SJn -> FLAG_ARENA_SHOW_SJn, FLAG_CH2_*_DONE -> FLAG_ARENA_{CHIEF,SHOW}_CH2_DONE, FLAG_P2_END -> FLAG_ARENA_SHOW_P2_END (same IDs).
+- P1 ROM 84.95% (jpt_p1 84.96%). 219 scene strings, 0 over 35 chars.
+- playtest_johto 34/34 PASS. playtest_story chief1 7/7 PASS; show1 8/10: SJ5 SKIP (night RTC, flag forced), SJ7 Whitney hooks FAIL via cmd 21 (emu stuck in CB2_LoadMap2; harness or script issue, open). SJ4 not reported separately by harness.

@@ -1,0 +1,59 @@
+{
+ "results": [
+  {
+   "check": "[show] ArenaStory_SJ1_20 on NEW_BARK_TOWN_PLAYERS_HOUSE_1F",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ1=1 battles=0 loc=(9, 9, 1, 3)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ2_21 on AZALEA_TOWN_KURTS_HOUSE",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ2=1 battles=0 loc=(4, 9, 4, 2)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ3_22 on ROUTE29",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ3A=1 battles=0 loc=(34, 11, 0, 11)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ3_23 on ROUTE30",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ3B=1 battles=0 loc=(26, 40, 0, 12)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ3_24 on ROUTE31",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ3C=1 battles=0 loc=(48, 10, 0, 13)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ5_26 on ROUTE37",
+   "status": "SKIP",
+   "detail": "SKIPPED: needs night RTC; flag forced"
+  },
+  {
+   "check": "[show] ArenaStory_SJ6_27 on GATE_ROUTE29_ROUTE46",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ6=1 battles=1 loc=(7, 2, 22, 0)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ8_29 on RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ8=1 battles=0 loc=(20, 10, 24, 7)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ9_30 on BURNED_TOWER_B1F",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ9=1 battles=0 loc=(26, 8, 24, 17)"
+  },
+  {
+   "check": "[show] SJ7 Whitney hooks (Pre x2, Badge) via cmd 21",
+   "status": "FAIL",
+   "detail": "SJ7_LOSS=0 SJ7=0 battles=0"
+  }
+ ],
+ "shortcuts": [
+  "show P1: story battles run in classic engine (playtest cmd 30)",
+  "show P1: party set to Mewtwo L100; badges 1-3 forced",
+  "show: Charizard L50 added for ArenaStory_SJ6_27"
+ ]
+}

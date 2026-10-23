@@ -53,7 +53,7 @@ def drive(e, f, maxf=24000):
             return True, battles
     return bool(flag(e, f)), battles
 def refresh(e):  # full PP + HP on the lead before each scene (shortcut)
-    for i, mv in enumerate(('MOVE_PSYSTRIKE', 'MOVE_AURA_SPHERE', 'MOVE_ICE_BEAM', 'MOVE_THUNDERBOLT')): e.cmd(19, CM(mv), i, 0)
+    for i, mv in enumerate(('MOVE_ICE_BEAM', 'MOVE_AURA_SPHERE', 'MOVE_PSYSTRIKE', 'MOVE_THUNDERBOLT')): e.cmd(19, CM(mv), i, 0)
     e.cmd(13, 0, 353)
 def run(story, part, sav):
     name = {1: 'chief', 2: 'show'}[story]
@@ -86,11 +86,11 @@ def run(story, part, sav):
     if story == 2 and part == 1:  # SJ7 is on Whitney's talk script: run its hooks directly
         a = e.s('ArenaStory_SJ7_Pre')
         for i in range(2):
-            e.cmd(21, a & 0xffff, a >> 16, C('FLAG_SHOW_SJ7_LOSS')); drive(e, 'FLAG_SHOW_SJ7_LOSS', 6000)
-        b = e.s('ArenaStory_SJ7_Badge'); e.cmd(21, b & 0xffff, b >> 16, C('FLAG_SHOW_SJ7')); ok, nb = drive(e, 'FLAG_SHOW_SJ7', 6000)
-        check('[show] SJ7 Whitney hooks (Pre x2, Badge) via cmd 21', ok and flag(e, 'FLAG_SHOW_SJ7_LOSS') == 1, f'SJ7_LOSS={flag(e,"FLAG_SHOW_SJ7_LOSS")} SJ7={int(ok)} battles={nb}')
+            e.cmd(21, a & 0xffff, a >> 16, C('FLAG_ARENA_SHOW_SJ7_LOSS')); drive(e, 'FLAG_ARENA_SHOW_SJ7_LOSS', 6000)
+        b = e.s('ArenaStory_SJ7_Badge'); e.cmd(21, b & 0xffff, b >> 16, C('FLAG_ARENA_SHOW_SJ7')); ok, nb = drive(e, 'FLAG_ARENA_SHOW_SJ7', 6000)
+        check('[show] SJ7 Whitney hooks (Pre x2, Badge) via cmd 21', ok and flag(e, 'FLAG_ARENA_SHOW_SJ7_LOSS') == 1, f'SJ7_LOSS={flag(e,"FLAG_ARENA_SHOW_SJ7_LOSS")} SJ7={int(ok)} battles={nb}')
     if story == 2 and part == 2:
-        check('[show] P2_END set after Harrison rematch', flag(e, 'FLAG_SHOW_P2_END') == 1, '')
+        check('[show] P2_END set after Harrison rematch', flag(e, 'FLAG_ARENA_SHOW_P2_END') == 1, '')
     e.close()
 ONLY = sys.argv[3] if len(sys.argv) > 3 else None
 for story in (1, 2):
