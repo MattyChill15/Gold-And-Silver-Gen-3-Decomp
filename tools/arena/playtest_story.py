@@ -49,7 +49,7 @@ def lose(e, maxf=30000):
     bm = e.s('gBattleMons'); bcb = e.s('BattleMainCB2') | 1; f = 0; hit = 0
     while f < 1500 and (e.cb2() | 1) != bcb and not e.in_field(): e.run(4); e.run(4, 1); f += 8
     if not nowhite(e):  # ordinary battle: normal win driver
-        e.battle(maxf=30000); return 0
+        battle_win(e); return 0
     while f < maxf:
         if hit == 1 and not nowhite(e):  # scripted-loss battle over (flag cleared by script): record its outcome
             hit = 2; OUTCOMES.append((CUR[0] + ':loss', 1, e.r8(e.s('gBattleOutcome')), e.location()[:2])); print('  outcome', OUTCOMES[-1], flush=True)
@@ -67,6 +67,19 @@ def lose(e, maxf=30000):
             e.run(60)
             if e.in_field(): break
     return 1 if hit == 1 else 0  # 2 = loss already recorded; this outcome is the rematch
+ASSIST = os.environ.get('ARENA_ASSIST') == '1'; ASSISTED = []
+def battle_win(e):
+    if not ASSIST: return e.battle(maxf=30000)
+    # shortcut (win assist): lead battle HP and PP refilled every 8 frames so one Mewtwo can clear 6-mon L70+ teams
+    bm = e.s('gBattleMons'); f = 0; ASSISTED.append(CUR[0])
+    while f < 40000:
+        if not e.in_field():
+            e.w16(bm + 42, e.r16(bm + 46))
+            for i in range(4): e.w8(bm + 37 + i, 10)  # PP too
+        e.run(4); e.run(4, 1); f += 8
+        if f % 200 == 0 and e.in_field():
+            e.run(60)
+            if e.in_field(): break
 def drive(e, f, maxf=24000):
     """Tap A through text; hand battles to Emu.battle; stop when flag f set and back in field."""
     t = 0; battles = 0; topup = False
@@ -75,7 +88,12 @@ def drive(e, f, maxf=24000):
             e.shot(str(OUT / f'live_{ONLY}.png'))
             cb = e.cb2() & ~1; nm = next((k for k, v in e.sym.items() if (v & ~1) == cb), hex(cb))
             print(f'  non-field cb2={nm} t={t}', flush=True)
-            nw = lose(e) if LOSS else (e.battle(maxf=30000), nowhite(e))[1]
+            if nm == 'CB2_PokeStorage':  # SJ17 opens the PC: leave it with B (no box changes)
+                for _ in range(60):
+                    if (e.cb2() | 1) != (e.s('CB2_PokeStorage') | 1): break
+                    e.run(6, 2); e.run(40); e.run(6, 2); e.run(40); e.run(6, 1); e.run(40)  # B,B -> 'exit box?' -> A (yes); converges if a menu was open
+                t += 400; continue
+            nw = lose(e) if LOSS else (battle_win(e), nowhite(e))[1]
             OUTCOMES.append((CUR[0], nw, e.r8(e.s('gBattleOutcome')), e.location()[:2])); print('  outcome', OUTCOMES[-1], flush=True)
             battles += 1; t += 600; topup = True; continue
         if topup: refresh(e); topup = False; SHORTCUTS_PP.append(battles)  # shortcut: PP/HP top-up between back-to-back scene battles
@@ -116,6 +134,9 @@ def run(story, part, sav):
         CUR[0] = scr; ok, nb = drive(e, f)
         e.shot(str(OUT / f'{name}_{scr}.png'))
         check(f'[{name}] {scr} on {m}', ok, f'flag {f}={int(ok)} battles={nb} loc={e.location()}')
+    if story == 2 and part == 3:
+        # SJ16 shares the Pyramid lobby with SJ15_46 and fires straight after it; check it explicitly.
+        check('[show] SJ16 set (Pyramid lose->rematch, fires after SJ15_46)', flag(e, 'FLAG_ARENA_SHOW_SJ16') == 1, f'SJ16={flag(e, "FLAG_ARENA_SHOW_SJ16")}')
     if story == 2 and part == 1:
         # SJ4 shares Route 30 with SJ3B and fires straight after it; check it explicitly.
         check('[show] SJ4 set (fires after SJ3B on ROUTE30)', flag(e, 'FLAG_ARENA_SHOW_SJ4') == 1, f'SJ4={flag(e, "FLAG_ARENA_SHOW_SJ4")}')
@@ -148,6 +169,7 @@ for story in (1, 2):
 if LOSS: shortcuts.append('loss test: in FLAG_ARENA_NO_WHITEOUT battles the lead is held at 1 HP with Splash-only moves, bench HP 0, foe HP refilled (memory writes) to force a real loss')
 nwb = [o for o in OUTCOMES if o[1] == 1]
 if nwb: check(f'no-whiteout battles {"lost" if LOSS else "won"} without blackout', all(o[2] == (2 if LOSS else 1) for o in nwb) and all(o[3] != (10, 10) for o in OUTCOMES), str(nwb))
+shortcuts.append(f'win assist: lead HP+PP refilled in battle (memory write) for {sorted(set(ASSISTED))}') if ASSISTED else None
 shortcuts.append(f'harness: lead PP/HP topped up (cmd 19/13) between back-to-back battles inside one scene, {len(SHORTCUTS_PP)} times') if SHORTCUTS_PP else None
 (OUT / f'story-results-{ONLY or "all"}{"-loss" if LOSS else ""}.json').write_text(json.dumps(dict(results=results, shortcuts=shortcuts, battle_outcomes=OUTCOMES, outcome_key='1=won 2=lost'), indent=1))
 print(f"\n{sum(r['status']=='PASS' for r in results)}/{len(results)} PASS, {sum(r['status']=='SKIP' for r in results)} SKIP")
