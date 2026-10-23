@@ -392,6 +392,7 @@ ArenaStory_SJ2_21::
 	msgbox ArenaStory_SJ2_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ2_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ2_T5, MSGBOX_DEFAULT
+	call ArenaStory_FollowBrock
 	setflag FLAG_ARENA_SHOW_SJ2
 	releaseall
 	end
@@ -440,6 +441,7 @@ ArenaStory_SJ4_25::
 	msgbox ArenaStory_SJ4_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ4_T5, MSGBOX_DEFAULT
 	givemon SPECIES_HERACROSS, 9
+	call ArenaStory_FollowMisty
 	setflag FLAG_ARENA_SHOW_SJ4
 	releaseall
 	end
@@ -461,6 +463,7 @@ ArenaStory_SJ5_26::
 ArenaStory_SJ5_26_c:
 	clearflag FLAG_SET_SHINY
 	msgbox ArenaStory_SJ5_T4, MSGBOX_DEFAULT
+	call ArenaStory_FollowBrock
 	setflag FLAG_ARENA_SHOW_SJ5
 	releaseall
 	end
@@ -485,6 +488,7 @@ ArenaStory_SJ6_28::
 	msgbox ArenaStory_SJ6_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ6_T5, MSGBOX_DEFAULT
 	special ArenaStory_CharizardToLiza
+	call ArenaStory_FollowMisty
 	setflag FLAG_ARENA_SHOW_SJ6
 	special ArenaStory_LoadReturn
 	releaseall
@@ -517,6 +521,7 @@ ArenaStory_SJ9_30::
 	msgbox ArenaStory_SJ9_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ9_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ9_T4, MSGBOX_DEFAULT
+	call ArenaStory_FollowBrock
 	setflag FLAG_ARENA_SHOW_SJ9
 	releaseall
 	end
@@ -549,6 +554,7 @@ ArenaStory_SJ10_33::
 	removeitem ITEM_SECRET_POTION
 	msgbox ArenaStory_SJ10_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ10_T5, MSGBOX_DEFAULT
+	call ArenaStory_FollowBrock
 	setflag FLAG_ARENA_SHOW_SJ10
 	releaseall
 	end
@@ -585,6 +591,7 @@ ArenaStory_SJ11_35::
 	trainerbattle_no_intro TRAINER_ARENA_STORY, ArenaStory_Text_Lose
 	msgbox ArenaStory_SJ11_T4, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ11_T5, MSGBOX_DEFAULT
+	call ArenaStory_FollowMisty
 	setflag FLAG_ARENA_SHOW_SJ11
 	special ArenaStory_LoadReturn
 	releaseall
@@ -603,6 +610,7 @@ ArenaStory_SJ12_36::
 	msgbox ArenaStory_SJ12_T1, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ12_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ12_T3, MSGBOX_DEFAULT
+	call ArenaStory_FollowBrock
 	setflag FLAG_ARENA_SHOW_SJ12
 	releaseall
 	end
@@ -663,6 +671,7 @@ ArenaStory_SJ14_39::
 	msgbox ArenaStory_SJ14_T2, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ14_T3, MSGBOX_DEFAULT
 	msgbox ArenaStory_SJ14_T4, MSGBOX_DEFAULT
+	call ArenaStory_FollowMisty
 	setflag FLAG_ARENA_SHOW_SJ14
 	releaseall
 	end
@@ -1866,3 +1875,16 @@ ArenaStory_Text_Lose:
 ArenaStory_Text_Fight:
 	.string "Fight the Chief?$"
 
+
+@ Arena D2: Misty and Brock take turns as the single NPC follower; the Pokemon follower walks behind them.
+ArenaStory_FollowMisty::
+	destroyfollowernpc
+	createfollowernpc OBJ_EVENT_GFX_MISTY, FNPC_ALL
+	updatefollowingmon
+	return
+
+ArenaStory_FollowBrock::
+	destroyfollowernpc
+	createfollowernpc OBJ_EVENT_GFX_BROCK, FNPC_ALL
+	updatefollowingmon
+	return

@@ -38,6 +38,19 @@
  ],
  "shortcuts": [
   "chief P1: story battles run in classic engine (playtest cmd 30)",
-  "chief P1: party set to Mewtwo L100; badges 1-3 forced"
- ]
+  "chief P1: party set to Mewtwo L100; badges 1-3 forced",
+  "harness: lead PP/HP topped up (cmd 19/13) between back-to-back battles inside one scene, 1 times"
+ ],
+ "battle_outcomes": [
+  [
+   "ArenaStory_J5_4",
+   0,
+   1,
+   [
+    22,
+    64
+   ]
+  ]
+ ],
+ "outcome_key": "1=won 2=lost"
 }

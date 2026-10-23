@@ -2398,7 +2398,7 @@ void UpdateFollowingPokemon(void)
      || SpeciesToGraphicsInfo(species, shiny, female) == NULL
      || (gMapHeader.mapType == MAP_TYPE_INDOOR && SpeciesToGraphicsInfo(species, shiny, female)->oam->size > ST_OAM_SIZE_2)
      || FlagGet(FLAG_TEMP_HIDE_FOLLOWER)
-     || PlayerHasFollowerNPC()
+     // Arena D2: the Pokemon follower walks behind the NPC follower instead of being removed
      || (gSaveBlock2Ptr->optionsfollowerEnable == 1)
      )
     {
@@ -5895,10 +5895,14 @@ bool8 FollowablePlayerMovement_Step(struct ObjectEvent *objectEvent, struct Spri
     s16 targetY;
     u32 playerAction = gObjectEvents[gPlayerAvatar.objectEventId].movementActionId;
 
-    targetX = gObjectEvents[gPlayerAvatar.objectEventId].previousCoords.x;
-    targetY = gObjectEvents[gPlayerAvatar.objectEventId].previousCoords.y;
-    x = gObjectEvents[gPlayerAvatar.objectEventId].currentCoords.x;
-    y = gObjectEvents[gPlayerAvatar.objectEventId].currentCoords.y;
+    struct ObjectEvent *leader = &gObjectEvents[gPlayerAvatar.objectEventId];
+    // Arena D2: chain behind the NPC follower when one is out
+    if (PlayerHasFollowerNPC() && !gObjectEvents[GetFollowerNPCObjectId()].invisible)
+        leader = &gObjectEvents[GetFollowerNPCObjectId()];
+    targetX = leader->previousCoords.x;
+    targetY = leader->previousCoords.y;
+    x = leader->currentCoords.x;
+    y = leader->currentCoords.y;
 
     if ((x == targetX && y == targetY) || !IsFollowerVisible()) // don't move on player collision or if not visible
         return FALSE;

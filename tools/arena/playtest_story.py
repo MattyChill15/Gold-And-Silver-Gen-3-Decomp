@@ -105,6 +105,26 @@ def drive(e, f, maxf=24000):
             return True, battles
     return bool(flag(e, f)), battles
 CUR = ['']
+def objs(e):  # active object events -> {localId: (gfx, x, y)}
+    r = {}
+    for i in range(16):
+        a = e.s('gObjectEvents') + i * 36
+        if e.r8(a) & 1: r[e.r8(a + 8)] = (e.r16(a + 4), e.r16(a + 16) - 7, e.r16(a + 18) - 7)
+    return r
+def walk_test(e, who, gfx):
+    """D2 outdoor walk in New Bark Town: NPC follower (253) and Pokemon follower (254) must trail the player."""
+    e.cmd(1, 25, 5, 0)  # shortcut: lead set to Pikachu L5 for the walk (story harness otherwise leads with Mewtwo)
+    shortcuts.append(f'show P1: D2 walk ({who}) warped to New Bark Town (cmd 14), lead set to Pikachu (cmd 1)')
+    g, n = PJ.mapid('MAP_NEW_BARK_TOWN'); e.cmd(14, g, n, 10 | 10 << 8); e.run(240)
+    trail = [(e.location()[:2], objs(e).get(253), objs(e).get(254))]
+    for k in [128, 128, 16, 16, 16, 128]:  # down, down, right x3, down
+        e.run(16, k); e.run(24); trail.append((e.location()[:2], objs(e).get(253), objs(e).get(254)))
+    shot = OUT / f'show_D2_walk_{who.lower()}.png'; e.shot(str(shot))
+    p0, n0, m0 = trail[0]; p1, n1, m1 = trail[-1]
+    ok = (p1 != p0 and n1 and m1 and n1[0] == gfx and n0 and m0 and n1[1:] != n0[1:] and m1[1:] != m0[1:]
+          and len({p1, n1[1:], m1[1:]}) == 3)
+    check(f'[show] D2 walk {who}+Pikachu trail player (New Bark)', bool(ok), f'trail(player,npc,mon)={trail} shot={shot}')
+    e.cmd(1, 150, 100, 0)  # restore the harness lead
 def refresh(e):  # full PP + HP on the lead before each scene (shortcut)
     for i, mv in enumerate(('MOVE_ICE_BEAM', 'MOVE_AURA_SPHERE', 'MOVE_PSYSTRIKE', 'MOVE_THUNDERBOLT')): e.cmd(19, CM(mv), i, 0)
     e.cmd(13, 0, 353)
@@ -135,6 +155,8 @@ def run(story, part, sav):
         CUR[0] = scr; ok, nb = drive(e, f)
         e.shot(str(OUT / f'{name}_{scr}.png'))
         check(f'[{name}] {scr} on {m}', ok, f'flag {f}={int(ok)} battles={nb} loc={e.location()}')
+        if scr == 'ArenaStory_SJ1_20': walk_test(e, 'Misty', 303)
+        if scr == 'ArenaStory_SJ2_21': walk_test(e, 'Brock', 302)
         if scr.startswith('ArenaStory_SJ1_'):  # D2: Misty must be the active NPC follower (FNPC supports one)
             sb3 = e.r32(e.s('gSaveBlock3Ptr')); gfx = e.r16(sb3 + 12 + 18); oid = e.r8(sb3 + 12 + 1)
             x0 = e.location()[2:]; e.run(20, 32); e.run(40); e.run(20, 16); e.run(40)  # walk W then E
