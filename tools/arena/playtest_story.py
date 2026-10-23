@@ -135,6 +135,12 @@ def run(story, part, sav):
         CUR[0] = scr; ok, nb = drive(e, f)
         e.shot(str(OUT / f'{name}_{scr}.png'))
         check(f'[{name}] {scr} on {m}', ok, f'flag {f}={int(ok)} battles={nb} loc={e.location()}')
+        if scr.startswith('ArenaStory_SJ1_'):  # D2: Misty must be the active NPC follower (FNPC supports one)
+            sb3 = e.r32(e.s('gSaveBlock3Ptr')); gfx = e.r16(sb3 + 12 + 18); oid = e.r8(sb3 + 12 + 1)
+            x0 = e.location()[2:]; e.run(20, 32); e.run(40); e.run(20, 16); e.run(40)  # walk W then E
+            oa = e.s('gObjectEvents') + oid * 36; active = e.r8(oa) & 1; ogfx = e.r16(oa + 4)
+            e.shot(str(OUT / f'{name}_SJ1_follower.png'))
+            check('[show] D2 Misty follows after SJ1', gfx == 303 and ogfx == 303 and active == 1, f'gfx={gfx} objgfx={ogfx} (303=MISTY) objId={oid} active={active} start={x0} now={e.location()}')
     if story == 2 and part == 3:
         # SJ16 shares the Pyramid lobby with SJ15_46 and fires straight after it; check it explicitly.
         check('[show] SJ16 set (Pyramid lose->rematch, fires after SJ15_46)', flag(e, 'FLAG_ARENA_SHOW_SJ16') == 1, f'SJ16={flag(e, "FLAG_ARENA_SHOW_SJ16")}')
