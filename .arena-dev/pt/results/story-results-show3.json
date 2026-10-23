@@ -38,7 +38,7 @@
   {
    "check": "[show] ArenaStory_SJ15_46 on BATTLE_FRONTIER_BATTLE_PYRAMID_LOBBY",
    "status": "PASS",
-   "detail": "flag FLAG_ARENA_SHOW_SJ15_7=1 battles=2 loc=(7, 18, 31, 11)"
+   "detail": "flag FLAG_ARENA_SHOW_SJ15_7=1 battles=1 loc=(7, 18, 31, 11)"
   },
   {
    "check": "[show] ArenaStory_SJ17_48 on PALLET_TOWN_LAB",
@@ -68,18 +68,10 @@
   "show: FLAG_SYS_PYRAMID_SILVER forced for ArenaStory_SJ15_46",
   "show: 7 silver symbols forced for ArenaStory_SJ17_48",
   "show: 7 silver symbols forced for ArenaStory_SJ18_49",
-  "harness: lead PP/HP topped up (cmd 19/13) between back-to-back battles inside one scene, 2 times"
+  "win assist: lead HP+PP refilled in battle (memory write) for ['ArenaStory_SJ15_46']",
+  "harness: lead PP/HP topped up (cmd 19/13) between back-to-back battles inside one scene, 1 times"
  ],
  "battle_outcomes": [
-  [
-   "ArenaStory_SJ15_46",
-   0,
-   2,
-   [
-    7,
-    18
-   ]
-  ],
   [
    "ArenaStory_SJ15_46",
    0,
