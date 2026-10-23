@@ -32,8 +32,8 @@ static void BarrierStart(u8 side,u16 move)
     u8 kind=move==MOVE_LIGHT_SCREEN;
     if(sBarrierLife[side][kind])return;
     gSideStatuses[side]|=sBarrierFlag[kind];
-    if(kind){gSideTimers[side].lightscreenTimer=5;gSideTimers[side].lightscreenBattlerId=side;}
-    else {gSideTimers[side].reflectTimer=5;gSideTimers[side].reflectBattlerId=side;}
+    if(kind){gSideTimers[side].lightscreenTimer=5;}
+    else {gSideTimers[side].reflectTimer=5;}
     sBarrierLife[side][kind]=BARRIER_LIFE;gArenaBarrierTelemetry[side]++;
     PlaySE(SE_M_REFLECT);
 }

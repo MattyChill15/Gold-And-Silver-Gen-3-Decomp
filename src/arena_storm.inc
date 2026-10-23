@@ -99,8 +99,8 @@ static void StormStart(void)
     if(!sStorm.tiles)return; // Never enable invisible hazards on allocation failure.
     if(!sStorm.life)sStorm.oldWeather=gBattleWeather;
     sStorm.age=0;sStorm.life=STORM_DURATION;sStorm.dirty=TRUE;
-    gBattleWeather=B_WEATHER_RAIN_TEMPORARY;
-    gWishFutureKnock.weatherDuration=5;
+    gBattleWeather=B_WEATHER_RAIN_NORMAL;
+    gBattleStruct->weatherDuration=5;
     gArenaStormTelemetry[0]++;PlaySE(SE_M_RAIN_DANCE);
 }
 static void StormMap(void)

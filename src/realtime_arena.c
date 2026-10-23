@@ -2,28 +2,29 @@
 #include "arena_series.h"
 #include "matt_config.h"
 // Matt mod state (reset every battle in RealtimeArena_ResetBattle).
-static EWRAM_DATA u8 sMattPrompt = 0;     // 0 not asked, 1 asking, 2 answered
-static EWRAM_DATA u8 sMattCatchMode = 0;  // 1 = weaken then throw balls
-static EWRAM_DATA u8 sMattStatusUsed = 0; // bit per move slot: setup/status used
-static EWRAM_DATA u8 sMattThrowWait = 0;
-static EWRAM_DATA u8 sMattBackoff = 0;
-static EWRAM_DATA u16 sMattBall = 0;
-static EWRAM_DATA u16 sMattLeftoversClock[2] = {0};
-static EWRAM_DATA u8 sProtectChain[2] = {0};
-static EWRAM_DATA u16 sMattProtectGap = 0; // bit15: must attack before next guard
-static EWRAM_DATA u8 sEndureLife[2] = {0};
+static EWRAM_INIT u8 sMattPrompt = 0;     // 0 not asked, 1 asking, 2 answered
+static EWRAM_INIT u8 sMattCatchMode = 0;  // 1 = weaken then throw balls
+static EWRAM_INIT u8 sMattStatusUsed = 0; // bit per move slot: setup/status used
+static EWRAM_INIT u8 sMattThrowWait = 0;
+static EWRAM_INIT u8 sMattBackoff = 0;
+static EWRAM_INIT u16 sMattBall = 0;
+static EWRAM_INIT u16 sMattLeftoversClock[2] = {0};
+static EWRAM_INIT u8 sProtectChain[2] = {0};
+static EWRAM_INIT u16 sMattProtectGap = 0; // bit15: must attack before next guard
+static EWRAM_INIT u8 sEndureLife[2] = {0};
 // v10 move state (12 bytes): last hit taken (Counter/Mirror Coat), its
 // category and age; Destiny Bond window; Perish count; Encore timer; SE shake.
-static EWRAM_DATA u16 sLastHit[2] = {0};
-static EWRAM_DATA u8 sLastHitAge[2] = {0}, sLastHitSpecial = 0, sDestinyLife[2] = {0}, sPerish[2] = {0}, sEncore[2] = {0}, sSeShake = 0;
-static EWRAM_DATA u16 sMattItemCd = 0;
-static EWRAM_DATA u8 sMattItemMsg[32] = {0};
-static EWRAM_DATA u8 sMattChoice = 0;    // 0 TRY CATCH, 1 CATCH (100%), 2 FIGHT
-static EWRAM_DATA u8 sMattForceCatch = 0;
-static EWRAM_DATA u8 sMattShots = 0;
+static EWRAM_INIT u16 sLastHit[2] = {0};
+static EWRAM_INIT u8 sLastHitAge[2] = {0}, sLastHitSpecial = 0, sDestinyLife[2] = {0}, sPerish[2] = {0}, sEncore[2] = {0}, sSeShake = 0;
+static EWRAM_INIT u16 sMattItemCd = 0;
+static EWRAM_INIT u8 sMattItemMsg[32] = {0};
+static EWRAM_INIT u8 sMattChoice = 0;    // 0 TRY CATCH, 1 CATCH (100%), 2 FIGHT
+static EWRAM_INIT u8 sMattForceCatch = 0;
+static EWRAM_INIT u8 sMattShots = 0;
 // Auto-switch: bits 0-1 switches used this battle, bits 2-7 cooldown (x15 frames).
-static EWRAM_DATA u8 sMattSwitch = 0;
+static EWRAM_INIT u8 sMattSwitch = 0;
 #include "realtime_arena.h"
+void ArenaJohto_DemoIntroFlags(void);
 #include "arena_capture.h"
 #include "item.h"
 #include "trig.h"
@@ -160,9 +161,9 @@ struct ArenaState
     struct ArenaToss toss;
 };
 
-static EWRAM_DATA struct ArenaState sArena = {};
+static EWRAM_INIT struct ArenaState sArena = {};
 // Persistent environment within one encounter, including native party switches.
-static EWRAM_DATA bool8 sEnvironmentInitialized=FALSE;
+static EWRAM_INIT bool8 sEnvironmentInitialized=FALSE;
 // Remember the living field occupants across native result/party handoffs.
 static EWRAM_DATA struct {
     s32 x, y;
@@ -171,8 +172,8 @@ static EWRAM_DATA struct {
     u16 cooldown, dashCooldown, burnClock;
     u8 moveSlot, statusActions;
 } sArenaResident[2] = {};
-static EWRAM_DATA u8 sArenaSendoutMask = 3;
-static EWRAM_DATA u8 sFlameReach[2]={},sFlameElementMask[2]={};
+static EWRAM_INIT u8 sArenaSendoutMask = 3;
+static EWRAM_INIT u8 sFlameReach[2]={},sFlameElementMask[2]={};
 // starts, active ticks, native hit opportunities, prop hits, peak reach.
 EWRAM_DATA u32 gArenaFlameTelemetry[5]={};
 static bool8 PsychicBusy(u8 side);
@@ -187,7 +188,7 @@ static bool8 NeedsStruggle(u8 side)
     u32 n;
     for(n=0;n<MAX_MON_MOVES;n++)
         if(gBattleMons[side].pp[n] && ArenaMoves_Get(gBattleMons[side].moves[n])
-            && gBattleMoves[gBattleMons[side].moves[n]].power)return FALSE;
+            && GetMovePower(gBattleMons[side].moves[n]))return FALSE;
     return TRUE;
 }
 static u8 ArenaMovePP(u8 side,u8 slot)
@@ -241,7 +242,7 @@ static bool8 ElementMotion(u8 side,s32 dx,s32 dy);
 #include "save.h"
 STATIC_ASSERT(sizeof(gSaveDataBuffer) >= 2 * 512 * sizeof(u32), ArenaFrameTilesFit);
 #define sMonFrameTiles ((u32 (*)[512])(void *)&gSaveDataBuffer)
-static EWRAM_DATA bool8 sDemoRequested = FALSE;
+static EWRAM_INIT bool8 sDemoRequested = FALSE;
 EWRAM_DATA struct RealtimeArenaTelemetry gRealtimeArenaTelemetry = {};
 EWRAM_DATA struct ArenaAiTelemetry gArenaAiTelemetry = {};
 EWRAM_DATA struct ArenaSpriteTelemetry gArenaSpriteTelemetry = {};
@@ -259,12 +260,12 @@ EWRAM_DATA struct ArenaResultTelemetry gArenaResultTelemetry = {};
 EWRAM_DATA struct ArenaIntroTelemetry gArenaIntroTelemetry = {};
 EWRAM_DATA u16 gArenaRenderTelemetry[8] = {};
 static EWRAM_DATA u8 sHudRecovery=0;
-static EWRAM_DATA bool8 sMoveMenuReady=FALSE;
+static EWRAM_INIT bool8 sMoveMenuReady=FALSE;
 EWRAM_DATA u8 gArenaMenuRequest=0; // 1: native bag, 2: native party
 EWRAM_DATA u16 gArenaCompatibilityReason=ARENA_COMPAT_OK;
 static EWRAM_DATA u8 sPausePage=0;
 static EWRAM_DATA u8 sPauseChoice=0;
-static EWRAM_DATA u16 sBideDamage[2]={};
+static EWRAM_INIT u16 sBideDamage[2]={};
 static void ArenaExpFieldTick(void);
 
 static const struct BgTemplate sArenaBgs[] =
@@ -372,7 +373,7 @@ static const struct {u16 species;u8 level;} sPracticeRivals[] =
     {SPECIES_BLAZIKEN,20}, {SPECIES_DRAGONITE,30}, {SPECIES_CHARIZARD,36},
     {SPECIES_SCEPTILE,43}, {SPECIES_RAYQUAZA,60}, {SPECIES_MEWTWO,66}
 };
-static EWRAM_DATA u8 sPracticeRival = 0;
+static EWRAM_INIT u8 sPracticeRival = 0;
 
 void RealtimeArena_PracticeTick(void)
 {
@@ -509,7 +510,7 @@ static u8 FirstMove(u8 side, bool8 needsPP)
     // Start on an attack when possible. Adding Growl/Screech must not change
     // a previously playable lead into an apparently harmless default action.
     for (i = 0; i < MAX_MON_MOVES; i++)
-        if (SupportedMove(ArenaMoveId(side,i)) && gBattleMoves[ArenaMoveId(side,i)].power
+        if (SupportedMove(ArenaMoveId(side,i)) && GetMovePower(ArenaMoveId(side,i))
             && (!needsPP || ArenaMovePP(side,i))) return i;
     // Legal status-only sets (e.g. newly caught Ralts/Cascoon) remain usable.
     // Never hide an unsupported action such as Bide behind an adapted buff.
@@ -532,8 +533,8 @@ static bool8 SupportedBattler(u8 side)
     gArenaCompatibilityReason=ARENA_COMPAT_STATUS|(side<<8);
     if (
            (gBattleMons[side].status1 & ~(STATUS1_ANY|STATUS1_TOXIC_COUNTER))
-        || (gBattleMons[side].status2 & ~(STATUS2_FOCUS_ENERGY|STATUS2_DEFENSE_CURL))
-        || gStatuses3[side] || gBattleMons[side].hp == 0)
+        || (gBattleMons[side].volatiles.confusionTurns||gBattleMons[side].volatiles.wrapped||gBattleMons[side].volatiles.escapePrevention||gBattleMons[side].volatiles.substitute||gBattleMons[side].volatiles.infatuation||gBattleMons[side].volatiles.transformed||gBattleMons[side].volatiles.foresight||gBattleMons[side].volatiles.cursed||gBattleMons[side].volatiles.nightmare)
+        || gBattleMons[side].volatiles.leechSeed || gBattleMons[side].volatiles.root || gBattleMons[side].volatiles.lockOn || gBattleMons[side].volatiles.mudSport || gBattleMons[side].hp == 0)
         return FALSE;
     gArenaCompatibilityReason=ARENA_COMPAT_MOVES|(side<<8);
     if(FirstMove(side,TRUE)==ARENA_NO_MOVE)return FALSE;
@@ -622,12 +623,14 @@ static bool8 SupportedBattler(u8 side)
         for (i = 0; i <= MAX_MON_MOVES; i++)
             if (SupportedMove(ArenaMoveId(side ^ 1,i))
                 && ArenaMovePP(side ^ 1,i)
-                && (gBattleMoves[ArenaMoveId(side ^ 1,i)].flags & FLAG_MAKES_CONTACT))
+                && MoveMakesContact(ArenaMoveId(side ^ 1,i)))
             {
                 gArenaCompatibilityReason=ARENA_COMPAT_CONTACT|(side<<8);
                 return FALSE;
             }
         return TRUE;
+    default: // Gen 4+ abilities stay in native classic mode.
+        break;
     }
     return FALSE;
 }
@@ -869,8 +872,8 @@ static void DrawHud(void)
             u8 color=!p?8:!pp?6:4;
             u8 y=17+side*12;
             PrintPopup(5,y,sMoveDirections[side],color);
-            PrintPopup(43,y,gMoveNames[move],color);
-            PrintPopup(132,y,p&&!gBattleMoves[move].power?sMoveStatusLabel:sMoveKinds[p?p->kind:0],color);
+            PrintPopup(43,y,GetMoveName(move),color);
+            PrintPopup(132,y,p&&!GetMovePower(move)?sMoveStatusLabel:sMoveKinds[p?p->kind:0],color);
             end=StringCopy(text,sTextPP);
             ConvertIntToDecimalStringN(end,pp,STR_CONV_MODE_LEFT_ALIGN,2);
             PrintPopup(180,y,text,color);
@@ -924,7 +927,7 @@ static const struct OamData sTrainerOam =
 
 static u8 OpponentGraphics(void)
 {
-    u8 pic = gTrainers[gTrainerBattleOpponent_A].trainerPic;
+    u8 pic = GetTrainerPicFromId(TRAINER_BATTLE_PARAM.opponentA);
     if (pic >= TRAINER_PIC_ELITE_FOUR_SIDNEY && pic <= TRAINER_PIC_LEADER_WINONA)
         return OBJ_EVENT_GFX_SIDNEY + pic - TRAINER_PIC_ELITE_FOUR_SIDNEY;
     switch (pic)
@@ -1127,13 +1130,14 @@ static void CB2_ArenaInit(void)
             // Other species retain the native fallback until their art is imported.
             for (front = 0; front < 2; front++)
             {
-                LoadSpecialPokePic(front ? &gMonFrontPicTable[gBattleMons[i].species] : &gMonBackPicTable[gBattleMons[i].species],
-                    gDecompressionBuffer, gBattleMons[i].species, gBattleMons[i].personality, front);
-                sheet.data = gDecompressionBuffer; sheet.size = 2048; sheet.tag = MON_TAG + i * 2 + front;
+                void *picBuf = AllocZeroed(MON_PIC_SIZE);
+                LoadSpecialPokePic(picBuf, gBattleMons[i].species, gBattleMons[i].personality, front);
+                sheet.data = picBuf; sheet.size = 2048; sheet.tag = MON_TAG + i * 2 + front;
                 LoadSpriteSheet(&sheet);
+                Free(picBuf);
             }
-            LoadCompressedPalette(GetMonSpritePalFromSpeciesAndPersonality(gBattleMons[i].species,
-                gBattleMons[i].otId, gBattleMons[i].personality), OBJ_PLTT_ID(i), PLTT_SIZE_4BPP);
+            LoadPalette(GetMonSpritePalFromSpeciesAndPersonality(gBattleMons[i].species,
+                gBattleMons[i].isShiny, gBattleMons[i].personality), OBJ_PLTT_ID(i), PLTT_SIZE_4BPP);
             template.tileTag = MON_TAG + i * 2 + (i ? 1 : 0);
         }
         body->x = 120 * Q;
@@ -1362,7 +1366,7 @@ static void Fire(u8 side, u8 slot, s32 targetX, s32 targetY)
     // cover. Self-targeted buffs do not target the opponent. Clamp the last PP.
     pp = ArenaMovePP(side,slot);
     if (gBattleMons[side ^ 1].ability == ABILITY_PRESSURE
-        && gBattleMoves[profile->move].target != MOVE_TARGET_USER && pp > 1)
+        && GetMoveTarget(profile->move) != TARGET_USER && pp > 1)
         pp--;
     if(slot<MAX_MON_MOVES)
     {
@@ -1374,7 +1378,7 @@ static void Fire(u8 side, u8 slot, s32 targetX, s32 targetY)
     if (gBattleMons[side].ability == ABILITY_TRUANT) body->cooldown = body->cooldown * 2 + 60; // loafs between actions
     gRealtimeArenaTelemetry.shots[side]++;
     gArenaCombatTelemetry.lastMove[side] = profile->move;
-    if(!gBattleMoves[profile->move].power && body->statusActions<255)body->statusActions++;
+    if(!GetMovePower(profile->move) && body->statusActions<255)body->statusActions++;
     sArena.hudDirty = TRUE;
     PlaySE(profile->move == MOVE_ROLLOUT ? SE_M_TAKE_DOWN
         : profile->move == MOVE_PSYCHIC ? SE_M_PSYBEAM
@@ -1480,18 +1484,12 @@ static void BufferPlayerActions(void)
 static s32 PlayerTypeValue(u16 move)
 {
     u32 i;
-    u8 type = gBattleMoves[move].type;
+    u8 type = GetMoveType(move);
     const struct BattlePokemon *target = &gBattleMons[1];
     s32 value = 100;
     if (target->ability == ABILITY_LEVITATE && type == TYPE_GROUND) return 0;
-    for (i = 0; i < sizeof(gTypeEffectiveness); i += 3)
-    {
-        u8 attack = TYPE_EFFECT_ATK_TYPE(i), defense = TYPE_EFFECT_DEF_TYPE(i);
-        if (attack == TYPE_ENDTABLE) break;
-        if (attack == TYPE_FORESIGHT) { if (target->status2 & STATUS2_FORESIGHT) break; continue; }
-        if (attack == type && (defense == target->types[0] || defense == target->types[1]))
-            value = value * TYPE_EFFECT_MULTIPLIER(i) / 10;
-    }
+    value = value * GetTypeModifier(type, target->types[0]) / 4096;
+    if (target->types[1] != target->types[0]) value = value * GetTypeModifier(type, target->types[1]) / 4096;
     if (target->ability == ABILITY_WONDER_GUARD && value <= 100) return 0;
     return value;
 }
@@ -1502,40 +1500,39 @@ static s32 PlayerTypeValue(u16 move)
 static s32 MattEstimateDamage(u16 move)
 {
     const struct BattlePokemon *a = &gBattleMons[0], *d = &gBattleMons[1];
-    u8 type = gBattleMoves[move].type;
+    u8 type = GetMoveType(move);
     s32 atk, def, dmg, eff;
     if (move == MOVE_NIGHT_SHADE || move == MOVE_SEISMIC_TOSS) return PlayerTypeValue(move) ? a->level : 0;
-    if (!gBattleMoves[move].power) return 0;
+    if (!GetMovePower(move)) return 0;
     eff = move == MOVE_STRUGGLE ? 100 : PlayerTypeValue(move);
     if (!eff) return 0;
     if (type < TYPE_MYSTERY) { atk = a->attack; def = d->defense; }
     else { atk = a->spAttack; def = d->spDefense; }
     if (def < 1) def = 1;
-    dmg = ((2 * a->level / 5 + 2) * gBattleMoves[move].power * atk / def) / 50 + 2;
+    dmg = ((2 * a->level / 5 + 2) * GetMovePower(move) * atk / def) / 50 + 2;
     if (type == a->types[0] || type == a->types[1]) dmg = dmg * 3 / 2;
     return dmg * eff / 100;
 }
 
 static bool8 MattIsStatusInflict(u16 move)
 {
-    u8 e = gBattleMoves[move].effect;
-    return e == EFFECT_SLEEP || e == EFFECT_PARALYZE || e == EFFECT_POISON || e == EFFECT_TOXIC
-        || e == EFFECT_CONFUSE || e == EFFECT_WILL_O_WISP;
+    u8 e = GetMoveEffect(move);
+    return e == EFFECT_NON_VOLATILE_STATUS || e == EFFECT_CONFUSE;
 }
 
 static s32 AiTypeValue(u16 move);
 static s32 MattEnemyDamage(u16 move)
 {
     const struct BattlePokemon *a = &gBattleMons[1], *d = &gBattleMons[0];
-    u8 type = gBattleMoves[move].type;
+    u8 type = GetMoveType(move);
     s32 atk, def, dmg, eff;
     if (move == MOVE_NIGHT_SHADE || move == MOVE_SEISMIC_TOSS) return AiTypeValue(move) ? a->level : 0;
-    if (!gBattleMoves[move].power) return 0;
+    if (!GetMovePower(move)) return 0;
     eff = AiTypeValue(move);
     if (type < TYPE_MYSTERY) { atk = a->attack; def = d->defense; if (sBarrierLife[0][0]) def *= 2; }
     else { atk = a->spAttack; def = d->spDefense; if (sBarrierLife[0][1]) def *= 2; }
     if (def < 1) def = 1;
-    dmg = ((2 * a->level / 5 + 2) * gBattleMoves[move].power * atk / def) / 50 + 2;
+    dmg = ((2 * a->level / 5 + 2) * GetMovePower(move) * atk / def) / 50 + 2;
     if (type == a->types[0] || type == a->types[1]) dmg = dmg * 3 / 2;
     return dmg * eff / 100;
 }
@@ -1625,7 +1622,7 @@ static s8 MattEnemyMainCategory(void)
         u16 move = ArenaMoveId(1, i);
         if (!SupportedMove(move) || !ArenaMovePP(1, i)) continue;
         d = MattEnemyDamage(move);
-        if (d > best) { best = d; cat = gBattleMoves[move].type < TYPE_MYSTERY ? 0 : 1; }
+        if (d > best) { best = d; cat = GetMoveType(move) < TYPE_MYSTERY ? 0 : 1; }
     }
     return cat;
 }
@@ -1667,7 +1664,7 @@ static bool8 PlayerAutoChooseMove(s32 distance)
         if (move == MOVE_STRUGGLE && hasAttack) continue;
         pp = ArenaMovePP(0, i);
         maxPP = i < MAX_MON_MOVES ? CalculatePPWithBonus(move, me->ppBonuses, i) : 1;
-        if (gBattleMoves[move].power || move == MOVE_NIGHT_SHADE || move == MOVE_SEISMIC_TOSS)
+        if (GetMovePower(move) || move == MOVE_NIGHT_SHADE || move == MOVE_SEISMIC_TOSS)
         {
             est = MattEstimateDamage(move);
             if (!est) continue;                                  // immune: never
@@ -1679,7 +1676,7 @@ static bool8 PlayerAutoChooseMove(s32 distance)
                 score = est * 100 / (foe->hp ? foe->hp : 1);     // biggest safe chunk
             }
             else if (est >= foe->hp)
-                score = 1000 + gBattleMoves[move].accuracy;      // finisher: reliable
+                score = 1000 + GetMoveAccuracy(move);      // finisher: reliable
             else
                 score = est * 100 / bestEst;                     // relative damage 0..100
         }
@@ -1724,7 +1721,7 @@ static bool8 PlayerAutoChooseMove(s32 distance)
         }
         else if (move == MOVE_LEECH_SEED)
         {
-            if ((gStatuses3[1] & STATUS3_LEECHSEED) || IS_BATTLER_OF_TYPE(1, TYPE_GRASS) || sMattCatchMode) continue;
+            if (gBattleMons[1].volatiles.leechSeed || IS_BATTLER_OF_TYPE(1, TYPE_GRASS) || sMattCatchMode) continue;
             score = healthy ? 80 : 40;
         }
         else if (move == MOVE_PERISH_SONG || move == MOVE_SKETCH || move == MOVE_BATON_PASS || move == MOVE_WHIRLWIND
@@ -1758,7 +1755,7 @@ static bool8 PlayerAutoChooseMove(s32 distance)
             if (sMattStatusUsed & (1 << i)) continue;            // never repeat setup/status
             if (MattIsStatusInflict(move))
             {
-                if (foeStatused || (foe->status2 & STATUS2_CONFUSION)) continue;
+                if (foeStatused || foe->volatiles.confusionTurns) continue;
                 score = sMattCatchMode ? 400 : (healthy ? 85 : -1);
             }
             else
@@ -1959,13 +1956,8 @@ static void MattAutoItems(void)
 static u32 MattTypeMul(u8 atk,u8 t1,u8 t2)
 {
     u32 i,m=10;
-    for(i=0;TYPE_EFFECT_ATK_TYPE(i)!=TYPE_ENDTABLE;i+=3)
-    {
-        if(TYPE_EFFECT_ATK_TYPE(i)==TYPE_FORESIGHT)continue;
-        if(TYPE_EFFECT_ATK_TYPE(i)!=atk)continue;
-        if(TYPE_EFFECT_DEF_TYPE(i)==t1)m=m*TYPE_EFFECT_MULTIPLIER(i)/10;
-        if(TYPE_EFFECT_DEF_TYPE(i)==t2&&t2!=t1)m=m*TYPE_EFFECT_MULTIPLIER(i)/10;
-    }
+    m=m*GetTypeModifier(atk,t1)/4096;
+    if(t2!=t1)m=m*GetTypeModifier(atk,t2)/4096;
     return m;
 }
 // Worst x10 multiplier the foe's damaging moves have against (t1,t2).
@@ -1975,8 +1967,8 @@ static u32 MattFoeThreat(u8 t1,u8 t2)
     for(i=0;i<MAX_MON_MOVES;i++)
     {
         u16 mv=gBattleMons[1].moves[i];
-        if(!mv||!gBattleMons[1].pp[i]||!gBattleMoves[mv].power)continue;
-        if((m=MattTypeMul(gBattleMoves[mv].type,t1,t2))>b)b=m;
+        if(!mv||!gBattleMons[1].pp[i]||!GetMovePower(mv))continue;
+        if((m=MattTypeMul(GetMoveType(mv),t1,t2))>b)b=m;
     }
     return b;
 }
@@ -1987,9 +1979,9 @@ static u32 MattOffense(struct Pokemon *mon,u8 t1,u8 t2)
     for(i=0;i<MAX_MON_MOVES;i++)
     {
         u16 mv=GetMonData(mon,MON_DATA_MOVE1+i);
-        if(!mv||!GetMonData(mon,MON_DATA_PP1+i)||!gBattleMoves[mv].power||!SupportedMove(mv))continue;
-        m=MattTypeMul(gBattleMoves[mv].type,gBattleMons[1].types[0],gBattleMons[1].types[1]);
-        if(gBattleMoves[mv].type==t1||gBattleMoves[mv].type==t2)m=m*3/2;
+        if(!mv||!GetMonData(mon,MON_DATA_PP1+i)||!GetMovePower(mv)||!SupportedMove(mv))continue;
+        m=MattTypeMul(GetMoveType(mv),gBattleMons[1].types[0],gBattleMons[1].types[1]);
+        if(GetMoveType(mv)==t1||GetMoveType(mv)==t2)m=m*3/2;
         if(m>b)b=m;
     }
     return b;
@@ -2008,7 +2000,7 @@ static bool8 MattCanStillHeal(void)
 static bool8 MattTrapped(void)
 {
     struct BattlePokemon *me=&gBattleMons[0],*foe=&gBattleMons[1];
-    if(me->status2&(STATUS2_WRAPPED|STATUS2_ESCAPE_PREVENTION)||gStatuses3[0]&STATUS3_ROOTED)return TRUE;
+    if(me->volatiles.wrapped||me->volatiles.escapePrevention||me->volatiles.root)return TRUE;
     if(!foe->hp)return FALSE;
     if(foe->ability==ABILITY_SHADOW_TAG)return TRUE;
     if(foe->ability==ABILITY_ARENA_TRAP&&!IS_BATTLER_OF_TYPE(0,TYPE_FLYING)&&me->ability!=ABILITY_LEVITATE)return TRUE;
@@ -2127,12 +2119,12 @@ static void TickPlayer(void)
         else if (canAttack && sMattCatchMode) canAttack = PlayerAutoChooseMove(dist);
         ap = ArenaMoves_Get(ArenaMoveId(0, body->moveSlot));
         if (canAttack && ap && ArenaMovePP(0, body->moveSlot)
-            && (gBattleMoves[ArenaMoveId(0, body->moveSlot)].power || ArenaMoveId(0, body->moveSlot) == MOVE_STRUGGLE
+            && (GetMovePower(ArenaMoveId(0, body->moveSlot)) || ArenaMoveId(0, body->moveSlot) == MOVE_STRUGGLE
                 || sArena.frame % 8 == 0 || sMattCatchMode) // support moves only when freshly chosen
             && (ap->kind == ARENA_MOVE_SELF
                 || (dist <= ap->range && ArenaNav_LineClear(body->x/Q, body->y/Q, sArena.bodies[1].x/Q, sArena.bodies[1].y/Q, 2))))
         {
-            if (!gBattleMoves[ArenaMoveId(0, body->moveSlot)].power && body->moveSlot < MAX_MON_MOVES)
+            if (!GetMovePower(ArenaMoveId(0, body->moveSlot)) && body->moveSlot < MAX_MON_MOVES)
                 sMattStatusUsed |= 1 << body->moveSlot;
             else sMattProtectGap &= 0x7FFF; // attacked: guards allowed again
             sArena.attackBuffer = 1;
@@ -2285,22 +2277,12 @@ static void AiBeginAim(void)
 static s32 AiTypeValue(u16 move)
 {
     u32 i;
-    u8 type=gBattleMoves[move].type;
+    u8 type=GetMoveType(move);
     const struct BattlePokemon *target=&gBattleMons[0];
     s32 value=100;
     if(target->ability==ABILITY_LEVITATE && type==TYPE_GROUND)return 0;
-    for(i=0;i<sizeof(gTypeEffectiveness);i+=3)
-    {
-        u8 attack=TYPE_EFFECT_ATK_TYPE(i),defense=TYPE_EFFECT_DEF_TYPE(i);
-        if(attack==TYPE_ENDTABLE)break;
-        if(attack==TYPE_FORESIGHT)
-        {
-            if(target->status2&STATUS2_FORESIGHT)break;
-            continue;
-        }
-        if(attack==type && (defense==target->types[0] || defense==target->types[1]))
-            value=value*TYPE_EFFECT_MULTIPLIER(i)/10;
-    }
+    value=value*GetTypeModifier(type,target->types[0])/4096;
+    if(target->types[1]!=target->types[0])value=value*GetTypeModifier(type,target->types[1])/4096;
     if(target->ability==ABILITY_WONDER_GUARD && value<=100)return 0;
     if(type==gBattleMons[1].types[0] || type==gBattleMons[1].types[1])value=value*3/2;
     return value;
@@ -2315,9 +2297,9 @@ static void AiChooseMove(s32 distance)
     for(i=0;i<=MAX_MON_MOVES;i++)
     {
         u16 move=ArenaMoveId(1,i);
-        if(SupportedMove(move) && ArenaMovePP(1,i) && gBattleMoves[move].power
-            && gBattleMoves[move].type<TYPE_MYSTERY && AiTypeValue(move))hasPhysical=TRUE;
-        if(SupportedMove(move) && ArenaMovePP(1,i) && gBattleMoves[move].power)hasAttack=TRUE;
+        if(SupportedMove(move) && ArenaMovePP(1,i) && GetMovePower(move)
+            && GetMoveType(move)<TYPE_MYSTERY && AiTypeValue(move))hasPhysical=TRUE;
+        if(SupportedMove(move) && ArenaMovePP(1,i) && GetMovePower(move))hasAttack=TRUE;
     }
     for(i=0;i<=MAX_MON_MOVES;i++)
     {
@@ -2327,21 +2309,21 @@ static void AiChooseMove(s32 distance)
         if(!p||!ArenaMovePP(1,i))continue;
         // Pure estimate from the native type chart. Never call TypeCalc here:
         // its damage globals belong to the actual hit transaction.
-        score=gBattleMoves[move].power*(move==MOVE_STRUGGLE?100:AiTypeValue(move))/50+AiRandom()%25;
+        score=GetMovePower(move)*(move==MOVE_STRUGGLE?100:AiTypeValue(move))/50+AiRandom()%25;
         if(move==MOVE_NIGHT_SHADE||move==MOVE_SEISMIC_TOSS)score=AiTypeValue(move)?gBattleMons[1].level*2:-1000;
         if(move==MOVE_SNORE&&!(gBattleMons[1].status1&STATUS1_SLEEP))score=-1000;
         if(move==MOVE_FAKE_OUT&&sArena.frame>240)score-=40; // a lead-off move
         if(move==MOVE_ROLLOUT&&AiTypeValue(move))score+=45; // the roll's ramp is worth more than its listed power
-        else if(move!=MOVE_STRUGGLE && gBattleMoves[move].power && !AiTypeValue(move))score=-1000;
+        else if(move!=MOVE_STRUGGLE && GetMovePower(move) && !AiTypeValue(move))score=-1000;
         if((move==MOVE_ABSORB||move==MOVE_MEGA_DRAIN||move==MOVE_GIGA_DRAIN||move==MOVE_LEECH_LIFE) && AiTypeValue(move)
             && gBattleMons[1].hp*2<gBattleMons[1].maxHP)score+=90;
-        if(!gBattleMoves[move].power)
+        if(!GetMovePower(move))
         {
             u8 stat=STAT_ATK;bool8 self;
             s8 change=RealtimeArena_StatChange(move,&stat,&self);
             bool8 useful=change && (change>0?gBattleMons[1].statStages[stat]<8:gBattleMons[0].statStages[stat]>4);
             if((move==MOVE_LEER||move==MOVE_TAIL_WHIP||move==MOVE_SCREECH||move==MOVE_HOWL)&&!hasPhysical)useful=FALSE;
-            if(move==MOVE_FOCUS_ENERGY)useful=hasPhysical&&!(gBattleMons[1].status2&STATUS2_FOCUS_ENERGY);
+            if(move==MOVE_FOCUS_ENERGY)useful=hasPhysical&&!gBattleMons[1].volatiles.focusEnergy;
             if(move==MOVE_DOUBLE_TEAM)useful=!sDecoys[1].life;
             if(move==MOVE_SUBSTITUTE)useful=!sCover[1].hp&&gBattleMons[1].hp>gBattleMons[1].maxHP/2;
             if(move==MOVE_SMOKESCREEN)useful=!sSmoke[1].life&&distance<100;
@@ -2370,7 +2352,7 @@ static void AiChooseMove(s32 distance)
                 else if(move==MOVE_SUPERSONIC||move==MOVE_CONFUSE_RAY)
                     score=sArena.bodies[0].cooldown<30&&AiRandom()%3==0?80+AiRandom()%20:-1000;
                 else if(move==MOVE_LEECH_SEED)
-                    score=!(gStatuses3[0]&STATUS3_LEECHSEED)&&!IS_BATTLER_OF_TYPE(0,TYPE_GRASS)?105+AiRandom()%20:-1000;
+                    score=!gBattleMons[0].volatiles.leechSeed&&!IS_BATTLER_OF_TYPE(0,TYPE_GRASS)?105+AiRandom()%20:-1000;
                 else if(move==MOVE_COUNTER||move==MOVE_MIRROR_COAT)
                     score=sLastHitAge[1]&&sLastHit[1]&&((sLastHitSpecial>>1)&1)==(move==MOVE_MIRROR_COAT)?140+AiRandom()%30:-1000;
                 else if(move==MOVE_DESTINY_BOND)
@@ -2378,13 +2360,13 @@ static void AiChooseMove(s32 distance)
                 else if(move==MOVE_PERISH_SONG)
                     score=!sPerish[0]&&!sArena.bodies[1].statusActions&&AiRandom()%4==0?70:-1000;
                 else if(move==MOVE_TRANSFORM)
-                    score=!(me->status2&STATUS2_TRANSFORMED)?200:-1000;
+                    score=!me->volatiles.transformed?200:-1000;
                 else if(move==MOVE_ENCORE)
-                    score=!sEncore[0]&&sArena.bodies[0].moveSlot<MAX_MON_MOVES&&!gBattleMoves[ArenaMoveId(0,sArena.bodies[0].moveSlot)].power?100:-1000;
+                    score=!sEncore[0]&&sArena.bodies[0].moveSlot<MAX_MON_MOVES&&!GetMovePower(ArenaMoveId(0,sArena.bodies[0].moveSlot))?100:-1000;
                 else if(move==MOVE_SAFEGUARD)
                     score=!(gSideStatuses[1]&SIDE_STATUS_SAFEGUARD)&&!sArena.bodies[1].statusActions?75:-1000;
                 else if(move==MOVE_MIND_READER)
-                    score=!(gStatuses3[0]&STATUS3_ALWAYS_HITS)&&hasAttack&&AiRandom()%3==0?85:-1000;
+                    score=!gBattleMons[0].volatiles.lockOn&&hasAttack&&AiRandom()%3==0?85:-1000;
                 else if(move==MOVE_WHIRLWIND)
                     score=distance<50&&AiRandom()%3==0?80:-1000;
                 else if(move==MOVE_BELLY_DRUM)
@@ -2496,8 +2478,8 @@ static bool8 MattSupportMoveEffect(u8 side,u16 move)
         heal=mon->maxHP/2; break;
     case MOVE_SYNTHESIS: case MOVE_MORNING_SUN: case MOVE_MOONLIGHT:
         heal=mon->maxHP/2;
-        if(!AbilityBattleEffects(ABILITYEFFECT_CHECK_ON_FIELD,0,ABILITY_CLOUD_NINE,0,0)
-           &&!AbilityBattleEffects(ABILITYEFFECT_CHECK_ON_FIELD,0,ABILITY_AIR_LOCK,0,0))
+        if(!IsAbilityOnField(ABILITY_CLOUD_NINE)
+           &&!IsAbilityOnField(ABILITY_AIR_LOCK))
         {
             if(gBattleWeather&B_WEATHER_SUN)heal=mon->maxHP*2/3;
             else if(gBattleWeather&B_WEATHER_ANY)heal=mon->maxHP/4;
@@ -2517,7 +2499,7 @@ static bool8 MattSupportMoveEffect(u8 side,u16 move)
     case MOVE_MIST:
         if(gSideStatuses[side]&SIDE_STATUS_MIST)
         {ArenaFeedback_Impact(side,body->x/Q,body->y/Q,0,ARENA_FEEDBACK_MISS);return TRUE;}
-        gSideStatuses[side]|=SIDE_STATUS_MIST;gSideTimers[side].mistTimer=5;gSideTimers[side].mistBattlerId=side;
+        gSideStatuses[side]|=SIDE_STATUS_MIST;gSideTimers[side].mistTimer=5;
         PlaySE(SE_M_MIST);return TRUE;
     case MOVE_BELLY_DRUM:
         if(mon->hp<=mon->maxHP/2||mon->statStages[STAT_ATK]==MAX_STAT_STAGE)
@@ -2529,10 +2511,10 @@ static bool8 MattSupportMoveEffect(u8 side,u16 move)
     case MOVE_SAFEGUARD:
         if(gSideStatuses[side]&SIDE_STATUS_SAFEGUARD)
         {ArenaFeedback_Impact(side,body->x/Q,body->y/Q,0,ARENA_FEEDBACK_MISS);return TRUE;}
-        gSideStatuses[side]|=SIDE_STATUS_SAFEGUARD;gSideTimers[side].safeguardTimer=5;gSideTimers[side].safeguardBattlerId=side;
+        gSideStatuses[side]|=SIDE_STATUS_SAFEGUARD;gSideTimers[side].safeguardTimer=5;
         PlaySE(SE_M_REFLECT);return TRUE;
     case MOVE_MUD_SPORT:
-        gStatuses3[side]|=STATUS3_MUDSPORT;PlaySE(SE_M_SAND_ATTACK);return TRUE;
+        gBattleMons[side].volatiles.mudSport=1;gFieldTimers.mudSportTimer=5;PlaySE(SE_M_SAND_ATTACK);return TRUE;
     case MOVE_DESTINY_BOND:
         sDestinyLife[side]=180;PlaySE(SE_M_PSYBEAM);return TRUE;
     case MOVE_PERISH_SONG:
@@ -2542,15 +2524,15 @@ static bool8 MattSupportMoveEffect(u8 side,u16 move)
     case MOVE_TRANSFORM:
     {
         struct BattlePokemon *t=&gBattleMons[side^1];
-        if(mon->status2&STATUS2_TRANSFORMED)
+        if(mon->volatiles.transformed)
         {ArenaFeedback_Impact(side,body->x/Q,body->y/Q,0,ARENA_FEEDBACK_MISS);return TRUE;}
         // Native copy minus species/sprite: types, stats, stages, moves (5 PP).
         mon->attack=t->attack;mon->defense=t->defense;mon->speed=t->speed;
         mon->spAttack=t->spAttack;mon->spDefense=t->spDefense;
         mon->types[0]=t->types[0];mon->types[1]=t->types[1];mon->ability=t->ability;
         for(i=0;i<NUM_BATTLE_STATS;i++)mon->statStages[i]=t->statStages[i];
-        for(i=0;i<MAX_MON_MOVES;i++){mon->moves[i]=t->moves[i];mon->pp[i]=t->moves[i]?min(5,gBattleMoves[t->moves[i]].pp):0;}
-        mon->status2|=STATUS2_TRANSFORMED;body->moveSlot=FirstMove(side,TRUE);
+        for(i=0;i<MAX_MON_MOVES;i++){mon->moves[i]=t->moves[i];mon->pp[i]=t->moves[i]?min(5,GetMovePP(t->moves[i])):0;}
+        mon->volatiles.transformed=1;body->moveSlot=FirstMove(side,TRUE);
         if(body->moveSlot==ARENA_NO_MOVE)body->moveSlot=ARENA_STRUGGLE_SLOT;
         PlaySE(SE_M_TELEPORT);body->flash=8;sArena.hudDirty=TRUE;return TRUE;
     }
@@ -2572,7 +2554,7 @@ static bool8 MattTargetUtility(u8 side,u8 targetSide,u16 move)
     struct BattlePokemon *t=&gBattleMons[targetSide];
     struct ArenaBody *target=&sArena.bodies[targetSide];
     bool8 worked=FALSE;
-    u8 acc=gBattleMoves[move].accuracy;
+    u8 acc=GetMoveAccuracy(move);
     switch(move)
     {
     case MOVE_THUNDER_WAVE:
@@ -2589,8 +2571,8 @@ static bool8 MattTargetUtility(u8 side,u8 targetSide,u16 move)
         }
         break;
     case MOVE_LEECH_SEED:
-        if(!IS_BATTLER_OF_TYPE(targetSide,TYPE_GRASS) && !(gStatuses3[targetSide]&STATUS3_LEECHSEED) && Random()%100<acc)
-        {gStatuses3[targetSide]|=STATUS3_LEECHSEED|side;worked=TRUE;}
+        if(!IS_BATTLER_OF_TYPE(targetSide,TYPE_GRASS) && !gBattleMons[targetSide].volatiles.leechSeed && Random()%100<acc)
+        {gBattleMons[targetSide].volatiles.leechSeed=LEECHSEEDED_BY(side);worked=TRUE;}
         break;
     case MOVE_WHIRLWIND:
         // Wild Gen III Whirlwind ends the battle; the arena blows the target away.
@@ -2605,11 +2587,11 @@ static bool8 MattTargetUtility(u8 side,u8 targetSide,u16 move)
         {sEncore[targetSide]=60;worked=TRUE;} // ~3 turns in 15-frame units
         break;
     case MOVE_MIND_READER:
-        gStatuses3[targetSide]=(gStatuses3[targetSide]&~STATUS3_ALWAYS_HITS)|STATUS3_ALWAYS_HITS_TURN(2);
-        gDisableStructs[targetSide].battlerWithSureHit=side;worked=TRUE;
+        gBattleMons[targetSide].volatiles.lockOn=2;
+        gBattleMons[targetSide].volatiles.battlerWithSureHit=side;worked=TRUE;
         break;
     case MOVE_ODOR_SLEUTH:
-        t->status2|=STATUS2_FORESIGHT;worked=TRUE;
+        t->volatiles.foresight=1;worked=TRUE;
         break;
     case MOVE_SKETCH: // Permanent move copy is not modeled in the arena.
         break;
@@ -2648,7 +2630,7 @@ static void ApplyMoveHit(u8 side,u16 move)
     }
     sProtectChain[side]=0;
     if(MattSupportMoveEffect(side,move))return;
-    if(gBattleMoves[move].power&&GuardIntercept(side,move))return;
+    if(GetMovePower(move)&&GuardIntercept(side,move))return;
     if(move==MOVE_SUBSTITUTE){if(!CoverStart(side))ArenaFeedback_Wall(target->x/Q,target->y/Q);return;}
     if(move==MOVE_SMOKESCREEN){SmokeStart(side);return;}
     if(move==MOVE_RAIN_DANCE){StormStart();return;}
@@ -2662,7 +2644,7 @@ static void ApplyMoveHit(u8 side,u16 move)
         if(!DecoyStart(side))ArenaFeedback_Impact(side,target->x/Q,target->y/Q,0,ARENA_FEEDBACK_MISS);
         return;
     }
-    if(!gBattleMoves[move].power)
+    if(!GetMovePower(move))
     {
         u8 stat=STAT_ATK;bool8 self;
         s8 delta=RealtimeArena_StatChange(move,&stat,&self);
@@ -2689,7 +2671,7 @@ static void ApplyMoveHit(u8 side,u16 move)
     if(move==MOVE_BIDE && damage>0)damage=min(65535,sBideDamage[side]*2);
     // Visual only: super-effective hits get a slightly longer hit-pause and a
     // 2px horizontal shake of the arena layer. Damage is untouched.
-    if(damage>0 && (gMoveResultFlags&MOVE_RESULT_SUPER_EFFECTIVE))sSeShake=10;
+    if(damage>0 && (gBattleStruct->moveResultFlags[1]&MOVE_RESULT_SUPER_EFFECTIVE))sSeShake=10;
     ApplyResolvedHit(side,move,damage);
     if(sSeShake==10)sArena.hitstop=max(sArena.hitstop,5);
 }
@@ -2707,7 +2689,7 @@ static void ApplyResolvedHit(u8 side,u16 move,s32 damage)
         if(move!=MOVE_COUNTER&&move!=MOVE_MIRROR_COAT)
         {
             sLastHit[targetSide]=dealt;sLastHitAge[targetSide]=180;
-            if(gBattleMoves[move].type>=TYPE_MYSTERY)sLastHitSpecial|=1<<targetSide;else sLastHitSpecial&=~(1<<targetSide);
+            if(GetMoveType(move)>=TYPE_MYSTERY)sLastHitSpecial|=1<<targetSide;else sLastHitSpecial&=~(1<<targetSide);
         }
         if(target->actionLife && ArenaMoveId(targetSide,target->shotSlot)==MOVE_BIDE)
             sBideDamage[targetSide]=min(32767,sBideDamage[targetSide]+dealt);
@@ -2736,7 +2718,7 @@ static void ApplyResolvedHit(u8 side,u16 move,s32 damage)
                                 target->x/Q,target->y/Q,healing);
         }
         target->flash=8;
-        if((gBattleMoves[move].flags&FLAG_MAKES_CONTACT) && gBattleMons[side].hp)
+        if(MoveMakesContact(move) && gBattleMons[side].hp)
         {
             u8 ability=gBattleMons[targetSide].ability;
             u8 effect=ability==ABILITY_STATIC?MOVE_EFFECT_PARALYSIS:
@@ -2760,7 +2742,7 @@ static void ApplyResolvedHit(u8 side,u16 move,s32 damage)
                 RealtimeArena_InflictStatus(targetSide,side,effect,TRUE);
             }
         }
-        if((gBattleMons[targetSide].status1&STATUS1_FREEZE)&&gBattleMoves[move].type==TYPE_FIRE)
+        if((gBattleMons[targetSide].status1&STATUS1_FREEZE)&&GetMoveType(move)==TYPE_FIRE)
         {
             gBattleMons[targetSide].status1&=~STATUS1_FREEZE;
             SetMonData(targetSide?&gEnemyParty[gBattlerPartyIndexes[targetSide]]:&gPlayerParty[gBattlerPartyIndexes[targetSide]],
@@ -2809,7 +2791,7 @@ static void ApplyResolvedHit(u8 side,u16 move,s32 damage)
             gArenaResultTelemetry.started=gMain.vblankCounter1;
         }
     }
-    else if(move==MOVE_FALSE_SWIPE && !(gMoveResultFlags&MOVE_RESULT_NO_EFFECT))
+    else if(move==MOVE_FALSE_SWIPE && !(gBattleStruct->moveResultFlags[1]&MOVE_RESULT_NO_EFFECT))
     {
         // The native damage clamp legitimately returns zero at 1 HP. This
         // contact is not an accuracy miss and must never faint the target.
@@ -2821,7 +2803,7 @@ static void ApplyResolvedHit(u8 side,u16 move,s32 damage)
     {
         gRealtimeArenaTelemetry.misses++;
         ArenaFeedback_Impact(targetSide,target->x/Q,target->y/Q,0,
-            (gMoveResultFlags&MOVE_RESULT_DOESNT_AFFECT_FOE)?ARENA_FEEDBACK_IMMUNE:ARENA_FEEDBACK_MISS);
+            (gBattleStruct->moveResultFlags[1]&MOVE_RESULT_DOESNT_AFFECT_FOE)?ARENA_FEEDBACK_IMMUNE:ARENA_FEEDBACK_MISS);
     }
 }
 
@@ -2962,7 +2944,7 @@ static void TickActions(void)
                 }
             }
             sFlameReach[side]=reach;gArenaFlameTelemetry[1]++;
-            if(gBattleMoves[p->move].type==TYPE_ELECTRIC&&!body->connected)
+            if(GetMoveType(p->move)==TYPE_ELECTRIC&&!body->connected)
             {
                 u32 along;
                 for(along=8;along<=reach;along+=6)
@@ -3018,7 +3000,7 @@ static void TickActions(void)
             hit=ArenaMoves_InCone((target->x-body->x)/Q,(target->y-body->y)/Q,
                                   body->attackX,body->attackY,range,p->cone);
         }
-        if(!body->connected && gBattleMoves[p->move].power)
+        if(!body->connected && GetMovePower(p->move))
         {
             if(p->kind==ARENA_MOVE_RUSH)
             {if(CoverSegment(side,p->move,oldX,oldY,body->x/Q,body->y/Q,p->radius))body->connected=TRUE;}
@@ -3028,7 +3010,7 @@ static void TickActions(void)
                 if(CoverCone(side,p,range,hit))body->connected=TRUE;
             }
         }
-        if(!body->connected && gBattleMoves[p->move].power && sDecoys[side^1].life)
+        if(!body->connected && GetMovePower(p->move) && sDecoys[side^1].life)
         {
             struct ArenaDecoy*d=&sDecoys[side^1];
             bool8 decoyHit=FALSE;
@@ -3164,11 +3146,11 @@ static void MattTickItems(void)
         if(sEncore[side]&&sArena.frame%15==0)sEncore[side]--;
         if(sArena.frame%300==0 && b->hp && !sArena.resultTimer)
         {
-            if(gStatuses3[side]&STATUS3_ALWAYS_HITS)gStatuses3[side]-=STATUS3_ALWAYS_HITS_TURN(1);
+            if(gBattleMons[side].volatiles.lockOn)gBattleMons[side].volatiles.lockOn--;
             if((gSideStatuses[side]&SIDE_STATUS_SAFEGUARD)&&!--gSideTimers[side].safeguardTimer)gSideStatuses[side]&=~SIDE_STATUS_SAFEGUARD;
-            if((gStatuses3[side]&STATUS3_LEECHSEED)&&gBattleMons[side^1].hp)
+            if(gBattleMons[side].volatiles.leechSeed&&gBattleMons[side^1].hp)
             {
-                u8 to=gStatuses3[side]&STATUS3_LEECHSEED_BATTLER;
+                u8 to=gBattleMons[side].volatiles.leechSeed-1;
                 u16 d=min(b->hp,max(1,b->maxHP/8)),h;
                 b->hp-=d;SetMonData(side?&gEnemyParty[gBattlerPartyIndexes[side]]:&gPlayerParty[gBattlerPartyIndexes[side]],MON_DATA_HP,&b->hp);
                 h=min(gBattleMons[to].maxHP,gBattleMons[to].hp+d);gBattleMons[to].hp=h;
@@ -3219,7 +3201,7 @@ static void MattTickItems(void)
         if(cure && (mon->status1&cure&STATUS1_ANY))
         {
             u16 none=ITEM_NONE;
-            gBattleStruct->usedHeldItems[side]=mon->item;
+            gBattleStruct->partyState[side][gBattlerPartyIndexes[side]].usedHeldItem=mon->item;
             mon->status1&=~cure;mon->item=ITEM_NONE;
             SetMonData(party,MON_DATA_STATUS,&mon->status1);
             SetMonData(party,MON_DATA_HELD_ITEM,&none);
@@ -3487,7 +3469,7 @@ static void CB2_Arena(void)
                         u16 item = mon->item;
                         struct Pokemon *party = i ? &gEnemyParty[gBattlerPartyIndexes[i]] : &gPlayerParty[gBattlerPartyIndexes[i]];
                         mon->hp = min(mon->maxHP, mon->hp + GetItemHoldEffectParam(item));
-                        gBattleStruct->usedHeldItems[i] = item;
+                        gBattleStruct->partyState[i][gBattlerPartyIndexes[i]].usedHeldItem = item;
                         mon->item = ITEM_NONE;
                         SetMonData(party, MON_DATA_HELD_ITEM, &mon->item);
                         SetMonData(party, MON_DATA_HP, &mon->hp);
@@ -3843,14 +3825,11 @@ bool8 RealtimeArena_SetupDemo(void)
     FlagSet(FLAG_ADVENTURE_STARTED);
     FlagSet(FLAG_SYS_B_DASH);
     AddBagItem(ITEM_POKE_BALL,20);
-    FlagSet(FLAG_HIDE_ROUTE_101_BIRCH_STARTERS_BAG);
-    FlagSet(FLAG_HIDE_ROUTE_101_BIRCH_ZIGZAGOON_BATTLE);
-    FlagSet(FLAG_HIDE_ROUTE_101_ZIGZAGOON);
-    FlagSet(FLAG_HIDE_ROUTE_101_BIRCH);
-    VarSet(VAR_ROUTE101_STATE, 3);
+    // Johto: the stock New Bark intro flags are left to the native scripts.
+    ArenaJohto_DemoIntroFlags();
 #if ARENA_LAB
-    CreateMon(&gPlayerParty[0], SPECIES_TREECKO, 6, 20, TRUE, 0, OT_ID_PLAYER_ID, 0);
-    CreateMon(&gPlayerParty[1], SPECIES_MUDKIP, 5, 20, TRUE, 0, OT_ID_PLAYER_ID, 0);
+    CreateMonLegacy(&gPlayerParty[0], SPECIES_TREECKO, 6, 20, TRUE, 0, OT_ID_PLAYER_ID, 0);
+    CreateMonLegacy(&gPlayerParty[1], SPECIES_MUDKIP, 5, 20, TRUE, 0, OT_ID_PLAYER_ID, 0);
     gPlayerPartyCount = 2;
 #else
     // A native NEW GAME preset, never an imported save or a fixture mailbox.
@@ -3858,7 +3837,7 @@ bool8 RealtimeArena_SetupDemo(void)
     FlagSet(FLAG_ARENA_PRACTICE);
     gPlayerPartyCount = ARRAY_COUNT(team);
     for (i = 0; i < ARRAY_COUNT(team); i++)
-        CreateMon(&gPlayerParty[i], team[i].species, team[i].level,
+        CreateMonLegacy(&gPlayerParty[i], team[i].species, team[i].level,
                   20, TRUE, i * 2, OT_ID_PLAYER_ID, 0);
     for (i = 0; i < ARRAY_COUNT(box); i++)
         CreateBoxMonAt(0, i, box[i].species, box[i].level,

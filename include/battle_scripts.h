@@ -51,6 +51,8 @@ extern const u8 BattleScript_DoSwitchOut[];
 extern const u8 BattleScript_MoveSwitchOpenPartyScreen[];
 extern const u8 BattleScript_Pausex20[];
 extern const u8 BattleScript_LevelUp[];
+extern const u8 BattleScript_ArenaEvolutionLearn[];
+extern const u8 BattleScript_RealtimeArenaFaint[];
 extern const u8 BattleScript_WeatherContinues[];
 extern const u8 BattleScript_WeatherFaded[];
 extern const u8 BattleScript_DamagingWeather[];

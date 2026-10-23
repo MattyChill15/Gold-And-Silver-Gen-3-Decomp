@@ -66,7 +66,7 @@ static void CaptureHud(void)
             const u8 *opts[3];
             u8 line[48],*p;u32 k;
             opts[0]=opt0;opts[1]=opt1;opts[2]=opt2;
-            p=StringCopy(line,gSpeciesNames[gBattleMons[1].species]);
+            p=StringCopy(line,GetSpeciesName(gBattleMons[1].species));
             for(k=0;k<3;k++){p=StringCopy(p,sp);p=StringCopy(p,k==sMattChoice?sel:sp);p=StringCopy(p,opts[k]+1);p=StringCopy(p,k==sMattChoice?sel:sp);}
             HudTinyWindow(2,9,10,line,4,44);
         }
@@ -83,7 +83,7 @@ static void CaptureHud(void)
         }
         else
         {
-            HudTinyWindow(2,9,10,gMoveNames[ArenaMoveId(0,sArena.bodies[0].moveSlot)],4,16);
+            HudTinyWindow(2,9,10,GetMoveName(ArenaMoveId(0,sArena.bodies[0].moveSlot)),4,16);
             if(sArena.bodies[0].moveSlot==ARENA_STRUGGLE_SLOT)
             {static const u8 unlimited[]=_("PP --");StringCopy(text,unlimited);}
             else ConvertIntToDecimalStringN(StringCopy(text,sHudPPLabel),ArenaMovePP(0,sArena.bodies[0].moveSlot),STR_CONV_MODE_LEFT_ALIGN,2);
@@ -122,8 +122,8 @@ static void CaptureInit(void)
     // A practice encounter may start while the shoulders are still held.
     // Require a fresh press then; never spend a ball just for entering battle.
     sCapture.heldLatch=JOY_HELD(L_BUTTON|R_BUTTON)==(L_BUTTON|R_BUTTON);
-    LZDecompressWram(gBallGfx_Poke,tiles);
-    LZDecompressWram(gBallPal_Poke,palette);
+    DecompressDataWithHeaderWram(gBallGfx_Poke,tiles);
+    CpuCopy16(gBallPal_Poke,palette,sizeof(palette));
     for(i=0;i<sizeof(tiles);i++)
     {
         u8 a=pixels[i]&15,b=pixels[i]>>4;
@@ -229,8 +229,8 @@ static void CaptureInput(void)
     gArenaCaptureTelemetry.throws++;
     gArenaCaptureTelemetry.balls=CountTotalItemQuantityInBag(ITEM_POKE_BALL);
     gLastUsedItem=ITEM_POKE_BALL;
-    if(gBattleResults.catchAttempts[ITEM_POKE_BALL-ITEM_ULTRA_BALL]<255)
-        gBattleResults.catchAttempts[ITEM_POKE_BALL-ITEM_ULTRA_BALL]++;
+    if(gBattleResults.catchAttempts[BALL_POKE]<255)
+        gBattleResults.catchAttempts[BALL_POKE]++;
     // Small assist only near the actual target; never bend a deliberate miss.
     if(ArenaNav_Distance(sCapture.aimX,sCapture.aimY,enemy->x/Q,enemy->y/Q)<18)
     {
@@ -253,7 +253,7 @@ static bool8 CaptureAward(void)
     SetMonData(mon,MON_DATA_HP,&gBattleMons[1].hp);
     SetMonData(mon,MON_DATA_STATUS,&gBattleMons[1].status1);
     SetMonData(mon,MON_DATA_POKEBALL,&ball);
-    result=GiveMonToPlayer(mon);
+    result=GiveCapturedMonToPlayer(mon);
     if(result==MON_CANT_GIVE)return FALSE;
     gArenaCaptureTelemetry.destination=result;
     gBattleResults.caughtMonSpecies=GetMonData(mon,MON_DATA_SPECIES,NULL);

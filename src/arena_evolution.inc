@@ -62,7 +62,7 @@ static void EvolutionCommit(void)
     GetSetPokedexFlag(SpeciesToNationalPokedexNum(battle->species), FLAG_SET_SEEN);
     GetSetPokedexFlag(SpeciesToNationalPokedexNum(battle->species), FLAG_SET_CAUGHT);
     IncrementGameStat(GAME_STAT_EVOLVED_POKEMON);
-    gLeveledUpInBattle &= ~gBitTable[sEvolution.party];
+    gLeveledUpInBattle &= ~(1u << sEvolution.party);
     body->art = ArenaSprites_Get(battle->species);
     body->drawnFrame = body->drawnDirection = 255;
     LoadPalette(body->art->palette, OBJ_PLTT_ID(0), 32);
@@ -88,7 +88,7 @@ static void EvolutionFinish(bool8 canceled)
         gArenaEvolutionTelemetry[2]++;
         // Same promise as the original B-button cancellation: no second offer
         // at the end of this battle, but a later level-up can offer it again.
-        gLeveledUpInBattle &= ~gBitTable[sEvolution.party];
+        gLeveledUpInBattle &= ~(1u << sEvolution.party);
     }
     else
     {
@@ -165,7 +165,7 @@ bool8 RealtimeArena_TryEvolution(u8 party)
     mon = &gPlayerParty[party];
     oldSpecies = GetMonData(mon, MON_DATA_SPECIES);
     if (oldSpecies == SPECIES_NINCADA) return FALSE;
-    species = GetEvolutionTargetSpecies(mon, EVO_MODE_NORMAL, 0);
+    species = GetEvolutionTargetSpecies(mon, EVO_MODE_NORMAL, 0, NULL, NULL, CHECK_EVO);
     if (!species || !ArenaSprites_Get(species)) return FALSE;
     if (oldSpecies == SPECIES_GASTLY) sheet.data = sSpectralEvolutionFrames;
     // Borrow the inactive enemy projectile bank, NOT the player's bank:

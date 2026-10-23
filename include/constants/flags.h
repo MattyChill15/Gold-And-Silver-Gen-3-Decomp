@@ -745,6 +745,16 @@
 #define FLAG_UNUSED_0x2BA  0x2BA // Unused Flag
 #define FLAG_UNUSED_0x2BB  0x2BB // Unused Flag
 
+// Arena series (Johto chapter). Reuse formerly-unused flags 0x2B1-0x2B8.
+#define FLAG_ARENA_PRACTICE        FLAG_UNUSED_0x2B1 // opt-in disposable practice save
+#define FLAG_MATT_PART1_COMPLETE   FLAG_UNUSED_0x2B2 // Johto Part 1: Lance beaten
+#define FLAG_MATT_PART2_INIT       FLAG_UNUSED_0x2B3 // Johto Part 2 carry-over init done
+#define FLAG_ARENA_SERIES_IMPORTED FLAG_UNUSED_0x2B4 // team imported from an earlier chapter
+#define FLAG_ARENA_DEX_REWARD      FLAG_UNUSED_0x2B5 // dex reward claimed
+#define FLAG_MATT_PART2_COMPLETE   FLAG_UNUSED_0x2B6 // Johto Part 2: Red beaten
+#define FLAG_MATT_PART3_INIT       FLAG_UNUSED_0x2B7 // unused in Johto (no Part 3)
+#define FLAG_ARENA_CHIEF_STORY     FLAG_UNUSED_0x2B8 // storyline: 0 = Classic (default), 1 = Chief Story
+
 // Event Flags
 #define FLAG_HIDE_ROUTE_101_BIRCH_STARTERS_BAG                      0x2BC
 #define FLAG_HIDE_APPRENTICE                                        0x2BD

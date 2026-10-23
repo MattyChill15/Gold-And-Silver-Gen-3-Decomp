@@ -22,13 +22,13 @@ static const u16 sGymPalettes[]=INCBIN_U16(".arena-dev/art/gym-prop-palettes.gba
 static const u16 *const sBiomePalettes[]={sPalettes,sCoastPalettes,sCavePalettes,sDesertPalettes,sGymPalettes};
 static const s16 sDirections[8][2] = {{0,256},{181,181},{256,0},{181,-181},
     {0,-256},{-181,-181},{-256,0},{-181,181}};
-static EWRAM_DATA u8 sActorFx[2] = {};
-static EWRAM_DATA u16 sDrawn[2] = {};
-static EWRAM_DATA u16 sBoltFrames[ARENA_BOLT_SLOTS] = {};
+static EWRAM_INIT u8 sActorFx[2] = {};
+static EWRAM_INIT u16 sDrawn[2] = {};
+static EWRAM_INIT u16 sBoltFrames[ARENA_BOLT_SLOTS] = {};
 static const u32 sFlameTiles[]=INCBIN_U32("graphics/arena/flame/plume.4bpp");
 static const u32 sClashTiles[]=INCBIN_U32("graphics/arena/flame-clash/effect.4bpp");
 static const u16 sClashPalette[]=INCBIN_U16("graphics/arena/flame-clash/palette.gbapal");
-static EWRAM_DATA u8 sClashSprite=MAX_SPRITES,sClashFrame=255;
+static EWRAM_INIT u8 sClashSprite=MAX_SPRITES,sClashFrame=255;
 EWRAM_DATA u32 gArenaClashFxFailures=0;
 static const u32 sGuardTiles[]=INCBIN_U32("graphics/arena/guard/effect.4bpp");
 static const u16 sGuardPalette[]=INCBIN_U16("graphics/arena/guard/palette.gbapal");
@@ -47,7 +47,7 @@ static u8 SignaturePalette(u8 group)
 {
     return IndexOfSpritePaletteTag(0xA740+(group==3?0:group==0?2:group==1||group==2||group==6?1:3));
 }
-static EWRAM_DATA u8 sFlameSprites[2]={};
+static EWRAM_INIT u8 sFlameSprites[2]={};
 EWRAM_DATA u32 gArenaFlameFxFailures=0;
 static const struct OamData sFlameOam={.affineMode=ST_OAM_AFFINE_DOUBLE,
     .shape=SPRITE_SHAPE(64x64),.size=SPRITE_SIZE(64x64),.priority=0};

@@ -51,7 +51,7 @@ static void DrawStatusHud(void)
         u32 x=side?128:7,bar=side?129:8;
         u32 fill=mon->maxHP?mon->hp*102/mon->maxHP:0;
         u8 color=mon->hp*5<=mon->maxHP?6:mon->hp*2<=mon->maxHP?7:5;
-        StringCopy(text,gSpeciesNames[mon->species]);
+        StringCopy(text,GetSpeciesName(mon->species));
         Print(x,0,text,4);
         StringCopy(text,sQualityLevel);
         ConvertIntToDecimalStringN(text+4,mon->level,STR_CONV_MODE_LEFT_ALIGN,3);

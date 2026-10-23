@@ -2,9 +2,9 @@
 #define COVER_TAG 0xA840
 struct ArenaCover {s32 x,y; s16 vx,vy; u16 hp,age; u8 sprite,frame,burst;};
 struct ArenaSmoke {s16 x,y;u16 life,age;u8 sprites[3];};
-static EWRAM_DATA struct ArenaCover sCover[2]={};
-static EWRAM_DATA struct ArenaSmoke sSmoke[2]={};
-static EWRAM_DATA u8 sSmokeFrame=255;
+static EWRAM_INIT struct ArenaCover sCover[2]={};
+static EWRAM_INIT struct ArenaSmoke sSmoke[2]={};
+static EWRAM_INIT u8 sSmokeFrame=255;
 // casts, hits, breaks, HP paid, smoke casts, sight blocks, reserved, reserved, allocation failures
 EWRAM_DATA u32 gArenaCoverTelemetry[9]={};
 static const u32 sCoverFrames[]=INCBIN_U32("graphics/arena/cover-smoke/effect.4bpp");

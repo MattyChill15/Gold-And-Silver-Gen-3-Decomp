@@ -42,7 +42,7 @@ static void LoadArenaBiome(void)
     }
     if(gBattleTypeFlags&BATTLE_TYPE_TRAINER)
     {
-        u8 pic=gTrainers[gTrainerBattleOpponent_A].trainerPic;
+        u8 pic=GetTrainerPicFromId(TRAINER_BATTLE_PARAM.opponentA);
         if(pic>=TRAINER_PIC_LEADER_ROXANNE&&pic<=TRAINER_PIC_LEADER_JUAN)
             gArenaStage=8+pic-TRAINER_PIC_LEADER_ROXANNE;
     }

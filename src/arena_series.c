@@ -144,8 +144,8 @@ bool8 ArenaSeries_WriteChapterComplete(void)
 #endif
     for (i = 0; i < ARENA_SERIES_DEX_BYTES; i++)
     {
-        r->dexSeen[i] |= gSaveBlock2Ptr->pokedex.seen[i];
-        r->dexCaught[i] |= gSaveBlock2Ptr->pokedex.owned[i];
+        r->dexSeen[i] |= gSaveBlock1Ptr->dexSeen[i];
+        r->dexCaught[i] |= gSaveBlock1Ptr->dexCaught[i];
     }
     r->partyCount = gPlayerPartyCount;
     for (i = 0; i < PARTY_SIZE; i++)
@@ -593,7 +593,7 @@ static void ArenaPlaytest_Run(void)
     case 19: // party slot c: move slot b := move a (full PP)
         i = m->a;
         SetMonData(&gPlayerParty[m->c], MON_DATA_MOVE1 + m->b, &i);
-        i = gBattleMoves[m->a].pp;
+        i = GetMovePP(m->a);
         SetMonData(&gPlayerParty[m->c], MON_DATA_PP1 + m->b, &i);
         break;
 #endif

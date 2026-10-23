@@ -14,7 +14,7 @@ static const struct OamData sHaloOam={.shape=SPRITE_SHAPE(32x32),.size=SPRITE_SI
 static const struct OamData sImpactOam={.shape=SPRITE_SHAPE(64x64),.size=SPRITE_SIZE(64x64),.priority=0};
 static const struct SpriteTemplate sTemplate={.tileTag=TAG,.paletteTag=PALETTE_TAG,.oam=&sHaloOam,
     .anims=gDummySpriteAnimTable,.images=NULL,.affineAnims=gDummySpriteAffineAnimTable,.callback=SpriteCallbackDummy};
-static EWRAM_DATA u8 sHalos[3]={},sBurst=0,sAge=0,sFrame=255,sHaloFrame=255;
+static EWRAM_INIT u8 sHalos[3]={},sBurst=0,sAge=0,sFrame=255,sHaloFrame=255;
 void ArenaPsychicFx_Init(bool8 enabled)
 {
     u32 i;

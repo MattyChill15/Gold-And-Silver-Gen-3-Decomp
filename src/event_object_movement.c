@@ -12274,3 +12274,10 @@ bool8 MovementType_OverworldWildEncounter_Despawn_Step11(struct ObjectEvent *obj
 }
 
 #undef sDespawnTimer
+
+// Arena: palette data for an object event palette tag (falls back to Brendan).
+const u16 *ArenaObjectPalette(u16 tag)
+{
+    u8 i = FindObjectEventPaletteIndexByTag(tag);
+    return i == 0xFF ? gObjectEventPal_Brendan : sObjectEventSpritePalettes[i].data;
+}

@@ -75,4 +75,5 @@ u32 CountPartyNonEggMons(void);
 void RemoveSelectedPcMon(struct Pokemon *mon);
 s32 StorePokemonInBox(struct BoxPokemon *src, u8 *boxId, u8 *position); //HnS
 
+void CreateBoxMonAt(u8 boxId, u8 boxPosition, u16 species, u8 level, u8 fixedIV, u8 hasFixedPersonality, u32 personality, u8 otIDType, u32 otID);
 #endif // GUARD_POKEMON_STORAGE_SYSTEM_H

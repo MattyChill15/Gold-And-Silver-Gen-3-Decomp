@@ -5,13 +5,13 @@
 #define ELEMENT_PAL 0xA742
 enum { SURFACE_NONE, SURFACE_WATER, SURFACE_ICE, SURFACE_CHARGED };
 struct ArenaSurface {s16 x,y;u16 life,age;u8 kind,sprite;};
-static EWRAM_DATA struct ArenaSurface sSurfaces[ELEMENT_COUNT]={};
-static EWRAM_DATA s16 sSlide[2][2]={};
-static EWRAM_DATA s16 sElementInput[2][2]={};
-static EWRAM_DATA bool8 sElementApplying=FALSE;
-static EWRAM_DATA u8 sElementCrash[2]={};
-static EWRAM_DATA u8 sElementFrames[4]={};
-static EWRAM_DATA u8 sElementBurst=MAX_SPRITES,sElementBurstAge=0;
+static EWRAM_INIT struct ArenaSurface sSurfaces[ELEMENT_COUNT]={};
+static EWRAM_INIT s16 sSlide[2][2]={};
+static EWRAM_INIT s16 sElementInput[2][2]={};
+static EWRAM_INIT bool8 sElementApplying=FALSE;
+static EWRAM_INIT u8 sElementCrash[2]={};
+static EWRAM_INIT u8 sElementFrames[4]={};
+static EWRAM_INIT u8 sElementBurst=MAX_SPRITES,sElementBurstAge=0;
 // deposits, freezes, charge chains, conducted hits, slide frames, wall crashes,
 // melts, expired, peak surfaces, allocation failures, grounded immune, ticks.
 EWRAM_DATA u32 gArenaElementTelemetry[12]={};
@@ -111,7 +111,7 @@ static void ElementDeposit(s16 x,s16 y)
 static bool8 ElementReact(struct ArenaShot *shot)
 {
     u32 i,j,pass,mask=0,changed=0;
-    u8 type=gBattleMoves[shot->move].type;
+    u8 type=GetMoveType(shot->move);
     s16 x=shot->x/Q,y=shot->y/Q;
     if(type==TYPE_WATER)
     {
