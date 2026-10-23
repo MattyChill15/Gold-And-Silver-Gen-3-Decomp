@@ -50,12 +50,17 @@ void ReadFlash(u16 sectorNum, u32 offset, u8 *dest, u32 size);
 static const u8 sChapterText[] = _("CHAPTER 1 COMPLETE!");
 #elif defined(ARENA_JOHTO)
 #define ARENA_GAME_STAMP ARENA_GAME_STAMP_JOHTO
-#if MATT_PART == 2
+// Three parts (Matt 2026-10-23): P1 New Bark..Ecruteak (Fog Badge), P2 to Lance,
+// P3 Kanto/Mt Silver/Frontier to Red. P3 completes as ARENA_SEG_JOHTO for Emerald.
+#if MATT_PART == 3
 #define ARENA_SEG ARENA_SEG_JOHTO
-#define ARENA_CHAPTER_CLEAR() FlagGet(FLAG_MATT_PART2_COMPLETE) /* Part 2 ends at Red */
+#define ARENA_CHAPTER_CLEAR() FlagGet(FLAG_DEFEATED_RED) /* Part 3 ends at Red */
+#elif MATT_PART == 2
+#define ARENA_SEG ARENA_SEG_JOHTO_P2
+#define ARENA_CHAPTER_CLEAR() FlagGet(FLAG_MATT_PART2_COMPLETE) /* Part 2 ends at Lance */
 #else
 #define ARENA_SEG ARENA_SEG_JOHTO_P1
-#define ARENA_CHAPTER_CLEAR() FlagGet(FLAG_MATT_PART1_COMPLETE) /* Part 1 ends at Lance */
+#define ARENA_CHAPTER_CLEAR() FlagGet(FLAG_MATT_PART1_COMPLETE) /* Part 1 ends at Morty (Ecruteak) */
 #endif
 #define ARENA_DEX_REWARD_FLAG FLAG_ARENA_DEX_REWARD
 #define ARENA_SCALING_ACTIVE() FlagGet(FLAG_ARENA_SERIES_IMPORTED)
@@ -344,8 +349,21 @@ bool8 ArenaSeries_WriteChapterComplete(void)
 
 // Called after every successful normal/HoF save once the chapter is clear,
 // so the hub always mirrors the newest team, boxes slot and dex.
+#ifdef ARENA_JOHTO
+static void JohtoSyncPartFlags(void)
+{
+#if MATT_PART == 1
+    if (FlagGet(FLAG_BADGE04_GET)) FlagSet(FLAG_MATT_PART1_COMPLETE);
+#elif MATT_PART == 2
+    if (FlagGet(FLAG_SYS_GAME_CLEAR)) FlagSet(FLAG_MATT_PART2_COMPLETE);
+#endif
+}
+#endif
 void ArenaSeries_OnSaved(u8 saveType)
 {
+#ifdef ARENA_JOHTO
+    JohtoSyncPartFlags();
+#endif
     if ((saveType == SAVE_NORMAL || saveType == SAVE_HALL_OF_FAME) && ARENA_CHAPTER_CLEAR())
         ArenaSeries_WriteChapterComplete();
 }
@@ -417,6 +435,9 @@ void ArenaSeries_FieldTick(void)
 {
 #if ARENA_PLAYTEST
     ArenaPlaytest_Run();
+#endif
+#ifdef ARENA_JOHTO
+    JohtoSyncPartFlags(); // before any save, so the flag is in the slot the next part reads
 #endif
     if (!gArenaSeriesDexDirty)
         return;
@@ -745,7 +766,7 @@ static void ArenaPlaytest_Run(void)
     case 1: // party slot c = species a at level b (c==0 clears the party first)
         if (m->c == 0)
             ZeroPlayerPartyMons();
-        CreateMon(&gPlayerParty[m->c], m->a, m->b, USE_RANDOM_IVS, FALSE, 0, OT_ID_PLAYER_ID, 0);
+        CreateMonLegacy(&gPlayerParty[m->c], m->a, m->b, USE_RANDOM_IVS, FALSE, 0, OT_ID_PLAYER_ID, 0);
         CalculatePlayerPartyCount();
         m->result[0] = gPlayerPartyCount;
         break;
@@ -878,6 +899,18 @@ static void ArenaPlaytest_Run(void)
         m->result[1] = gPlayerPartyCount;
         m->result[2] = PtCountStorageMons();
         m->result[3] = gArenaItemsUsed;
+        break;
+#endif
+#ifdef ARENA_JOHTO
+    case 23: // import check: party count, PC mons, species slot 0|1<<16, storyline
+        m->result[0] = gPlayerPartyCount;
+        m->result[1] = PtCountStorageMons();
+        m->result[2] = GetMonData(&gPlayerParty[0], MON_DATA_SPECIES) | (GetMonData(&gPlayerParty[1], MON_DATA_SPECIES) << 16);
+        m->result[3] = ArenaStory_Get() | (FlagGet(FLAG_ARENA_SERIES_IMPORTED) << 8);
+        break;
+    case 24: // storyline := a
+        ArenaStory_Set(m->a);
+        m->result[0] = ArenaStory_Get();
         break;
 #endif
     }

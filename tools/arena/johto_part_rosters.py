@@ -17,22 +17,23 @@ PRIO = {
      153, 156, 159, 93, 24,
      # likely starters' lines / early partners
      16, 161, 163, 179, 180, 74, 66],
- 2: [# story: Chief B/C, J13 boss; Show SJ11-SJ13 (Lugia, Charizard, Gary Blastoise, Harrison Blaziken) + partners
-     198, 42, 215, 229, 148, 169, 130, 110, 89, 248, 249, 6, 9, 257, 25, 214, 164, 181,
+ 2: [# Pikachu every part; Lance's Dragonite (Matt 7:49); new P2 story: Chief B/C, J13 boss, Lugia, Gary/Harrison
+     25, 149, 42, 215, 229, 148, 169, 130, 110, 89, 248, 249, 9, 257,
+     # Elite Four aces (Will Xatu, Bruno Machamp, Karen Umbreon; Koga Crobat above)
+     178, 68, 197,
      # gym aces Chuck, Pryce, Clair
      62, 221, 230,
-     # Elite Four + Lance
-     178, 68, 197, 149,
-     # starters' finals
-     154, 157, 160, 154, 24, 110],
- 3: [# story: Chief D/Full; Show SJ14-SJ18 (Regis, old squad) + partners
-     198, 169, 215, 229, 130, 149, 248, 377, 378, 379, 1, 7, 99, 89, 128, 25, 6,
-     # Frontier Brain aces (Emerald brains)
-     144, 145, 146, 376, 65, 143,
-     # Kanto gym aces
-     95, 121, 26, 45, 49, 126, 18,
-     # Red
-     3, 9, 196],
+     # repeats from P1 last (Matt: drop repeats first)
+     6, 198, 214, 164, 181],
+ 3: [# Pikachu every part; Red's HGSS team (Pikachu, Espeon, Snorlax, Venusaur, Charizard, Blastoise)
+     25, 196, 143, 3, 6, 9,
+     # new P3 story: Chief Full ace, Show SJ14-SJ18 (Regis, old squad)
+     248, 377, 378, 379, 1, 7, 99, 89, 128,
+     # Chief D/Full repeats of P2 species
+     149, 169, 215, 229, 130,
+     # Frontier Brain aces, Kanto gym aces
+     144, 145, 146, 376, 65, 95, 121, 26, 45, 49, 126, 18,
+     198],
 }
 src = open('.arena-dev/pmd/sprites_all386.inc').read()
 head, rest = src.split('\n', 1)

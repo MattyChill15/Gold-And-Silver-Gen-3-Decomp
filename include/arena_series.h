@@ -14,7 +14,8 @@
 #define ARENA_SEG_EMERALD_P2    4
 #define ARENA_SEG_FIRERED_P1    5 // FireRed Part 1 checkpoint (Erika); the chapter itself completes as ARENA_SEG_FIRERED in Part 2
 #define ARENA_SEG_EMERALD_P3    6
-#define ARENA_SEG_JOHTO_P1      7 // Johto Part 1 checkpoint (Lance); the chapter completes as ARENA_SEG_JOHTO in Part 2
+#define ARENA_SEG_JOHTO_P1      7 // Johto Part 1 checkpoint (Morty, Ecruteak)
+#define ARENA_SEG_JOHTO_P2      8 // Johto Part 2 checkpoint (Lance); the chapter completes as ARENA_SEG_JOHTO in Part 3 (Red)
 
 // Save identity stamped into each part's save (VAR_ARENA_GAME_STAMP).
 #define ARENA_GAME_STAMP_FIRERED 0x4652 // "FR"

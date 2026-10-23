@@ -747,12 +747,12 @@
 
 // Arena series (Johto chapter). Reuse formerly-unused flags 0x2B1-0x2B8.
 #define FLAG_ARENA_PRACTICE        FLAG_UNUSED_0x2B1 // opt-in disposable practice save
-#define FLAG_MATT_PART1_COMPLETE   FLAG_UNUSED_0x2B2 // Johto Part 1: Lance beaten
+#define FLAG_MATT_PART1_COMPLETE   FLAG_UNUSED_0x2B2 // Johto Part 1: Fog Badge (Morty)
 #define FLAG_MATT_PART2_INIT       FLAG_UNUSED_0x2B3 // Johto Part 2 carry-over init done
 #define FLAG_ARENA_SERIES_IMPORTED FLAG_UNUSED_0x2B4 // team imported from an earlier chapter
 #define FLAG_ARENA_DEX_REWARD      FLAG_UNUSED_0x2B5 // dex reward claimed
-#define FLAG_MATT_PART2_COMPLETE   FLAG_UNUSED_0x2B6 // Johto Part 2: Red beaten
-#define FLAG_MATT_PART3_INIT       FLAG_UNUSED_0x2B7 // unused in Johto (no Part 3)
+#define FLAG_MATT_PART2_COMPLETE   FLAG_UNUSED_0x2B6 // Johto Part 2: Lance beaten
+#define FLAG_MATT_PART3_INIT       FLAG_UNUSED_0x2B7 // Johto Part 3 carry-over init done
 // Storyline selector, 2 bits: value = STORY_BIT0 | STORY_BIT1 << 1 (see ARENA_STORYLINE_* in constants/arena_story.h)
 #define FLAG_ARENA_STORY_BIT0      FLAG_UNUSED_0x2B8
 #define FLAG_ARENA_STORY_BIT1      FLAG_UNUSED_0x2B9
