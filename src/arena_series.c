@@ -703,6 +703,37 @@ static void SanitizeMon(struct Pokemon *mon)
 }
 #endif
 
+#ifdef ARENA_JOHTO
+// 1.8.0 (Ch2 SJ1, Matt t474): Yellow / True Ash always carries Bulbasaur into Johto.
+// In party: keep. In a box: move it to the party. Missing: a new one (Lv 10 stand-in).
+static bool8 IsBulbaLine(u32 sp) { return sp >= SPECIES_BULBASAUR && sp <= SPECIES_VENUSAUR; }
+static void Johto_CarryBulbasaur(void)
+{
+    u32 i, box, pos, slot;
+    for (i = 0; i < gPlayerPartyCount; i++)
+        if (IsBulbaLine(GetMonData(&gPlayerParty[i], MON_DATA_SPECIES)))
+            return;
+    slot = gPlayerPartyCount;
+    if (slot >= PARTY_SIZE)
+    {
+        slot = PARTY_SIZE - 1;
+        if (CopyMonToPC(&gPlayerParty[slot]) == MON_CANT_GIVE)
+            return;
+    }
+    for (box = 0; box < TOTAL_BOXES_COUNT; box++)
+        for (pos = 0; pos < IN_BOX_COUNT; pos++)
+            if (IsBulbaLine(GetBoxMonDataAt(box, pos, MON_DATA_SPECIES)))
+            {
+                BoxMonToMon(GetBoxedMonPtr(box, pos), &gPlayerParty[slot]);
+                ZeroBoxMonAt(box, pos);
+                CalculatePlayerPartyCount();
+                return;
+            }
+    CreateMonLegacy(&gPlayerParty[slot], SPECIES_BULBASAUR, 10, USE_RANDOM_IVS, FALSE, 0, OT_ID_PLAYER_ID, 0);
+    CalculatePlayerPartyCount();
+}
+#endif
+
 void ArenaSeries_ApplyImport(void)
 {
     struct ArenaSeriesRecord *r;
@@ -752,6 +783,8 @@ void ArenaSeries_ApplyImport(void)
         FlagSet(ARENA_DEX_REWARD_FLAG);
 #ifdef ARENA_JOHTO
     ArenaStory_Set((r->seriesFlags & ARENA_SERIES_STORY_MASK) >> ARENA_SERIES_STORY_SHIFT); // storyline carries over
+    if (r->seriesFlags & ARENA_SERIES_FLAG_YELLOW)
+        Johto_CarryBulbasaur();
 #endif
     FlagSet(FLAG_ARENA_SERIES_IMPORTED);
     gArenaSeriesDexDirty = 1;

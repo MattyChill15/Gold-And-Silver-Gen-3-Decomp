@@ -24,6 +24,7 @@ C = consts(ROOT, 'include/constants/flags.h', 'include/constants/vars.h')
 CE = consts(EA, 'include/constants/flags.h')
 CEV = consts(EA, 'include/constants/vars.h')
 results = []
+LAST = {}  # party count of the Johto record (1.8.0: Yellow records gain Bulbasaur at Johto import)
 def check(name, ok, detail):
     s = 'PASS' if ok else 'FAIL'; results.append(dict(check=name, status=s, detail=detail)); print(f'{s:5} {name}: {detail}', flush=True)
 def boot_new(e):  # title -> main menu -> New Game -> mash through intro/game-mode/naming
@@ -71,7 +72,7 @@ def chain(out, story, fr_sav, label):
     check(f'[{label}] Johto P2 -> P3 carry-over', inf and not rej and part == 3 and (i[3] & 0xff) == story,
           f'rejected={rej} field={inf} part={part} party={i[0]} storyline={i[3]&0xff}')
     e.cmd(6, C('FLAG_DEFEATED_RED'), 1); settle(e); save(e)
-    g = e.cmd(22, 0); r = rec(e); e.close()
+    g = e.cmd(22, 0); r = rec(e); e.close(); LAST['party'] = r['party']
     sf = g[1] & 0xff
     check(f'[{label}] Red beaten -> record completes as SEG_JOHTO', r['ok'] and r['src'] == 2 and (r['segs'] & 2) and ((sf >> 2) & 3) == story,
           f"record src={r['src']} segsComplete=0x{r['segs']:02x} party={r['party']} seriesFlags=0x{sf:02x} (story bits={(sf>>2)&3})")
@@ -84,8 +85,8 @@ def ea_import(out, jsav, story, label):
     imp = e.cmd(22, CE('FLAG_ARENA_SERIES_IMPORTED'))[0] if inf else 0; e.shot(str(out / f'{label}_ea.png'))
     est = e.cmd(20, CEV('VAR_ARENA_STORYLINE'))[0] if inf else -1
     save(e); sf = e.cmd(22, 0)[1] & 0xff; e.close()
-    check(f'[{label}] Johto P3 -> Emerald P1 import', pend == 1 and inf and pc == 2 and imp == 1,
-          f'importPending={pend} field={inf} party={pc} imported={imp}')
+    check(f'[{label}] Johto P3 -> Emerald P1 import', pend == 1 and inf and pc == LAST['party'] and imp == 1,
+          f'importPending={pend} field={inf} party={pc} (record party={LAST["party"]}) imported={imp}')
     check(f'[{label}] Emerald P1 keeps storyline and re-saves it', est == story and ((sf >> 2) & 3) == story,
           f'VAR_ARENA_STORYLINE={est} record story bits after Emerald save={(sf>>2)&3} expected={story}')
 MAPS = None
