@@ -43,7 +43,7 @@ Branch `arena` (local only). Commits: ed44097d (copy), dbdee09e (overlay compile
 
 ## 2026-10-23 — Option 1 per-part arena-art rosters
 - tools/arena/johto_part_rosters.py writes .arena-dev/pmd/sprites_p{1,2,3}.inc (from sprites_all386.inc, regenerated with import_sprites.py over roster+roster_part2+roster_part3); arena_sprites.c picks by MATT_PART. Species without art use the native-sprite fallback; in-arena evolution animation declines for them and the stock post-battle evolution runs (no content cut).
-- Builds: make FILE_NAME=johto_pN BUILD_DIR=build-pN MATT_PART=N. P1 84.90% / P2 84.84% / P3 84.59% ROM, EWRAM 239,020 B (23,124 B free). Rosters in tools/arena/johto_part_rosters.json.
+- Builds: make FILE_NAME=johto_pN BUILD_DIR=build-pN MATT_PART=N. P1 84.90% / P2 84.84% / P3 84.59% ROM, EWRAM 239,052 B (23,092 B free) on the non-release dev builds (corrected from 239,020 B / 23,124 B). Rosters in tools/arena/johto_part_rosters.json.
 - Next: 3-part segment/stamp/completion flags, Chief J1-J18, Show SJ1-SJ18, harness + round trips, Drive backup.
 
 ## Milestone 4 (2026-10-23)
@@ -73,3 +73,5 @@ Branch `arena` (local only). Commits: ed44097d (copy), dbdee09e (overlay compile
 - Placeholder flags renamed: FLAG_CH_Jn -> FLAG_ARENA_CHIEF_Jn, FLAG_SHOW_SJn -> FLAG_ARENA_SHOW_SJn, FLAG_CH2_*_DONE -> FLAG_ARENA_{CHIEF,SHOW}_CH2_DONE, FLAG_P2_END -> FLAG_ARENA_SHOW_P2_END (same IDs).
 - P1 ROM 84.95% (jpt_p1 84.96%). 219 scene strings, 0 over 35 chars.
 - playtest_johto 34/34 PASS. playtest_story chief1 7/7 PASS; show1 8/10: SJ5 SKIP (night RTC, flag forced), SJ7 Whitney hooks FAIL via cmd 21 (emu stuck in CB2_LoadMap2; harness or script issue, open). SJ4 not reported separately by harness.
+
+- Release ROMs (2026-10-23): player ROMs are built with RELEASE=1 so the debug menus (overworld R+Start, battle Select, sprite visualiser) are compiled out. Run `MATT_PART=N tools/arena/dev.sh assets`, then `make RELEASE=1 FILE_NAME=johto_pN BUILD_DIR=build-pN-rel MATT_PART=N` (playtest: add ARENA_PLAYTEST=1, FILE_NAME=jpt_pN, BUILD_DIR=build-ptN-rel). Results: P1 84.39% / P2 84.37% / P3 84.02% ROM; EWRAM 238,967 B (91.16%, 23,177 B free); IWRAM 23,740 B (72.45%). md5s are in .arena-dev/pt/results/release/release_results.json. Older non-release ROMs were moved to superseded_roms/pre-release-20261023.

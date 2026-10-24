@@ -1,0 +1,113 @@
+{
+ "item": "checklist 10 fix: release builds (RELEASE=1)",
+ "build": "make RELEASE=1 FILE_NAME=johto_pN BUILD_DIR=build-pN-rel MATT_PART=N (jpt: + ARENA_PLAYTEST=1, BUILD_DIR=build-ptN-rel), after MATT_PART=N tools/arena/dev.sh assets",
+ "roms": {
+  "johto_p1": {
+   "md5": "f4bf9d572fbe334e5f59ac5730a73cf5",
+   "file_bytes": 33554432,
+   "rom_used_bytes": 28317964,
+   "rom_usage": "84.39%",
+   "ewram": [
+    "238967",
+    "91.16%"
+   ],
+   "iwram": [
+    "23740",
+    "72.45%"
+   ],
+   "debug_symbols_all": 130,
+   "debug_functions": 4
+  },
+  "jpt_p1": {
+   "md5": "11121f948ebfc40d4777a6c9ada9d178",
+   "file_bytes": 33554432,
+   "rom_used_bytes": 28319916,
+   "rom_usage": "84.40%",
+   "ewram": [
+    "238991",
+    "91.17%"
+   ],
+   "iwram": [
+    "23744",
+    "72.46%"
+   ],
+   "debug_symbols_all": 130,
+   "debug_functions": 4
+  },
+  "johto_p2": {
+   "md5": "7b8f6e499d7320453d376f0d23ec2b8b",
+   "file_bytes": 33554432,
+   "rom_used_bytes": 28308700,
+   "rom_usage": "84.37%",
+   "ewram": [
+    "238967",
+    "91.16%"
+   ],
+   "iwram": [
+    "23740",
+    "72.45%"
+   ],
+   "debug_symbols_all": 130,
+   "debug_functions": 4
+  },
+  "jpt_p2": {
+   "md5": "ecb29ac51af754ac2178d1db60e8ac76",
+   "file_bytes": 33554432,
+   "rom_used_bytes": 28310596,
+   "rom_usage": "84.37%",
+   "ewram": [
+    "238991",
+    "91.17%"
+   ],
+   "iwram": [
+    "23744",
+    "72.46%"
+   ],
+   "debug_symbols_all": 130,
+   "debug_functions": 4
+  },
+  "johto_p3": {
+   "md5": "f0d4303c6922552995cfe7c8c5b33bce",
+   "file_bytes": 33554432,
+   "rom_used_bytes": 28193144,
+   "rom_usage": "84.02%",
+   "ewram": [
+    "238967",
+    "91.16%"
+   ],
+   "iwram": [
+    "23740",
+    "72.45%"
+   ],
+   "debug_symbols_all": 130,
+   "debug_functions": 4
+  },
+  "jpt_p3": {
+   "md5": "036098a9acfb43b3436613859fcf862e",
+   "file_bytes": 33554432,
+   "rom_used_bytes": 28194952,
+   "rom_usage": "84.03%",
+   "ewram": [
+    "238991",
+    "91.17%"
+   ],
+   "iwram": [
+    "23744",
+    "72.46%"
+   ],
+   "debug_symbols_all": 130,
+   "debug_functions": 4
+  }
+ },
+ "results": {
+  "series": "34/34 PASS",
+  "items_4_9": "12/12 PASS",
+  "release_smoke": "9/9 PASS"
+ },
+ "notes": [
+  "Debug_ symbols are not 0: the remaining ones are data/scripts/debug.inc event scripts (always included by data/event_scripts.s) plus 4 dead helper functions and CB2_BattleDebugMenu; their entry points are compiled out (DEBUG_*_MENU=FALSE). R+Start on release ROMs opens the normal start menu.",
+  "Series and items tests use jpt_pN (release + playtest mailbox), not johto_pN; johto_pN are covered by release_smoke.",
+  "P2/P3 smoke saves come from the series chain (written by jpt ROMs)."
+ ],
+ "superseded": "/workspace/johto/superseded_roms/pre-release-20261023"
+}

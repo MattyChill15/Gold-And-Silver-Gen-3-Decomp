@@ -1,0 +1,69 @@
+{
+ "roms": {
+  "johto_p1": "f4bf9d572fbe334e5f59ac5730a73cf5",
+  "johto_p2": "7b8f6e499d7320453d376f0d23ec2b8b",
+  "johto_p3": "f0d4303c6922552995cfe7c8c5b33bce"
+ },
+ "results": [
+  {
+   "check": "P1 boots to field",
+   "status": "PASS",
+   "detail": [
+    1,
+    6,
+    1,
+    4
+   ]
+  },
+  {
+   "check": "P1 R+Start opens no debug menu",
+   "status": "PASS",
+   "detail": "see p1_r_start.png"
+  },
+  {
+   "check": "P1 save -> cold boot -> Continue keeps location",
+   "status": "PASS",
+   "detail": "(0, 6, 1, 4) -> (0, 6, 1, 4)"
+  },
+  {
+   "check": "P2 boots to field",
+   "status": "PASS",
+   "detail": [
+    1,
+    6,
+    1,
+    4
+   ]
+  },
+  {
+   "check": "P2 R+Start opens no debug menu",
+   "status": "PASS",
+   "detail": "see p2_r_start.png"
+  },
+  {
+   "check": "P2 save -> cold boot -> Continue keeps location",
+   "status": "PASS",
+   "detail": "(0, 6, 1, 4) -> (0, 6, 1, 4)"
+  },
+  {
+   "check": "P3 boots to field",
+   "status": "PASS",
+   "detail": [
+    1,
+    6,
+    1,
+    4
+   ]
+  },
+  {
+   "check": "P3 R+Start opens no debug menu",
+   "status": "PASS",
+   "detail": "see p3_r_start.png"
+  },
+  {
+   "check": "P3 save -> cold boot -> Continue keeps location",
+   "status": "PASS",
+   "detail": "(0, 6, 1, 4) -> (0, 6, 1, 4)"
+  }
+ ]
+}
