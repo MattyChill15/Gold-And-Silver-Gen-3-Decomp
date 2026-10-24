@@ -1,0 +1,86 @@
+{
+ "results": [
+  {
+   "check": "[show] ArenaStory_SJ14_39 on PALLET_TOWN_REDS_HOUSE_1F",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ14=1 battles=0 loc=(9, 9, 11, 0)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ15_40 on BATTLE_FRONTIER_BATTLE_TOWER_LOBBY",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ15_1=1 battles=0 loc=(12, 10, 30, 65)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ15_41 on BATTLE_FRONTIER_BATTLE_DOME_LOBBY",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ15_2=1 battles=0 loc=(11, 17, 31, 4)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ15_42 on BATTLE_FRONTIER_BATTLE_PALACE_LOBBY",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ15_3=1 battles=0 loc=(12, 12, 31, 8)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ15_43 on BATTLE_FRONTIER_BATTLE_ARENA_LOBBY",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ15_4=1 battles=0 loc=(7, 13, 31, 14)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ15_44 on BATTLE_FRONTIER_BATTLE_FACTORY_LOBBY",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ15_5=1 battles=0 loc=(9, 12, 31, 17)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ15_45 on BATTLE_FRONTIER_BATTLE_PIKE_LOBBY",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ15_6=1 battles=0 loc=(5, 13, 31, 20)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ15_46 on BATTLE_FRONTIER_BATTLE_PYRAMID_LOBBY",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ15_7=1 battles=1 loc=(7, 18, 31, 11)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ17_48 on PALLET_TOWN_LAB",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ17=1 battles=0 loc=(13, 21, 11, 4)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ18_49 on BATTLE_FRONTIER_OUTSIDE_EAST",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ18=1 battles=0 loc=(16, 15, 31, 0)"
+  },
+  {
+   "check": "[show] SJ16 set (Pyramid lose->rematch, fires after SJ15_46)",
+   "status": "PASS",
+   "detail": "SJ16=1"
+  }
+ ],
+ "shortcuts": [
+  "show P3: story battles run in classic engine (playtest cmd 30)",
+  "show P3: party set to Mewtwo L100; badges 1-8 forced",
+  "show: FLAG_SYS_TOWER_SILVER forced for ArenaStory_SJ15_40",
+  "show: FLAG_SYS_DOME_SILVER forced for ArenaStory_SJ15_41",
+  "show: FLAG_SYS_PALACE_SILVER forced for ArenaStory_SJ15_42",
+  "show: FLAG_SYS_ARENA_SILVER forced for ArenaStory_SJ15_43",
+  "show: FLAG_SYS_FACTORY_SILVER forced for ArenaStory_SJ15_44",
+  "show: FLAG_SYS_PIKE_SILVER forced for ArenaStory_SJ15_45",
+  "show: FLAG_SYS_PYRAMID_SILVER forced for ArenaStory_SJ15_46",
+  "show: 7 silver symbols forced for ArenaStory_SJ17_48",
+  "show: 7 silver symbols forced for ArenaStory_SJ18_49",
+  "win assist: lead HP+PP refilled in battle (memory write) for ['ArenaStory_SJ15_46']",
+  "harness: lead PP/HP topped up (cmd 19/13) between back-to-back battles inside one scene, 1 times"
+ ],
+ "battle_outcomes": [
+  [
+   "ArenaStory_SJ15_46",
+   0,
+   1,
+   [
+    7,
+    18
+   ]
+  ]
+ ],
+ "outcome_key": "1=won 2=lost"
+}

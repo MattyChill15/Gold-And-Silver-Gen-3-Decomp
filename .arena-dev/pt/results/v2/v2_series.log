@@ -1,0 +1,36 @@
+PASS  [classic] FR P2 -> Johto P1 import: importPending=1 field=True party=2 pcMons=7 slot0/1 species=(25, 6) imported=1
+PASS  [classic] Morty badge -> PART1_COMPLETE synced and saved: PART1_COMPLETE=1 storyline set=0
+PASS  [classic] Johto P1 -> P2 carry-over: rejected=0 field=True part=2 party=2 storyline=0
+PASS  [classic] Lance (GAME_CLEAR) -> PART2_COMPLETE synced and saved: PART2_COMPLETE=1
+PASS  [classic] Johto P2 -> P3 carry-over: rejected=0 field=True part=3 party=2 storyline=0
+PASS  [classic] Red beaten -> record completes as SEG_JOHTO: record src=2 segsComplete=0xd3 party=2 seriesFlags=0x03 (story bits=0)
+PASS  [classic] Johto P3 -> Emerald P1 import: importPending=1 field=True party=2 imported=1
+PASS  [classic] Emerald P1 keeps storyline and re-saves it: VAR_ARENA_STORYLINE=0 record story bits after Emerald save=0 expected=0
+PASS  [chief] FR P2 -> Johto P1 import: importPending=1 field=True party=2 pcMons=7 slot0/1 species=(25, 6) imported=1
+PASS  [chief] Morty badge -> PART1_COMPLETE synced and saved: PART1_COMPLETE=1 storyline set=1
+PASS  [chief] Johto P1 -> P2 carry-over: rejected=0 field=True part=2 party=2 storyline=1
+PASS  [chief] Lance (GAME_CLEAR) -> PART2_COMPLETE synced and saved: PART2_COMPLETE=1
+PASS  [chief] Johto P2 -> P3 carry-over: rejected=0 field=True part=3 party=2 storyline=1
+PASS  [chief] Red beaten -> record completes as SEG_JOHTO: record src=2 segsComplete=0xd3 party=2 seriesFlags=0x07 (story bits=1)
+PASS  [chief] Johto P3 -> Emerald P1 import: importPending=1 field=True party=2 imported=1
+PASS  [chief] Emerald P1 keeps storyline and re-saves it: VAR_ARENA_STORYLINE=1 record story bits after Emerald save=1 expected=1
+PASS  [show] FR P2 -> Johto P1 import: importPending=1 field=True party=2 pcMons=7 slot0/1 species=(25, 6) imported=1
+PASS  [show] Morty badge -> PART1_COMPLETE synced and saved: PART1_COMPLETE=1 storyline set=2
+PASS  [show] Johto P1 -> P2 carry-over: rejected=0 field=True part=2 party=2 storyline=2
+PASS  [show] Lance (GAME_CLEAR) -> PART2_COMPLETE synced and saved: PART2_COMPLETE=1
+PASS  [show] Johto P2 -> P3 carry-over: rejected=0 field=True part=3 party=2 storyline=2
+PASS  [show] Red beaten -> record completes as SEG_JOHTO: record src=2 segsComplete=0xd3 party=2 seriesFlags=0x0b (story bits=2)
+PASS  [show] Johto P3 -> Emerald P1 import: importPending=1 field=True party=2 imported=1
+PASS  [show] Emerald P1 keeps storyline and re-saves it: VAR_ARENA_STORYLINE=2 record story bits after Emerald save=2 expected=2
+PASS  D3 P1 blocks MAP_CIANWOOD_CITY: gate=1 field=True before=(1, 4) after=(1, 4) target=(0, 7)
+PASS  D3 P1 blocks MAP_PALLET_TOWN: gate=1 field=True before=(1, 4) after=(1, 4) target=(0, 31)
+PASS  D3 P1 allows MAP_VIOLET_CITY: gate=0 field=True before=(1, 4) after=(0, 2) target=(0, 2)
+PASS  D3 P2 blocks MAP_PALLET_TOWN: gate=1 field=True before=(1, 4) after=(1, 4) target=(0, 31)
+PASS  D3 P2 allows MAP_CIANWOOD_CITY: gate=0 field=True before=(1, 4) after=(0, 7) target=(0, 7)
+PASS  D3 P3 allows MAP_PALLET_TOWN: gate=0 field=True before=(1, 4) after=(0, 31) target=(0, 31)
+PASS  P2 rejects incomplete Johto P1 save: gArenaSeriesRejectedSave=1
+PASS  P2 rejects FireRed save: gArenaSeriesRejectedSave=1
+PASS  P3 rejects P1-only save: gArenaSeriesRejectedSave=1
+PASS  P3 rejects FireRed save: gArenaSeriesRejectedSave=1
+
+34/34 PASS

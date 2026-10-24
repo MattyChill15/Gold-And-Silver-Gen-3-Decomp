@@ -1,0 +1,75 @@
+{
+ "results": [
+  {
+   "check": "[chief] ArenaStory_J13_13 on SSAQUA_CAPTAINS_ROOM",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J13=1 battles=1 loc=(5, 9, 26, 2)"
+  },
+  {
+   "check": "[chief] ArenaStory_J14_14 on SAFFRON_CITY_SILPH_CO",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J14=1 battles=0 loc=(8, 21, 18, 6)"
+  },
+  {
+   "check": "[chief] ArenaStory_J15_15 on SEAFOAM_ISLANDS_B1F",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J15A=1 battles=0 loc=(27, 11, 26, 30)"
+  },
+  {
+   "check": "[chief] ArenaStory_J15_16 on CINNABAR_ISLAND",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J15=1 battles=0 loc=(41, 2, 0, 40)"
+  },
+  {
+   "check": "[chief] ArenaStory_J16_17 on MT_SILVER_3F",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J16=1 battles=1 loc=(12, 2, 24, 67)"
+  },
+  {
+   "check": "[chief] ArenaStory_J17_18 on BATTLE_FRONTIER_RANKING_HALL",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J17=1 battles=1 loc=(26, 15, 31, 26)"
+  },
+  {
+   "check": "[chief] ArenaStory_J18_19 on BATTLE_FRONTIER_OUTSIDE_WEST",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J18=1 battles=0 loc=(42, 28, 30, 64)"
+  }
+ ],
+ "shortcuts": [
+  "chief P3: story battles run in classic engine (playtest cmd 30)",
+  "chief P3: party set to Mewtwo L100; badges 1-8 forced",
+  "win assist: lead HP+PP refilled in battle (memory write) for ['ArenaStory_J13_13', 'ArenaStory_J16_17', 'ArenaStory_J17_18']",
+  "harness: lead PP/HP topped up (cmd 19/13) between back-to-back battles inside one scene, 3 times"
+ ],
+ "battle_outcomes": [
+  [
+   "ArenaStory_J13_13",
+   0,
+   1,
+   [
+    5,
+    9
+   ]
+  ],
+  [
+   "ArenaStory_J16_17",
+   0,
+   1,
+   [
+    12,
+    2
+   ]
+  ],
+  [
+   "ArenaStory_J17_18",
+   0,
+   1,
+   [
+    26,
+    15
+   ]
+  ]
+ ],
+ "outcome_key": "1=won 2=lost"
+}

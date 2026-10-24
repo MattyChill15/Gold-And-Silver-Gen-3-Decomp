@@ -1,0 +1,57 @@
+{
+ "results": [
+  {
+   "check": "[chief] ArenaStory_J1_0 on NEW_BARK_TOWN",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J1=1 battles=0 loc=(10, 10, 0, 0)"
+  },
+  {
+   "check": "[chief] ArenaStory_J2_1 on ROUTE30",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J2=1 battles=0 loc=(26, 40, 0, 12)"
+  },
+  {
+   "check": "[chief] ArenaStory_J3_2 on RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J3=1 battles=0 loc=(20, 10, 24, 7)"
+  },
+  {
+   "check": "[chief] ArenaStory_J4_3 on SLOWPOKE_WELL_B1F",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J4=1 battles=0 loc=(26, 30, 24, 11)"
+  },
+  {
+   "check": "[chief] ArenaStory_J5_4 on ILEX_FOREST",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J5=1 battles=1 loc=(22, 64, 24, 13)"
+  },
+  {
+   "check": "[chief] ArenaStory_J6_5 on GOLDENROD_CITY_UNDERGROUND_STORAGE",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J6=1 battles=0 loc=(19, 3, 5, 4)"
+  },
+  {
+   "check": "[chief] ArenaStory_J7_6 on BURNED_TOWER_B1F",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J7=1 battles=0 loc=(26, 8, 24, 17)"
+  }
+ ],
+ "shortcuts": [
+  "chief P1: story battles run in classic engine (playtest cmd 30)",
+  "chief P1: party set to Mewtwo L100; badges 1-3 forced",
+  "win assist: lead HP+PP refilled in battle (memory write) for ['ArenaStory_J5_4']",
+  "harness: lead PP/HP topped up (cmd 19/13) between back-to-back battles inside one scene, 1 times"
+ ],
+ "battle_outcomes": [
+  [
+   "ArenaStory_J5_4",
+   0,
+   1,
+   [
+    22,
+    64
+   ]
+  ]
+ ],
+ "outcome_key": "1=won 2=lost"
+}

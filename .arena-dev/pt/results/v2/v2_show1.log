@@ -1,0 +1,50 @@
+PASS  [show] ArenaStory_SJ1_20 on NEW_BARK_TOWN_PLAYERS_HOUSE_1F: flag FLAG_ARENA_SHOW_SJ1=1 battles=0 loc=(9, 9, 1, 3)
+PASS  [show] D2 walk Misty+Pikachu trail player (New Bark): trail(player,npc,mon)=[((10, 10), (303, 10, 10), (20505, 10, 10)), ((10, 11), (303, 10, 10), (20505, 10, 10)), ((10, 12), (303, 10, 11), (20505, 10, 10)), ((11, 12), (303, 10, 12), (20505, 10, 11)), ((12, 12), (303, 11, 12), (20505, 10, 12)), ((13, 12), (303, 12, 12), (20505, 11, 12)), ((13, 13), (303, 13, 12), (20505, 12, 12))] shot=/tmp/johto_story/show_D2_walk_misty.png
+PASS  [show] D2 Misty follows after SJ1: gfx=303 objgfx=303 (303=MISTY) objId=1 active=1 start=(0, 0) now=(13, 13, 0, 0)
+PASS  [show] ArenaStory_SJ2_21 on AZALEA_TOWN_KURTS_HOUSE: flag FLAG_ARENA_SHOW_SJ2=1 battles=0 loc=(4, 9, 4, 2)
+PASS  [show] D2 walk Brock+Pikachu trail player (New Bark): trail(player,npc,mon)=[((10, 10), (302, 10, 10), (16409, 10, 10)), ((10, 11), (302, 10, 10), (16409, 10, 10)), ((10, 12), (302, 10, 11), (16409, 10, 10)), ((11, 12), (302, 10, 12), (16409, 10, 11)), ((12, 12), (302, 11, 12), (16409, 10, 12)), ((13, 12), (302, 12, 12), (16409, 11, 12)), ((13, 13), (302, 13, 12), (16409, 12, 12))] shot=/tmp/johto_story/show_D2_walk_brock.png
+PASS  [show] ArenaStory_SJ3_22 on ROUTE29: flag FLAG_ARENA_SHOW_SJ3A=1 battles=0 loc=(34, 11, 0, 11)
+PASS  [show] ArenaStory_SJ3_23 on ROUTE30: flag FLAG_ARENA_SHOW_SJ3B=1 battles=0 loc=(26, 40, 0, 12)
+PASS  [show] ArenaStory_SJ3_24 on ROUTE31: flag FLAG_ARENA_SHOW_SJ3C=1 battles=0 loc=(48, 10, 0, 13)
+  non-field cb2=CB2_OverworldBasic t=160
+  outcome ('ArenaStory_SJ5_26', 0, 1, (17, 11))
+PASS  [show] ArenaStory_SJ5_26 on ROUTE37: flag FLAG_ARENA_SHOW_SJ5=1 battles=1 loc=(17, 11, 0, 19)
+  non-field cb2=CB2_LoadMap2 t=240
+  outcome ('ArenaStory_SJ6_27', 0, 1, (7, 2))
+PASS  [show] ArenaStory_SJ6_27 on GATE_ROUTE29_ROUTE46: flag FLAG_ARENA_SHOW_SJ6=1 battles=1 loc=(7, 2, 22, 0)
+PASS  [show] ArenaStory_SJ8_29 on RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS: flag FLAG_ARENA_SHOW_SJ8=1 battles=0 loc=(20, 10, 24, 7)
+PASS  [show] ArenaStory_SJ9_30 on BURNED_TOWER_B1F: flag FLAG_ARENA_SHOW_SJ9=1 battles=0 loc=(26, 8, 24, 17)
+PASS  [show] SJ4 set (fires after SJ3B on ROUTE30): SJ4=1
+  non-field cb2=CB2_OverworldBasic t=80
+  outcome ('SJ7_Whitney', 1, 0, (15, 9))
+  non-field cb2=CB2_UpdatePartyMenu t=680
+  outcome ('SJ7_Whitney', 1, 0, (15, 9))
+  non-field cb2=CB2_UpdatePartyMenu t=1280
+  outcome ('SJ7_Whitney', 1, 0, (15, 9))
+  non-field cb2=CB2_UpdatePartyMenu t=1880
+  outcome ('SJ7_Whitney', 1, 0, (15, 9))
+  non-field cb2=CB2_UpdatePartyMenu t=2480
+  outcome ('SJ7_Whitney', 1, 0, (15, 9))
+  non-field cb2=CB2_UpdatePartyMenu t=3080
+  outcome ('SJ7_Whitney', 1, 0, (15, 9))
+  non-field cb2=CB2_UpdatePartyMenu t=3680
+  outcome ('SJ7_Whitney', 1, 0, (15, 9))
+  non-field cb2=CB2_UpdatePartyMenu t=4280
+  outcome ('SJ7_Whitney', 1, 0, (15, 9))
+  non-field cb2=CB2_UpdatePartyMenu t=4880
+  outcome ('SJ7_Whitney', 1, 0, (15, 9))
+  non-field cb2=CB2_UpdatePartyMenu t=5480
+  outcome ('SJ7_Whitney', 1, 0, (15, 9))
+  non-field cb2=CB2_UpdatePartyMenu t=6080
+  outcome ('SJ7_Whitney', 1, 0, (15, 9))
+  non-field cb2=CB2_UpdatePartyMenu t=6680
+  outcome ('SJ7_Whitney', 1, 0, (15, 9))
+  non-field cb2=CB2_UpdatePartyMenu t=7280
+  outcome ('SJ7_Whitney', 1, 0, (15, 9))
+  non-field cb2=CB2_UpdatePartyMenu t=7880
+  outcome ('SJ7_Whitney', 1, 0, (15, 9))
+FAIL  [show] SJ7 forced loss then rematch at Whitney: SJ7_LOSS=0 state=3 battles=16
+PASS  [show] SJ7 badge hook: SJ7=1 badge3=1
+FAIL  no-whiteout battles won without blackout: [('SJ7_Whitney', 1, 0, (15, 9)), ('SJ7_Whitney', 1, 0, (15, 9)), ('SJ7_Whitney', 1, 0, (15, 9)), ('SJ7_Whitney', 1, 0, (15, 9)), ('SJ7_Whitney', 1, 0, (15, 9)), ('SJ7_Whitney', 1, 0, (15, 9)), ('SJ7_Whitney', 1, 0, (15, 9)), ('SJ7_Whitney', 1, 0, (15, 9)), ('SJ7_Whitney', 1, 0, (15, 9)), ('SJ7_Whitney', 1, 0, (15, 9)), ('SJ7_Whitney', 1, 0, (15, 9)), ('SJ7_Whitney', 1, 0, (15, 9)), ('SJ7_Whitney', 1, 0, (15, 9)), ('SJ7_Whitney', 1, 0, (15, 9))]
+
+14/16 PASS, 0 SKIP

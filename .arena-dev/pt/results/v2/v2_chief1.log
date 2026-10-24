@@ -1,0 +1,11 @@
+PASS  [chief] ArenaStory_J1_0 on NEW_BARK_TOWN: flag FLAG_ARENA_CHIEF_J1=1 battles=0 loc=(10, 10, 0, 0)
+PASS  [chief] ArenaStory_J2_1 on ROUTE30: flag FLAG_ARENA_CHIEF_J2=1 battles=0 loc=(26, 40, 0, 12)
+PASS  [chief] ArenaStory_J3_2 on RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS: flag FLAG_ARENA_CHIEF_J3=1 battles=0 loc=(20, 10, 24, 7)
+PASS  [chief] ArenaStory_J4_3 on SLOWPOKE_WELL_B1F: flag FLAG_ARENA_CHIEF_J4=1 battles=0 loc=(26, 30, 24, 11)
+  non-field cb2=CB2_OverworldBasic t=120
+  outcome ('ArenaStory_J5_4', 0, 1, (22, 64))
+PASS  [chief] ArenaStory_J5_4 on ILEX_FOREST: flag FLAG_ARENA_CHIEF_J5=1 battles=1 loc=(22, 64, 24, 13)
+PASS  [chief] ArenaStory_J6_5 on GOLDENROD_CITY_UNDERGROUND_STORAGE: flag FLAG_ARENA_CHIEF_J6=1 battles=0 loc=(19, 3, 5, 4)
+PASS  [chief] ArenaStory_J7_6 on BURNED_TOWER_B1F: flag FLAG_ARENA_CHIEF_J7=1 battles=0 loc=(26, 8, 24, 17)
+
+7/7 PASS, 0 SKIP

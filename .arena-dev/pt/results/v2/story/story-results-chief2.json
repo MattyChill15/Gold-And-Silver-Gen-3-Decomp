@@ -1,0 +1,70 @@
+{
+ "results": [
+  {
+   "check": "[chief] ArenaStory_J8_7 on OLIVINE_CITY_CAFE",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J8=1 battles=1 loc=(3, 9, 7, 2)"
+  },
+  {
+   "check": "[chief] ArenaStory_J8_8 on CIANWOOD_SHOP",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J8_DELIVERY=1 battles=0 loc=(8, 12, 8, 4)"
+  },
+  {
+   "check": "[chief] ArenaStory_J9_9 on LAKE_OF_RAGE",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J9=1 battles=0 loc=(39, 42, 24, 23)"
+  },
+  {
+   "check": "[chief] ArenaStory_J10_10 on GOLDENROD_CITY_RADIO_TOWER_5F",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J10=1 battles=1 loc=(11, 6, 5, 19)"
+  },
+  {
+   "check": "[chief] ArenaStory_J11_11 on DRAGONS_DEN_SHRINE",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J11=1 battles=0 loc=(6, 17, 24, 27)"
+  },
+  {
+   "check": "[chief] ArenaStory_J12_12 on VICTORY_ROAD_1F",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_CHIEF_J12=1 battles=1 loc=(15, 41, 29, 43)"
+  }
+ ],
+ "shortcuts": [
+  "chief P2: story battles run in classic engine (playtest cmd 30)",
+  "chief P2: party set to Mewtwo L100; badges 1-8 forced",
+  "win assist: lead HP+PP refilled in battle (memory write) for ['ArenaStory_J10_10', 'ArenaStory_J12_12', 'ArenaStory_J8_7']",
+  "harness: lead PP/HP topped up (cmd 19/13) between back-to-back battles inside one scene, 3 times"
+ ],
+ "battle_outcomes": [
+  [
+   "ArenaStory_J8_7",
+   0,
+   1,
+   [
+    3,
+    9
+   ]
+  ],
+  [
+   "ArenaStory_J10_10",
+   0,
+   1,
+   [
+    11,
+    6
+   ]
+  ],
+  [
+   "ArenaStory_J12_12",
+   0,
+   1,
+   [
+    15,
+    41
+   ]
+  ]
+ ],
+ "outcome_key": "1=won 2=lost"
+}

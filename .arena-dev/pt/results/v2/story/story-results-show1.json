@@ -1,0 +1,119 @@
+{
+ "results": [
+  {
+   "check": "[show] ArenaStory_SJ1_20 on NEW_BARK_TOWN_PLAYERS_HOUSE_1F",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ1=1 battles=0 loc=(9, 9, 1, 3)"
+  },
+  {
+   "check": "[show] D2 walk Misty+Pikachu trail player (New Bark)",
+   "status": "PASS",
+   "detail": "trail(player,npc,mon)=[((10, 10), (303, 10, 10), (20505, 10, 10)), ((10, 11), (303, 10, 10), (20505, 10, 10)), ((10, 12), (303, 10, 11), (20505, 10, 10)), ((11, 12), (303, 10, 12), (20505, 10, 11)), ((12, 12), (303, 11, 12), (20505, 10, 12)), ((13, 12), (303, 12, 12), (20505, 11, 12)), ((13, 13), (303, 13, 12), (20505, 12, 12))] shot=/tmp/johto_story/show_D2_walk_misty.png"
+  },
+  {
+   "check": "[show] D2 Misty follows after SJ1",
+   "status": "PASS",
+   "detail": "gfx=303 objgfx=303 (303=MISTY) objId=1 active=1 start=(0, 0) now=(13, 13, 0, 0)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ2_21 on AZALEA_TOWN_KURTS_HOUSE",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ2=1 battles=0 loc=(4, 9, 4, 2)"
+  },
+  {
+   "check": "[show] D2 walk Brock+Pikachu trail player (New Bark)",
+   "status": "PASS",
+   "detail": "trail(player,npc,mon)=[((10, 10), (302, 10, 10), (16409, 10, 10)), ((10, 11), (302, 10, 10), (16409, 10, 10)), ((10, 12), (302, 10, 11), (16409, 10, 10)), ((11, 12), (302, 10, 12), (16409, 10, 11)), ((12, 12), (302, 11, 12), (16409, 10, 12)), ((13, 12), (302, 12, 12), (16409, 11, 12)), ((13, 13), (302, 13, 12), (16409, 12, 12))] shot=/tmp/johto_story/show_D2_walk_brock.png"
+  },
+  {
+   "check": "[show] ArenaStory_SJ3_22 on ROUTE29",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ3A=1 battles=0 loc=(34, 11, 0, 11)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ3_23 on ROUTE30",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ3B=1 battles=0 loc=(26, 40, 0, 12)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ3_24 on ROUTE31",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ3C=1 battles=0 loc=(48, 10, 0, 13)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ5_26 on ROUTE37",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ5=1 battles=1 loc=(17, 11, 0, 19)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ6_27 on GATE_ROUTE29_ROUTE46",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ6=1 battles=1 loc=(7, 2, 22, 0)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ8_29 on RUINS_OF_ALPH_PUZZLE_AND_REWARD_CHAMBERS",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ8=1 battles=0 loc=(20, 10, 24, 7)"
+  },
+  {
+   "check": "[show] ArenaStory_SJ9_30 on BURNED_TOWER_B1F",
+   "status": "PASS",
+   "detail": "flag FLAG_ARENA_SHOW_SJ9=1 battles=0 loc=(26, 8, 24, 17)"
+  },
+  {
+   "check": "[show] SJ4 set (fires after SJ3B on ROUTE30)",
+   "status": "PASS",
+   "detail": "SJ4=1"
+  },
+  {
+   "check": "[show] SJ7 forced loss then rematch at Whitney",
+   "status": "PASS",
+   "detail": "SJ7_LOSS=1 state=3 battles=2"
+  },
+  {
+   "check": "[show] SJ7 badge hook",
+   "status": "PASS",
+   "detail": "SJ7=1 badge3=1"
+  }
+ ],
+ "shortcuts": [
+  "show P1: story battles run in classic engine (playtest cmd 30)",
+  "show P1: party set to Mewtwo L100; badges 1-3 forced",
+  "show P1: D2 walk (Misty) warped to New Bark Town (cmd 14), lead set to Pikachu (cmd 1)",
+  "show P1: D2 walk (Brock) warped to New Bark Town (cmd 14), lead set to Pikachu (cmd 1)",
+  "show: game clock set to 22:00 (cmd 31) for ArenaStory_SJ5_26, time of day=3",
+  "show: Charizard L50 added for ArenaStory_SJ6_27",
+  "show: Bridget trigger skipped, VAR_GOLDENROD_CITY_STATE=4 forced",
+  "harness: lead PP/HP topped up (cmd 19/13) between back-to-back battles inside one scene, 3 times"
+ ],
+ "battle_outcomes": [
+  [
+   "ArenaStory_SJ5_26",
+   0,
+   1,
+   [
+    17,
+    11
+   ]
+  ],
+  [
+   "ArenaStory_SJ6_27",
+   0,
+   1,
+   [
+    7,
+    2
+   ]
+  ],
+  [
+   "SJ7_Whitney",
+   0,
+   1,
+   [
+    15,
+    9
+   ]
+  ]
+ ],
+ "outcome_key": "1=won 2=lost"
+}

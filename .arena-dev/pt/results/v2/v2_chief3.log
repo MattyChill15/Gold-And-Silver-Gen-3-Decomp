@@ -1,0 +1,15 @@
+  non-field cb2=CB2_OverworldBasic t=200
+  outcome ('ArenaStory_J13_13', 0, 1, (5, 9))
+PASS  [chief] ArenaStory_J13_13 on SSAQUA_CAPTAINS_ROOM: flag FLAG_ARENA_CHIEF_J13=1 battles=1 loc=(5, 9, 26, 2)
+PASS  [chief] ArenaStory_J14_14 on SAFFRON_CITY_SILPH_CO: flag FLAG_ARENA_CHIEF_J14=1 battles=0 loc=(8, 21, 18, 6)
+PASS  [chief] ArenaStory_J15_15 on SEAFOAM_ISLANDS_B1F: flag FLAG_ARENA_CHIEF_J15A=1 battles=0 loc=(27, 11, 26, 30)
+PASS  [chief] ArenaStory_J15_16 on CINNABAR_ISLAND: flag FLAG_ARENA_CHIEF_J15=1 battles=0 loc=(41, 2, 0, 40)
+  non-field cb2=CB2_OverworldBasic t=160
+  outcome ('ArenaStory_J16_17', 0, 1, (12, 2))
+PASS  [chief] ArenaStory_J16_17 on MT_SILVER_3F: flag FLAG_ARENA_CHIEF_J16=1 battles=1 loc=(12, 2, 24, 67)
+  non-field cb2=CB2_OverworldBasic t=40
+  outcome ('ArenaStory_J17_18', 0, 1, (26, 15))
+PASS  [chief] ArenaStory_J17_18 on BATTLE_FRONTIER_RANKING_HALL: flag FLAG_ARENA_CHIEF_J17=1 battles=1 loc=(26, 15, 31, 26)
+PASS  [chief] ArenaStory_J18_19 on BATTLE_FRONTIER_OUTSIDE_WEST: flag FLAG_ARENA_CHIEF_J18=1 battles=0 loc=(42, 28, 30, 64)
+
+7/7 PASS, 0 SKIP

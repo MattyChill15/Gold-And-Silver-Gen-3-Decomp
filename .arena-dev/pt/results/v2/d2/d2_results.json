@@ -1,0 +1,35 @@
+{
+ "results": [
+  {
+   "check": "D2 door: Misty+Pikachu follow out of player house",
+   "status": "PASS",
+   "detail": "{'tag': 'indoor_before_door', 'loc': (20, 11, 0, 0), 'npc': (303, 20, 11), 'mon': (16409, 20, 11), 'surf': False, 'field': True, 'shot': '/tmp/johto_v2_d2/d2_indoor_before_door.png'} -> {'tag': 'after_door_exit', 'loc': (20, 15, 0, 0), 'npc': (303, 20, 14), 'mon': (16409, 20, 13), 'surf': False, 'field': True, 'shot': '/tmp/johto_v2_d2/d2_after_door_exit.png'}"
+  },
+  {
+   "check": "D2 map transition New Bark -> Route 29 (walk west)",
+   "status": "PASS",
+   "detail": "{'tag': 'after_edge_to_route29', 'loc': (69, 17, 0, 11), 'npc': (303, 70, 17), 'mon': (16409, 71, 17), 'surf': False, 'field': True, 'shot': '/tmp/johto_v2_d2/d2_after_edge_to_route29.png'}"
+  },
+  {
+   "check": "D2 swap: Brock replaces Misty after SJ2",
+   "status": "PASS",
+   "detail": "followerGfx=302 (302=Brock, 303=Misty) {'tag': 'after_SJ2', 'loc': (4, 9, 4, 2), 'npc': (302, 11, 16), 'mon': (16409, 4, 9), 'surf': False, 'field': True, 'shot': '/tmp/johto_v2_d2/d2_after_SJ2.png'}"
+  },
+  {
+   "check": "D2 water: Surf with followers, no softlock",
+   "status": "PASS",
+   "detail": "{'tag': 'surfing', 'loc': (26, 12, 0, 0), 'npc': (302, 25, 12), 'mon': (20505, 26, 12), 'surf': True, 'field': True, 'shot': '/tmp/johto_v2_d2/d2_surfing.png'} (followers hidden/on blob while surfing per FNPC)"
+  },
+  {
+   "check": "D2 water: dismount, followers back and trailing",
+   "status": "PASS",
+   "detail": "{'tag': 'after_dismount', 'loc': (20, 12, 0, 0), 'npc': (302, 21, 12), 'mon': (20505, 22, 12), 'surf': False, 'field': True, 'shot': '/tmp/johto_v2_d2/d2_after_dismount.png'}"
+  },
+  {
+   "check": "D2 no softlock after water (player still moves)",
+   "status": "PASS",
+   "detail": "{'tag': 'walk_after_surf', 'loc': (20, 16, 0, 0), 'npc': (302, 20, 15), 'mon': (20505, 20, 14), 'surf': False, 'field': True, 'shot': '/tmp/johto_v2_d2/d2_walk_after_surf.png'}"
+  }
+ ],
+ "shortcuts": "storyline set (cmd 24), warps to scene/test spots (cmd 14), lead Pikachu L5 (cmd 1),\nMewtwo slot 2 taught Surf (cmd 1/19), badges 1-4 forced in P1; water leg in P2 with badges 1-8 forced (Surf = badge 5), lead Pikachu raised to L100 + VAR_REPEL_STEP_COUNT=250 so wild battles don't interrupt; save made after SJ2 in P1 (cmd 6)."
+}

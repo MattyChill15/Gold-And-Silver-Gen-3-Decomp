@@ -1,0 +1,172 @@
+[
+ {
+  "check": "[classic] FR P2 -> Johto P1 import",
+  "status": "PASS",
+  "detail": "importPending=1 field=True party=2 pcMons=7 slot0/1 species=(25, 6) imported=1"
+ },
+ {
+  "check": "[classic] Morty badge -> PART1_COMPLETE synced and saved",
+  "status": "PASS",
+  "detail": "PART1_COMPLETE=1 storyline set=0"
+ },
+ {
+  "check": "[classic] Johto P1 -> P2 carry-over",
+  "status": "PASS",
+  "detail": "rejected=0 field=True part=2 party=2 storyline=0"
+ },
+ {
+  "check": "[classic] Lance (GAME_CLEAR) -> PART2_COMPLETE synced and saved",
+  "status": "PASS",
+  "detail": "PART2_COMPLETE=1"
+ },
+ {
+  "check": "[classic] Johto P2 -> P3 carry-over",
+  "status": "PASS",
+  "detail": "rejected=0 field=True part=3 party=2 storyline=0"
+ },
+ {
+  "check": "[classic] Red beaten -> record completes as SEG_JOHTO",
+  "status": "PASS",
+  "detail": "record src=2 segsComplete=0xd3 party=2 seriesFlags=0x03 (story bits=0)"
+ },
+ {
+  "check": "[classic] Johto P3 -> Emerald P1 import",
+  "status": "PASS",
+  "detail": "importPending=1 field=True party=2 imported=1"
+ },
+ {
+  "check": "[classic] Emerald P1 keeps storyline and re-saves it",
+  "status": "PASS",
+  "detail": "VAR_ARENA_STORYLINE=0 record story bits after Emerald save=0 expected=0"
+ },
+ {
+  "check": "[chief] FR P2 -> Johto P1 import",
+  "status": "PASS",
+  "detail": "importPending=1 field=True party=2 pcMons=7 slot0/1 species=(25, 6) imported=1"
+ },
+ {
+  "check": "[chief] Morty badge -> PART1_COMPLETE synced and saved",
+  "status": "PASS",
+  "detail": "PART1_COMPLETE=1 storyline set=1"
+ },
+ {
+  "check": "[chief] Johto P1 -> P2 carry-over",
+  "status": "PASS",
+  "detail": "rejected=0 field=True part=2 party=2 storyline=1"
+ },
+ {
+  "check": "[chief] Lance (GAME_CLEAR) -> PART2_COMPLETE synced and saved",
+  "status": "PASS",
+  "detail": "PART2_COMPLETE=1"
+ },
+ {
+  "check": "[chief] Johto P2 -> P3 carry-over",
+  "status": "PASS",
+  "detail": "rejected=0 field=True part=3 party=2 storyline=1"
+ },
+ {
+  "check": "[chief] Red beaten -> record completes as SEG_JOHTO",
+  "status": "PASS",
+  "detail": "record src=2 segsComplete=0xd3 party=2 seriesFlags=0x07 (story bits=1)"
+ },
+ {
+  "check": "[chief] Johto P3 -> Emerald P1 import",
+  "status": "PASS",
+  "detail": "importPending=1 field=True party=2 imported=1"
+ },
+ {
+  "check": "[chief] Emerald P1 keeps storyline and re-saves it",
+  "status": "PASS",
+  "detail": "VAR_ARENA_STORYLINE=1 record story bits after Emerald save=1 expected=1"
+ },
+ {
+  "check": "[show] FR P2 -> Johto P1 import",
+  "status": "PASS",
+  "detail": "importPending=1 field=True party=2 pcMons=7 slot0/1 species=(25, 6) imported=1"
+ },
+ {
+  "check": "[show] Morty badge -> PART1_COMPLETE synced and saved",
+  "status": "PASS",
+  "detail": "PART1_COMPLETE=1 storyline set=2"
+ },
+ {
+  "check": "[show] Johto P1 -> P2 carry-over",
+  "status": "PASS",
+  "detail": "rejected=0 field=True part=2 party=2 storyline=2"
+ },
+ {
+  "check": "[show] Lance (GAME_CLEAR) -> PART2_COMPLETE synced and saved",
+  "status": "PASS",
+  "detail": "PART2_COMPLETE=1"
+ },
+ {
+  "check": "[show] Johto P2 -> P3 carry-over",
+  "status": "PASS",
+  "detail": "rejected=0 field=True part=3 party=2 storyline=2"
+ },
+ {
+  "check": "[show] Red beaten -> record completes as SEG_JOHTO",
+  "status": "PASS",
+  "detail": "record src=2 segsComplete=0xd3 party=2 seriesFlags=0x0b (story bits=2)"
+ },
+ {
+  "check": "[show] Johto P3 -> Emerald P1 import",
+  "status": "PASS",
+  "detail": "importPending=1 field=True party=2 imported=1"
+ },
+ {
+  "check": "[show] Emerald P1 keeps storyline and re-saves it",
+  "status": "PASS",
+  "detail": "VAR_ARENA_STORYLINE=2 record story bits after Emerald save=2 expected=2"
+ },
+ {
+  "check": "D3 P1 blocks MAP_CIANWOOD_CITY",
+  "status": "PASS",
+  "detail": "gate=1 field=True before=(1, 4) after=(1, 4) target=(0, 7)"
+ },
+ {
+  "check": "D3 P1 blocks MAP_PALLET_TOWN",
+  "status": "PASS",
+  "detail": "gate=1 field=True before=(1, 4) after=(1, 4) target=(0, 31)"
+ },
+ {
+  "check": "D3 P1 allows MAP_VIOLET_CITY",
+  "status": "PASS",
+  "detail": "gate=0 field=True before=(1, 4) after=(0, 2) target=(0, 2)"
+ },
+ {
+  "check": "D3 P2 blocks MAP_PALLET_TOWN",
+  "status": "PASS",
+  "detail": "gate=1 field=True before=(1, 4) after=(1, 4) target=(0, 31)"
+ },
+ {
+  "check": "D3 P2 allows MAP_CIANWOOD_CITY",
+  "status": "PASS",
+  "detail": "gate=0 field=True before=(1, 4) after=(0, 7) target=(0, 7)"
+ },
+ {
+  "check": "D3 P3 allows MAP_PALLET_TOWN",
+  "status": "PASS",
+  "detail": "gate=0 field=True before=(1, 4) after=(0, 31) target=(0, 31)"
+ },
+ {
+  "check": "P2 rejects incomplete Johto P1 save",
+  "status": "PASS",
+  "detail": "gArenaSeriesRejectedSave=1"
+ },
+ {
+  "check": "P2 rejects FireRed save",
+  "status": "PASS",
+  "detail": "gArenaSeriesRejectedSave=1"
+ },
+ {
+  "check": "P3 rejects P1-only save",
+  "status": "PASS",
+  "detail": "gArenaSeriesRejectedSave=1"
+ },
+ {
+  "check": "P3 rejects FireRed save",
+  "status": "PASS",
+  "detail": "gArenaSeriesRejectedSave=1"
+ }
+]

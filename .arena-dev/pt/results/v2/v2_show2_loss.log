@@ -1,0 +1,21 @@
+PASS  [show] ArenaStory_SJ10_31 on OLIVINE_CITY_LIGHTHOUSE: flag FLAG_ARENA_SHOW_SJ10A=1 battles=0 loc=(14, 19, 7, 9)
+PASS  [show] ArenaStory_SJ10_32 on CIANWOOD_SHOP: flag FLAG_ARENA_SHOW_SJ10B=1 battles=0 loc=(8, 12, 8, 4)
+PASS  [show] ArenaStory_SJ10_33 on OLIVINE_CITY_LIGHTHOUSE: flag FLAG_ARENA_SHOW_SJ10=1 battles=0 loc=(14, 19, 7, 9)
+  non-field cb2=CB2_OverworldBasic t=40
+  outcome ('ArenaStory_SJ11_34', 1, 2, (9, 5))
+  non-field cb2=CB2_OverworldBasic t=680
+  outcome ('ArenaStory_SJ11_34', 0, 1, (9, 5))
+  non-field cb2=CB2_ChangeMapMain t=1360
+  outcome ('ArenaStory_SJ11_34', 0, 1, (13, 12))
+PASS  [show] ArenaStory_SJ11_34 on WHIRL_ISLANDS_1F: flag FLAG_ARENA_SHOW_SJ11=1 battles=3 loc=(13, 12, 24, 28)
+PASS  [show] ArenaStory_SJ12_36 on LAKE_OF_RAGE: flag FLAG_ARENA_SHOW_SJ12=1 battles=0 loc=(39, 42, 24, 23)
+  non-field cb2=CB2_OverworldBasic t=80
+  outcome ('ArenaStory_SJ13_37', 0, 1, (9, 5))
+  non-field cb2=BattleMainCB2 t=800
+  outcome ('ArenaStory_SJ13_37:loss', 1, 2, (9, 5))
+  outcome ('ArenaStory_SJ13_37', 0, 1, (19, 17))
+PASS  [show] ArenaStory_SJ13_37 on INDIGO_PLATEAU_POKEMON_CENTER: flag FLAG_ARENA_SHOW_SJ13=1 battles=2 loc=(19, 17, 21, 0)
+PASS  [show] P2_END set after Harrison rematch: 
+PASS  no-whiteout battles lost without blackout: [('ArenaStory_SJ11_34', 1, 2, (9, 5)), ('ArenaStory_SJ13_37:loss', 1, 2, (9, 5))]
+
+8/8 PASS, 0 SKIP

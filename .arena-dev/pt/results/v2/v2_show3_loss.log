@@ -1,0 +1,20 @@
+PASS  [show] ArenaStory_SJ14_39 on PALLET_TOWN_REDS_HOUSE_1F: flag FLAG_ARENA_SHOW_SJ14=1 battles=0 loc=(9, 9, 11, 0)
+PASS  [show] ArenaStory_SJ15_40 on BATTLE_FRONTIER_BATTLE_TOWER_LOBBY: flag FLAG_ARENA_SHOW_SJ15_1=1 battles=0 loc=(12, 10, 30, 65)
+PASS  [show] ArenaStory_SJ15_41 on BATTLE_FRONTIER_BATTLE_DOME_LOBBY: flag FLAG_ARENA_SHOW_SJ15_2=1 battles=0 loc=(11, 17, 31, 4)
+PASS  [show] ArenaStory_SJ15_42 on BATTLE_FRONTIER_BATTLE_PALACE_LOBBY: flag FLAG_ARENA_SHOW_SJ15_3=1 battles=0 loc=(12, 12, 31, 8)
+PASS  [show] ArenaStory_SJ15_43 on BATTLE_FRONTIER_BATTLE_ARENA_LOBBY: flag FLAG_ARENA_SHOW_SJ15_4=1 battles=0 loc=(7, 13, 31, 14)
+PASS  [show] ArenaStory_SJ15_44 on BATTLE_FRONTIER_BATTLE_FACTORY_LOBBY: flag FLAG_ARENA_SHOW_SJ15_5=1 battles=0 loc=(9, 12, 31, 17)
+PASS  [show] ArenaStory_SJ15_45 on BATTLE_FRONTIER_BATTLE_PIKE_LOBBY: flag FLAG_ARENA_SHOW_SJ15_6=1 battles=0 loc=(5, 13, 31, 20)
+  non-field cb2=CB2_OverworldBasic t=200
+  outcome ('ArenaStory_SJ15_46:loss', 1, 2, (7, 18))
+  outcome ('ArenaStory_SJ15_46', 0, 0, (7, 18))
+  non-field cb2=BattleMainCB2 t=800
+  outcome ('ArenaStory_SJ15_46', 0, 1, (7, 18))
+PASS  [show] ArenaStory_SJ15_46 on BATTLE_FRONTIER_BATTLE_PYRAMID_LOBBY: flag FLAG_ARENA_SHOW_SJ15_7=1 battles=2 loc=(7, 18, 31, 11)
+  non-field cb2=CB2_PokeStorage t=120
+PASS  [show] ArenaStory_SJ17_48 on PALLET_TOWN_LAB: flag FLAG_ARENA_SHOW_SJ17=1 battles=0 loc=(13, 21, 11, 4)
+PASS  [show] ArenaStory_SJ18_49 on BATTLE_FRONTIER_OUTSIDE_EAST: flag FLAG_ARENA_SHOW_SJ18=1 battles=0 loc=(16, 15, 31, 0)
+PASS  [show] SJ16 set (Pyramid lose->rematch, fires after SJ15_46): SJ16=1
+PASS  no-whiteout battles lost without blackout: [('ArenaStory_SJ15_46:loss', 1, 2, (7, 18))]
+
+12/12 PASS, 0 SKIP
