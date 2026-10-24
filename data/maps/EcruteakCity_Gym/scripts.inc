@@ -37,6 +37,7 @@ EcruteakCity_Gym_EventScript_Grace::
 EcruteakCity_Gym_EventScript_Morty::
 	lock
 	faceplayer
+	goto_if_set FLAG_SYS_GAME_CLEAR, EcruteakCity_Gym_EventScript_ArenaRematch
 	goto_if_set FLAG_DEFEATED_ECRUTEAK_CITY_GYM, EcruteakCity_Gym_EventScript_Morty_Defeated
 	msgbox MortyIntroText, MSGBOX_DEFAULT
 	trainerbattle_no_intro TRAINER_MORTY_1, MortyWinLossText
@@ -53,6 +54,8 @@ EcruteakCity_Gym_EventScript_Morty::
 	msgbox MortyText_ShadowBallSpeech, MSGBOX_DEFAULT
 	setvar VAR_ECRUTEAK_CITY_STATE, 4
 	closemessage
+	setvar VAR_0x8005, 1
+	call Arena_EventScript_PartEnd
 	release
 	end
 
@@ -220,3 +223,12 @@ EcruteakCity_GymClosedText:
 	.string "Sorry, but you'll have to\n"
 	.string "leave.\p"
 	.string "Hohohoho.$"
+
+EcruteakCity_Gym_EventScript_ArenaRematch::
+	msgbox Arena_Text_RematchAsk, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Arena_EventScript_RematchDeclined
+	special ArenaSeries_BeginRematch
+	trainerbattle_no_intro TRAINER_MORTY_1, MortyWinLossText
+	msgbox Arena_Text_RematchWon
+	release
+	end

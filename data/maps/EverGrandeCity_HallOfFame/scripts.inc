@@ -27,6 +27,8 @@ EverGrandeCity_HallOfFame_EventScript_EnterHallOfFame::
 	dofieldeffect FLDEFF_HALL_OF_FAME_RECORD
 	waitfieldeffect FLDEFF_HALL_OF_FAME_RECORD
 	delay 40
+	setvar VAR_0x8005, 2
+	call Arena_EventScript_PartEnd
 	setvar VAR_TEMP_1, 1
 	call EverGrandeCity_HallOfFame_EventScript_SetGameClearFlags
 	checkplayergender

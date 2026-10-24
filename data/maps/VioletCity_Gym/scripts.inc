@@ -28,6 +28,7 @@ VioletCity_Gym_EventScript_Abe::
 VioletCity_Gym_EventScript_Falkner::
 	lock
 	faceplayer
+	goto_if_set FLAG_SYS_GAME_CLEAR, VioletCity_Gym_EventScript_ArenaRematch
 	goto_if_set FLAG_DEFEATED_VIOLET_GYM, VioletCity_Gym_EventScript_Falkner_Defeated
 	msgbox VioletGym_Text_Falkner_Intro, MSGBOX_DEFAULT
 	trainerbattle_no_intro TRAINER_FALKNER_1, VioletGym_Text_Falkner_WinLoss
@@ -181,3 +182,11 @@ VioletCity_Gym_Text_GymStatueCertified:
 	.string "VIOLET CITY Pokémon GYM\p"
 	.string "FALKNER'S CERTIFIED TRAINERS:\n"
 	.string "{PLAYER}$"
+VioletCity_Gym_EventScript_ArenaRematch::
+	msgbox Arena_Text_RematchAsk, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Arena_EventScript_RematchDeclined
+	special ArenaSeries_BeginRematch
+	trainerbattle_no_intro TRAINER_FALKNER_1, VioletGym_Text_Falkner_WinLoss
+	msgbox Arena_Text_RematchWon
+	release
+	end

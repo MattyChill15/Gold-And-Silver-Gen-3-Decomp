@@ -1,4 +1,5 @@
 #include "global.h"
+#include "matt_config.h"
 #include "arena_series.h"
 #include "clock.h"
 #include "new_game.h"
@@ -106,7 +107,7 @@ static void SetDefaultOptions(void)
     gSaveBlock2Ptr->optionsWindowFrameType = 0;
     gSaveBlock2Ptr->optionsSound = OPTIONS_SOUND_STEREO;
     gSaveBlock2Ptr->optionsBattleStyle = OPTIONS_BATTLE_STYLE_SHIFT; //HnS
-    gSaveBlock2Ptr->optionsEXPShare = 1;
+    gSaveBlock2Ptr->optionsEXPShare = MATT_PARTY_EXP_SHARE ? 0 : 1; // 0 = whole-party Exp Share on
     gSaveBlock2Ptr->optionsAutoHMs = 1;
     gSaveBlock2Ptr->optionsBattleSceneOff = FALSE;
     gSaveBlock2Ptr->regionMapZoom = FALSE;

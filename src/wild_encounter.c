@@ -1,4 +1,5 @@
 #include "global.h"
+#include "arena_series.h"
 #include "battle_setup.h"
 #include "battle_pike.h"
 #include "battle_pyramid.h"
@@ -340,7 +341,13 @@ static u32 ChooseWildMonIndex_Fishing(u8 rod)
     return wildMonIndex;
 }
 
+static u8 ChooseWildMonLevel_Base(const struct WildPokemon *wildPokemon, u8 wildMonIndex, enum WildPokemonArea area);
 u8 ChooseWildMonLevel(const struct WildPokemon *wildPokemon, u8 wildMonIndex, enum WildPokemonArea area)
+{
+    return ArenaSeries_ScaleWildLevel(ChooseWildMonLevel_Base(wildPokemon, wildMonIndex, area));
+}
+
+static u8 ChooseWildMonLevel_Base(const struct WildPokemon *wildPokemon, u8 wildMonIndex, enum WildPokemonArea area)
 {
     u8 min;
     u8 max;

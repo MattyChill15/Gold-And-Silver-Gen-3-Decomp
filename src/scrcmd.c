@@ -1,4 +1,5 @@
 #include "global.h"
+#include "arena_series.h"
 #include "frontier_util.h"
 #include "battle_setup.h"
 #include "battle_util.h"
@@ -2373,6 +2374,12 @@ bool8 ScrCmd_checkfieldmove(struct ScriptContext *ctx)
             gSpecialVar_0x8004 = species;
             break;
         }
+    }
+    // Series QoL: the badge alone allows field HMs (first healthy mon acts).
+    if (gSpecialVar_Result == PARTY_SIZE && ArenaSeries_HmBadgeOk(move) && ArenaSeries_FirstFieldMon() >= 0)
+    {
+        gSpecialVar_Result = ArenaSeries_FirstFieldMon();
+        gSpecialVar_0x8004 = GetMonData(&gParties[B_TRAINER_PLAYER][gSpecialVar_Result], MON_DATA_SPECIES);
     }
 
     return FALSE;

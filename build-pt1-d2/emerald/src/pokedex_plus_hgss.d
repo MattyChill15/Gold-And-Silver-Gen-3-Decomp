@@ -1,0 +1,394 @@
+build-pt1-d2/emerald/src/pokedex_plus_hgss.o: build-pt1-d2/assets/graphics/pokedex/caught_ball.png.4bpp build-pt1-d2/assets/graphics/pokedex/hgss/SelectBar.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/SelectBar_clear.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/palette_default.pal.gbapal build-pt1-d2/assets/graphics/pokedex/hgss/palette_default_dark.pal.gbapal build-pt1-d2/assets/graphics/pokedex/hgss/palette_national.pal.gbapal build-pt1-d2/assets/graphics/pokedex/hgss/palette_national_dark.pal.gbapal build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_menu.pal.gbapal build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_menu_dark.pal.gbapal build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_results.pal.gbapal build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_results_dark.pal.gbapal build-pt1-d2/assets/graphics/pokedex/hgss/stat_bars.png.4bpp build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_cry_screen.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_evo_screen.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_evo_screen_PE.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_forms_screen.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_info_screen.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_list_screen.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_list_screen_underlay.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_search_screen_hoenn.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_search_screen_national.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_size_screen.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_start_menu.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_start_menu_search_results.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_stats_screen.bin.smolTM build-pt1-d2/assets/graphics/pokedex/hgss/tileset_interface.png.4bpp.smol build-pt1-d2/assets/graphics/pokedex/hgss/tileset_interface_DECA.png.4bpp.smol build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu1.png.4bpp.smol build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu2.png.4bpp.smol build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu3.png.4bpp.smol build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_list.png.4bpp.smol build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_list_DECA.png.4bpp.smol build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_search.png.4bpp.smol build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_search_DECA.png.4bpp.smol build-pt1-d2/assets/graphics/pokedex/size_silhouette.pal.gbapal include/assertf.h include/battle_main.h include/battle_util.h include/bg.h include/config/ai.h include/config/battle.h include/config/caps.h include/config/contest.h include/config/debug.h include/config/dexnav.h include/config/follower_npc.h include/config/general.h include/config/item.h include/config/map_preview_screen.h include/config/overworld.h include/config/pokedex_plus_hgss.h include/config/pokemon.h include/config/pokerus.h include/config/save.h include/config/species_enabled.h include/config/summary_screen.h include/config/test.h include/config/text.h include/config/wild_encounter.h include/config_changes.h include/constants/abilities.h include/constants/apricorn_tree.h include/constants/arena_story_flags.h include/constants/battle.h include/constants/battle_factory.h include/constants/battle_frontier_trainers.h include/constants/battle_move_effects.h include/constants/battle_partner.h include/constants/battle_stat_change.h include/constants/battle_string_ids.h include/constants/battle_z_move_effects.h include/constants/berries.h include/constants/berry.h include/constants/characters.h include/constants/config_changes.h include/constants/contest.h include/constants/cries.h include/constants/daycare.h include/constants/difficulty.h include/constants/easy_chat.h include/constants/egg_ids.h include/constants/flags.h include/constants/form_change_types.h include/constants/game_stat.h include/constants/global.h include/constants/hold_effects.h include/constants/item.h include/constants/item_effects.h include/constants/items.h include/constants/map_groups.h include/constants/map_types.h include/constants/maps.h include/constants/move_relearner.h include/constants/moves.h include/constants/opponents.h include/constants/opponents_frlg.h include/constants/party_menu.h include/constants/pokeball.h include/constants/pokedex.h include/constants/pokemon.h include/constants/region_map_sections.h include/constants/regions.h include/constants/rematches.h include/constants/rgb.h include/constants/rtc.h include/constants/siirtc.h include/constants/songs.h include/constants/sound.h include/constants/species.h include/constants/tms_hms.h include/constants/trainer_hill.h include/constants/trainer_tower.h include/constants/trainers.h include/constants/tv.h include/constants/vars.h include/constants/vars_frlg.h include/contest.h include/contest_effect.h include/data.h include/daycare.h include/debug.h include/decompress.h include/difficulty.h include/event_data.h include/fpmath.h include/gametypes.h include/gba/defines.h include/gba/gba.h include/gba/io_reg.h include/gba/isagbprint.h include/gba/m4a_internal.h include/gba/macro.h include/gba/multiboot.h include/gba/syscall.h include/gba/types.h include/global.berry.h include/global.fieldmap.h include/global.h include/global.tv.h include/gpu_regs.h include/graphics.h include/international_string_util.h include/item.h include/item_icon.h include/line_break.h include/list_menu.h include/m4a.h include/main.h include/malloc.h include/menu.h include/metaprogram.h include/move.h include/overworld.h include/palette.h include/party_menu.h include/pokedex.h include/pokedex_area_screen.h include/pokedex_cry_screen.h include/pokedex_plus_hgss.h include/pokemon.h include/pokemon_icon.h include/pokemon_summary_screen.h include/random.h include/region_map.h include/reset_rtc_screen.h include/rtc.h include/scanline_effect.h include/script.h include/shop.h include/siirtc.h include/sound.h include/sprite.h include/string_util.h include/strings.h include/task.h include/test_result.h include/text.h include/text_window.h include/trainer_pokemon_sprites.h include/trig.h include/wild_encounter_ow.h include/window.h
+build-pt1-d2/emerald/src/pokedex_plus_hgss.d: include/assertf.h include/battle_main.h include/battle_util.h include/bg.h include/config/ai.h include/config/battle.h include/config/caps.h include/config/contest.h include/config/debug.h include/config/dexnav.h include/config/follower_npc.h include/config/general.h include/config/item.h include/config/map_preview_screen.h include/config/overworld.h include/config/pokedex_plus_hgss.h include/config/pokemon.h include/config/pokerus.h include/config/save.h include/config/species_enabled.h include/config/summary_screen.h include/config/test.h include/config/text.h include/config/wild_encounter.h include/config_changes.h include/constants/abilities.h include/constants/apricorn_tree.h include/constants/arena_story_flags.h include/constants/battle.h include/constants/battle_factory.h include/constants/battle_frontier_trainers.h include/constants/battle_move_effects.h include/constants/battle_partner.h include/constants/battle_stat_change.h include/constants/battle_string_ids.h include/constants/battle_z_move_effects.h include/constants/berries.h include/constants/berry.h include/constants/characters.h include/constants/config_changes.h include/constants/contest.h include/constants/cries.h include/constants/daycare.h include/constants/difficulty.h include/constants/easy_chat.h include/constants/egg_ids.h include/constants/flags.h include/constants/form_change_types.h include/constants/game_stat.h include/constants/global.h include/constants/hold_effects.h include/constants/item.h include/constants/item_effects.h include/constants/items.h include/constants/map_groups.h include/constants/map_types.h include/constants/maps.h include/constants/move_relearner.h include/constants/moves.h include/constants/opponents.h include/constants/opponents_frlg.h include/constants/party_menu.h include/constants/pokeball.h include/constants/pokedex.h include/constants/pokemon.h include/constants/region_map_sections.h include/constants/regions.h include/constants/rematches.h include/constants/rgb.h include/constants/rtc.h include/constants/siirtc.h include/constants/songs.h include/constants/sound.h include/constants/species.h include/constants/tms_hms.h include/constants/trainer_hill.h include/constants/trainer_tower.h include/constants/trainers.h include/constants/tv.h include/constants/vars.h include/constants/vars_frlg.h include/contest.h include/contest_effect.h include/data.h include/daycare.h include/debug.h include/decompress.h include/difficulty.h include/event_data.h include/fpmath.h include/gametypes.h include/gba/defines.h include/gba/gba.h include/gba/io_reg.h include/gba/isagbprint.h include/gba/m4a_internal.h include/gba/macro.h include/gba/multiboot.h include/gba/syscall.h include/gba/types.h include/global.berry.h include/global.fieldmap.h include/global.h include/global.tv.h include/gpu_regs.h include/graphics.h include/international_string_util.h include/item.h include/item_icon.h include/line_break.h include/list_menu.h include/m4a.h include/main.h include/malloc.h include/menu.h include/metaprogram.h include/move.h include/overworld.h include/palette.h include/party_menu.h include/pokedex.h include/pokedex_area_screen.h include/pokedex_cry_screen.h include/pokedex_plus_hgss.h include/pokemon.h include/pokemon_icon.h include/pokemon_summary_screen.h include/random.h include/region_map.h include/reset_rtc_screen.h include/rtc.h include/scanline_effect.h include/script.h include/shop.h include/siirtc.h include/sound.h include/sprite.h include/string_util.h include/strings.h include/task.h include/test_result.h include/text.h include/text_window.h include/trainer_pokemon_sprites.h include/trig.h include/wild_encounter_ow.h include/window.h
+build-pt1-d2/assets/graphics/pokedex/caught_ball.png.4bpp:
+build-pt1-d2/assets/graphics/pokedex/hgss/SelectBar.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/SelectBar_clear.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_default.pal.gbapal:
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_default_dark.pal.gbapal:
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_national.pal.gbapal:
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_national_dark.pal.gbapal:
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_menu.pal.gbapal:
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_menu_dark.pal.gbapal:
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_results.pal.gbapal:
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_results_dark.pal.gbapal:
+build-pt1-d2/assets/graphics/pokedex/hgss/stat_bars.png.4bpp:
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_cry_screen.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_evo_screen.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_evo_screen_PE.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_forms_screen.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_info_screen.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_list_screen.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_list_screen_underlay.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_search_screen_hoenn.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_search_screen_national.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_size_screen.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_start_menu.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_start_menu_search_results.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_stats_screen.bin.smolTM:
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_interface.png.4bpp.smol:
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_interface_DECA.png.4bpp.smol:
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu1.png.4bpp.smol:
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu2.png.4bpp.smol:
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu3.png.4bpp.smol:
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_list.png.4bpp.smol:
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_list_DECA.png.4bpp.smol:
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_search.png.4bpp.smol:
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_search_DECA.png.4bpp.smol:
+build-pt1-d2/assets/graphics/pokedex/size_silhouette.pal.gbapal:
+include/assertf.h:
+include/battle_main.h:
+include/battle_util.h:
+include/bg.h:
+include/config/ai.h:
+include/config/battle.h:
+include/config/caps.h:
+include/config/contest.h:
+include/config/debug.h:
+include/config/dexnav.h:
+include/config/follower_npc.h:
+include/config/general.h:
+include/config/item.h:
+include/config/map_preview_screen.h:
+include/config/overworld.h:
+include/config/pokedex_plus_hgss.h:
+include/config/pokemon.h:
+include/config/pokerus.h:
+include/config/save.h:
+include/config/species_enabled.h:
+include/config/summary_screen.h:
+include/config/test.h:
+include/config/text.h:
+include/config/wild_encounter.h:
+include/config_changes.h:
+include/constants/abilities.h:
+include/constants/apricorn_tree.h:
+include/constants/arena_story_flags.h:
+include/constants/battle.h:
+include/constants/battle_factory.h:
+include/constants/battle_frontier_trainers.h:
+include/constants/battle_move_effects.h:
+include/constants/battle_partner.h:
+include/constants/battle_stat_change.h:
+include/constants/battle_string_ids.h:
+include/constants/battle_z_move_effects.h:
+include/constants/berries.h:
+include/constants/berry.h:
+include/constants/characters.h:
+include/constants/config_changes.h:
+include/constants/contest.h:
+include/constants/cries.h:
+include/constants/daycare.h:
+include/constants/difficulty.h:
+include/constants/easy_chat.h:
+include/constants/egg_ids.h:
+include/constants/flags.h:
+include/constants/form_change_types.h:
+include/constants/game_stat.h:
+include/constants/global.h:
+include/constants/hold_effects.h:
+include/constants/item.h:
+include/constants/item_effects.h:
+include/constants/items.h:
+include/constants/map_groups.h:
+include/constants/map_types.h:
+include/constants/maps.h:
+include/constants/move_relearner.h:
+include/constants/moves.h:
+include/constants/opponents.h:
+include/constants/opponents_frlg.h:
+include/constants/party_menu.h:
+include/constants/pokeball.h:
+include/constants/pokedex.h:
+include/constants/pokemon.h:
+include/constants/region_map_sections.h:
+include/constants/regions.h:
+include/constants/rematches.h:
+include/constants/rgb.h:
+include/constants/rtc.h:
+include/constants/siirtc.h:
+include/constants/songs.h:
+include/constants/sound.h:
+include/constants/species.h:
+include/constants/tms_hms.h:
+include/constants/trainer_hill.h:
+include/constants/trainer_tower.h:
+include/constants/trainers.h:
+include/constants/tv.h:
+include/constants/vars.h:
+include/constants/vars_frlg.h:
+include/contest.h:
+include/contest_effect.h:
+include/data.h:
+include/daycare.h:
+include/debug.h:
+include/decompress.h:
+include/difficulty.h:
+include/event_data.h:
+include/fpmath.h:
+include/gametypes.h:
+include/gba/defines.h:
+include/gba/gba.h:
+include/gba/io_reg.h:
+include/gba/isagbprint.h:
+include/gba/m4a_internal.h:
+include/gba/macro.h:
+include/gba/multiboot.h:
+include/gba/syscall.h:
+include/gba/types.h:
+include/global.berry.h:
+include/global.fieldmap.h:
+include/global.h:
+include/global.tv.h:
+include/gpu_regs.h:
+include/graphics.h:
+include/international_string_util.h:
+include/item.h:
+include/item_icon.h:
+include/line_break.h:
+include/list_menu.h:
+include/m4a.h:
+include/main.h:
+include/malloc.h:
+include/menu.h:
+include/metaprogram.h:
+include/move.h:
+include/overworld.h:
+include/palette.h:
+include/party_menu.h:
+include/pokedex.h:
+include/pokedex_area_screen.h:
+include/pokedex_cry_screen.h:
+include/pokedex_plus_hgss.h:
+include/pokemon.h:
+include/pokemon_icon.h:
+include/pokemon_summary_screen.h:
+include/random.h:
+include/region_map.h:
+include/reset_rtc_screen.h:
+include/rtc.h:
+include/scanline_effect.h:
+include/script.h:
+include/shop.h:
+include/siirtc.h:
+include/sound.h:
+include/sprite.h:
+include/string_util.h:
+include/strings.h:
+include/task.h:
+include/test_result.h:
+include/text.h:
+include/text_window.h:
+include/trainer_pokemon_sprites.h:
+include/trig.h:
+include/wild_encounter_ow.h:
+include/window.h:
+ifndef build-pt1-d2/assets/graphics/pokedex/caught_ball.png.4bpp
+build-pt1-d2/assets/graphics/pokedex/caught_ball.png.4bpp := defined
+build-pt1-d2/assets/graphics/pokedex/caught_ball.png.4bpp: graphics/pokedex/caught_ball.png
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/SelectBar.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/SelectBar.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/SelectBar.bin.smolTM: graphics/pokedex/hgss/SelectBar.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/SelectBar_clear.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/SelectBar_clear.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/SelectBar_clear.bin.smolTM: graphics/pokedex/hgss/SelectBar_clear.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/palette_default.pal.gbapal
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_default.pal.gbapal := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_default.pal.gbapal: graphics/pokedex/hgss/palette_default.pal
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/palette_default_dark.pal.gbapal
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_default_dark.pal.gbapal := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_default_dark.pal.gbapal: graphics/pokedex/hgss/palette_default_dark.pal
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/palette_national.pal.gbapal
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_national.pal.gbapal := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_national.pal.gbapal: graphics/pokedex/hgss/palette_national.pal
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/palette_national_dark.pal.gbapal
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_national_dark.pal.gbapal := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_national_dark.pal.gbapal: graphics/pokedex/hgss/palette_national_dark.pal
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_menu.pal.gbapal
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_menu.pal.gbapal := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_menu.pal.gbapal: graphics/pokedex/hgss/palette_search_menu.pal
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_menu_dark.pal.gbapal
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_menu_dark.pal.gbapal := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_menu_dark.pal.gbapal: graphics/pokedex/hgss/palette_search_menu_dark.pal
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_results.pal.gbapal
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_results.pal.gbapal := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_results.pal.gbapal: graphics/pokedex/hgss/palette_search_results.pal
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_results_dark.pal.gbapal
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_results_dark.pal.gbapal := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/palette_search_results_dark.pal.gbapal: graphics/pokedex/hgss/palette_search_results_dark.pal
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/stat_bars.png.4bpp
+build-pt1-d2/assets/graphics/pokedex/hgss/stat_bars.png.4bpp := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/stat_bars.png.4bpp: graphics/pokedex/hgss/stat_bars.png
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_cry_screen.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_cry_screen.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_cry_screen.bin.smolTM: graphics/pokedex/hgss/tilemap_cry_screen.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_evo_screen.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_evo_screen.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_evo_screen.bin.smolTM: graphics/pokedex/hgss/tilemap_evo_screen.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_evo_screen_PE.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_evo_screen_PE.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_evo_screen_PE.bin.smolTM: graphics/pokedex/hgss/tilemap_evo_screen_PE.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_forms_screen.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_forms_screen.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_forms_screen.bin.smolTM: graphics/pokedex/hgss/tilemap_forms_screen.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_info_screen.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_info_screen.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_info_screen.bin.smolTM: graphics/pokedex/hgss/tilemap_info_screen.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_list_screen.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_list_screen.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_list_screen.bin.smolTM: graphics/pokedex/hgss/tilemap_list_screen.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_list_screen_underlay.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_list_screen_underlay.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_list_screen_underlay.bin.smolTM: graphics/pokedex/hgss/tilemap_list_screen_underlay.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_search_screen_hoenn.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_search_screen_hoenn.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_search_screen_hoenn.bin.smolTM: graphics/pokedex/hgss/tilemap_search_screen_hoenn.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_search_screen_national.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_search_screen_national.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_search_screen_national.bin.smolTM: graphics/pokedex/hgss/tilemap_search_screen_national.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_size_screen.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_size_screen.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_size_screen.bin.smolTM: graphics/pokedex/hgss/tilemap_size_screen.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_start_menu.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_start_menu.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_start_menu.bin.smolTM: graphics/pokedex/hgss/tilemap_start_menu.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_start_menu_search_results.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_start_menu_search_results.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_start_menu_search_results.bin.smolTM: graphics/pokedex/hgss/tilemap_start_menu_search_results.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_stats_screen.bin.smolTM
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_stats_screen.bin.smolTM := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tilemap_stats_screen.bin.smolTM: graphics/pokedex/hgss/tilemap_stats_screen.bin
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tileset_interface.png.4bpp
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_interface.png.4bpp := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_interface.png.4bpp: graphics/pokedex/hgss/tileset_interface.png
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tileset_interface_DECA.png.4bpp
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_interface_DECA.png.4bpp := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_interface_DECA.png.4bpp: graphics/pokedex/hgss/tileset_interface_DECA.png
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu1.png.4bpp
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu1.png.4bpp := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu1.png.4bpp: graphics/pokedex/hgss/tileset_menu1.png
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu2.png.4bpp
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu2.png.4bpp := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu2.png.4bpp: graphics/pokedex/hgss/tileset_menu2.png
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu3.png.4bpp
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu3.png.4bpp := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu3.png.4bpp: graphics/pokedex/hgss/tileset_menu3.png
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_list.png.4bpp
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_list.png.4bpp := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_list.png.4bpp: graphics/pokedex/hgss/tileset_menu_list.png
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_list_DECA.png.4bpp
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_list_DECA.png.4bpp := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_list_DECA.png.4bpp: graphics/pokedex/hgss/tileset_menu_list_DECA.png
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_search.png.4bpp
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_search.png.4bpp := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_search.png.4bpp: graphics/pokedex/hgss/tileset_menu_search.png
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_search_DECA.png.4bpp
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_search_DECA.png.4bpp := defined
+build-pt1-d2/assets/graphics/pokedex/hgss/tileset_menu_search_DECA.png.4bpp: graphics/pokedex/hgss/tileset_menu_search_DECA.png
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex/hgss'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt1-d2/assets/graphics/pokedex/size_silhouette.pal.gbapal
+build-pt1-d2/assets/graphics/pokedex/size_silhouette.pal.gbapal := defined
+build-pt1-d2/assets/graphics/pokedex/size_silhouette.pal.gbapal: graphics/pokedex/size_silhouette.pal
+	@mkdir -p 'build-pt1-d2/assets/graphics/pokedex'
+	$(GFX) $< $@ 
+endif

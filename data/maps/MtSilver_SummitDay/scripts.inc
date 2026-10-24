@@ -42,8 +42,10 @@ MtSilver_SummitDay_EventScript_Red::
 	removeobject LOCALID_MTSILVER_RED
 	fadescreenswapbuffers FADE_FROM_BLACK
 	delay 180
-	fadescreenspeed FADE_TO_BLACK, 24
 	setflag FLAG_DEFEATED_RED
+	setvar VAR_0x8005, 3
+	call Arena_EventScript_PartEnd
+	fadescreenspeed FADE_TO_BLACK, 24
 	clearflag FLAG_HIDE_MTSILVER_RED
 	special GameClear
 	@waitstate

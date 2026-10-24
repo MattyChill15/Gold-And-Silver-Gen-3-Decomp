@@ -67,6 +67,7 @@ MahoganyTown_Gym_EventScript_Clarissa::
 MahoganyTown_Gym_EventScript_Pryce::
 	lock
 	faceplayer
+	goto_if_set FLAG_SYS_GAME_CLEAR, MahoganyTown_Gym_EventScript_ArenaRematch
 	goto_if_set FLAG_DEFEATED_MAHOGANY_TOWN_GYM, MahoganyTown_Gym_EventScript_Pryce_Defeated
 	msgbox MahoganyTown_Gym_Text_PryceIntro, MSGBOX_DEFAULT
 	goto_if_set FLAG_DEFEATED_OLIVINE_CITY_GYM, MahoganyTown_Gym_EventScript_OlivineCheckCianwood
@@ -256,3 +257,12 @@ MahoganyTown_Gym_Text_SkierClarissaAfter:
     .string "I shouldn't have been bragging\n"
     .string "about my skiing…$"
 
+
+MahoganyTown_Gym_EventScript_ArenaRematch::
+	msgbox Arena_Text_RematchAsk, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Arena_EventScript_RematchDeclined
+	special ArenaSeries_BeginRematch
+	trainerbattle_no_intro TRAINER_PRYCE_1, MahoganyTown_Gym_Text_PryceImpressed
+	msgbox Arena_Text_RematchWon
+	release
+	end

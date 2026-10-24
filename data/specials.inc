@@ -677,3 +677,5 @@ gSpecials::
 	def_special ArenaStory_LoadReturn
 	def_special ArenaStory_CharizardToLiza
 	def_special ArenaStory_CharizardFromLiza
+	def_special ArenaSeries_BeginRematch
+	def_special ArenaSeries_EndPart

@@ -43,6 +43,7 @@ GoldenrodCity_Gym_EventScript_Gym_Guy_After::
 GoldenrodCity_Gym_EventScript_Whitney::
 	lock
 	faceplayer
+	goto_if_set FLAG_SYS_GAME_CLEAR, GoldenrodCity_Gym_EventScript_ArenaRematch
 	goto_if_eq VAR_GOLDENROD_CITY_STATE, 3, GoldenrodCity_Gym_EventScript_WhitneyCrying
 	goto_if_eq VAR_GOLDENROD_CITY_STATE, 4, GoldenrodCity_Gym_EventScript_WhitneyBadge
 	goto_if_set FLAG_DEFEATED_GOLDENROD_CITY_GYM, GoldenrodCity_Gym_EventScript_WhitneyDefeated
@@ -250,3 +251,12 @@ GoldenrodCity_Gym_Text_GymGuideWin:
     .string "You won? Great! I was busy admiring\n"
     .string "the ladies here.$"
 
+
+GoldenrodCity_Gym_EventScript_ArenaRematch::
+	msgbox Arena_Text_RematchAsk, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Arena_EventScript_RematchDeclined
+	special ArenaSeries_BeginRematch
+	trainerbattle_no_intro TRAINER_WHITNEY_1, GoldenrodCity_Gym_Text_WhitneyShouldntBeSoSerious
+	msgbox Arena_Text_RematchWon
+	release
+	end

@@ -1,0 +1,328 @@
+build-pt2-d2/emerald/src/trade.o: build-pt2-d2/assets/graphics/trade/cable_end.png.4bpp build-pt2-d2/assets/graphics/trade/crossing_highlight_wireless.bin.smolTM build-pt2-d2/assets/graphics/trade/gba.pal.gbapal build-pt2-d2/assets/graphics/trade/gba_affine.png.8bpp build-pt2-d2/assets/graphics/trade/gba_screen.png.4bpp build-pt2-d2/assets/graphics/trade/link_mon.pal.gbapal build-pt2-d2/assets/graphics/trade/link_mon_glow.png.4bpp build-pt2-d2/assets/graphics/trade/link_mon_shadow.pal.gbapal build-pt2-d2/assets/graphics/trade/link_mon_shadow.png.4bpp build-pt2-d2/assets/graphics/trade/pokeball.png.4bpp build-pt2-d2/assets/graphics/trade/pokeball.png.gbapal build-pt2-d2/assets/graphics/trade/pokeball_symbol.png.8bpp build-pt2-d2/assets/graphics/trade/text.pal.gbapal build-pt2-d2/assets/graphics/trade/unused1.pal.gbapal build-pt2-d2/assets/graphics/trade/unused2.pal.gbapal build-pt2-d2/assets/graphics/trade/wireless_signal.bin.smolTM build-pt2-d2/assets/graphics/trade/wireless_signal.png.4bpp.smol build-pt2-d2/assets/graphics/trade/wireless_signal_none.pal.gbapal build-pt2-d2/assets/graphics/trade/wireless_signal_receive.pal.gbapal build-pt2-d2/assets/graphics/trade/wireless_signal_send.pal.gbapal graphics/trade/crossing_highlight_cable.bin graphics/trade/gba_affine_map_cable.bin graphics/trade/gba_affine_map_wireless.bin graphics/trade/gba_map_cable.bin graphics/trade/gba_map_wireless.bin graphics/trade/moves_box_map.bin graphics/trade/party_box_map.bin graphics/trade/platform.bin graphics/trade/pokeball_symbol_map.bin graphics/trade/stripes_bg2_map.bin graphics/trade/stripes_bg3_map.bin include/AgbRfu_LinkManager.h include/assertf.h include/battle.h include/battle_anim.h include/battle_anim_scripts.h include/battle_bg.h include/battle_controllers.h include/battle_debug.h include/battle_dynamax.h include/battle_gfx_sfx_util.h include/battle_gimmick.h include/battle_interface.h include/battle_main.h include/battle_message.h include/battle_script_commands.h include/battle_terastal.h include/battle_util.h include/battle_util2.h include/bg.h include/cable_club.h include/config/ai.h include/config/battle.h include/config/caps.h include/config/contest.h include/config/debug.h include/config/dexnav.h include/config/follower_npc.h include/config/general.h include/config/item.h include/config/map_preview_screen.h include/config/overworld.h include/config/pokemon.h include/config/pokerus.h include/config/save.h include/config/species_enabled.h include/config/summary_screen.h include/config/test.h include/config/text.h include/config/wild_encounter.h include/config_changes.h include/constants/abilities.h include/constants/apricorn_tree.h include/constants/arena_story_flags.h include/constants/battle.h include/constants/battle_anim.h include/constants/battle_end_turn.h include/constants/battle_factory.h include/constants/battle_frontier_trainers.h include/constants/battle_move_effects.h include/constants/battle_move_resolution.h include/constants/battle_partner.h include/constants/battle_script_commands.h include/constants/battle_stat_change.h include/constants/battle_string_ids.h include/constants/battle_switch_in.h include/constants/battle_z_move_effects.h include/constants/berries.h include/constants/berry.h include/constants/cable_club.h include/constants/characters.h include/constants/config_changes.h include/constants/contest.h include/constants/cries.h include/constants/daycare.h include/constants/difficulty.h include/constants/easy_chat.h include/constants/egg_ids.h include/constants/flags.h include/constants/form_change_types.h include/constants/game_stat.h include/constants/global.h include/constants/hold_effects.h include/constants/item.h include/constants/item_effects.h include/constants/items.h include/constants/map_groups.h include/constants/map_types.h include/constants/maps.h include/constants/move_relearner.h include/constants/moves.h include/constants/mystery_gift.h include/constants/opponents.h include/constants/opponents_frlg.h include/constants/party_menu.h include/constants/pokeball.h include/constants/pokedex.h include/constants/pokemon.h include/constants/region_map_sections.h include/constants/regions.h include/constants/rematches.h include/constants/rgb.h include/constants/siirtc.h include/constants/songs.h include/constants/sound.h include/constants/species.h include/constants/tms_hms.h include/constants/trade.h include/constants/trainer_card.h include/constants/trainer_hill.h include/constants/trainer_slide.h include/constants/trainer_tower.h include/constants/trainers.h include/constants/tv.h include/constants/union_room.h include/constants/vars.h include/constants/vars_frlg.h include/contest_effect.h include/data.h include/daycare.h include/debug.h include/decompress.h include/difficulty.h include/event_data.h include/evolution_scene.h include/field_screen_effect.h include/fpmath.h include/gametypes.h include/gba/defines.h include/gba/gba.h include/gba/io_reg.h include/gba/isagbprint.h include/gba/macro.h include/gba/multiboot.h include/gba/syscall.h include/gba/types.h include/global.berry.h include/global.fieldmap.h include/global.h include/global.tv.h include/gpu_regs.h include/graphics.h include/international_string_util.h include/item.h include/librfu.h include/link.h include/link_rfu.h include/list_menu.h include/load_save.h include/mail.h include/main.h include/malloc.h include/menu.h include/metaprogram.h include/move.h include/mystery_gift.h include/mystery_gift_menu.h include/overworld.h include/palette.h include/party_menu.h include/pokeball.h include/pokedex.h include/pokemon.h include/pokemon_icon.h include/pokemon_storage_system.h include/pokemon_summary_screen.h include/random.h include/save.h include/script.h include/siirtc.h include/sound.h include/sprite.h include/string_util.h include/strings.h include/task.h include/test_result.h include/text.h include/text_window.h include/trade.h include/trainer_card.h include/trainer_slide.h include/union_room.h include/util.h include/wild_encounter_ow.h include/window.h src/data/trade.h
+build-pt2-d2/emerald/src/trade.d: include/AgbRfu_LinkManager.h include/assertf.h include/battle.h include/battle_anim.h include/battle_anim_scripts.h include/battle_bg.h include/battle_controllers.h include/battle_debug.h include/battle_dynamax.h include/battle_gfx_sfx_util.h include/battle_gimmick.h include/battle_interface.h include/battle_main.h include/battle_message.h include/battle_script_commands.h include/battle_terastal.h include/battle_util.h include/battle_util2.h include/bg.h include/cable_club.h include/config/ai.h include/config/battle.h include/config/caps.h include/config/contest.h include/config/debug.h include/config/dexnav.h include/config/follower_npc.h include/config/general.h include/config/item.h include/config/map_preview_screen.h include/config/overworld.h include/config/pokemon.h include/config/pokerus.h include/config/save.h include/config/species_enabled.h include/config/summary_screen.h include/config/test.h include/config/text.h include/config/wild_encounter.h include/config_changes.h include/constants/abilities.h include/constants/apricorn_tree.h include/constants/arena_story_flags.h include/constants/battle.h include/constants/battle_anim.h include/constants/battle_end_turn.h include/constants/battle_factory.h include/constants/battle_frontier_trainers.h include/constants/battle_move_effects.h include/constants/battle_move_resolution.h include/constants/battle_partner.h include/constants/battle_script_commands.h include/constants/battle_stat_change.h include/constants/battle_string_ids.h include/constants/battle_switch_in.h include/constants/battle_z_move_effects.h include/constants/berries.h include/constants/berry.h include/constants/cable_club.h include/constants/characters.h include/constants/config_changes.h include/constants/contest.h include/constants/cries.h include/constants/daycare.h include/constants/difficulty.h include/constants/easy_chat.h include/constants/egg_ids.h include/constants/flags.h include/constants/form_change_types.h include/constants/game_stat.h include/constants/global.h include/constants/hold_effects.h include/constants/item.h include/constants/item_effects.h include/constants/items.h include/constants/map_groups.h include/constants/map_types.h include/constants/maps.h include/constants/move_relearner.h include/constants/moves.h include/constants/mystery_gift.h include/constants/opponents.h include/constants/opponents_frlg.h include/constants/party_menu.h include/constants/pokeball.h include/constants/pokedex.h include/constants/pokemon.h include/constants/region_map_sections.h include/constants/regions.h include/constants/rematches.h include/constants/rgb.h include/constants/siirtc.h include/constants/songs.h include/constants/sound.h include/constants/species.h include/constants/tms_hms.h include/constants/trade.h include/constants/trainer_card.h include/constants/trainer_hill.h include/constants/trainer_slide.h include/constants/trainer_tower.h include/constants/trainers.h include/constants/tv.h include/constants/union_room.h include/constants/vars.h include/constants/vars_frlg.h include/contest_effect.h include/data.h include/daycare.h include/debug.h include/decompress.h include/difficulty.h include/event_data.h include/evolution_scene.h include/field_screen_effect.h include/fpmath.h include/gametypes.h include/gba/defines.h include/gba/gba.h include/gba/io_reg.h include/gba/isagbprint.h include/gba/macro.h include/gba/multiboot.h include/gba/syscall.h include/gba/types.h include/global.berry.h include/global.fieldmap.h include/global.h include/global.tv.h include/gpu_regs.h include/graphics.h include/international_string_util.h include/item.h include/librfu.h include/link.h include/link_rfu.h include/list_menu.h include/load_save.h include/mail.h include/main.h include/malloc.h include/menu.h include/metaprogram.h include/move.h include/mystery_gift.h include/mystery_gift_menu.h include/overworld.h include/palette.h include/party_menu.h include/pokeball.h include/pokedex.h include/pokemon.h include/pokemon_icon.h include/pokemon_storage_system.h include/pokemon_summary_screen.h include/random.h include/save.h include/script.h include/siirtc.h include/sound.h include/sprite.h include/string_util.h include/strings.h include/task.h include/test_result.h include/text.h include/text_window.h include/trade.h include/trainer_card.h include/trainer_slide.h include/union_room.h include/util.h include/wild_encounter_ow.h include/window.h src/data/trade.h
+build-pt2-d2/assets/graphics/trade/cable_end.png.4bpp:
+build-pt2-d2/assets/graphics/trade/crossing_highlight_wireless.bin.smolTM:
+build-pt2-d2/assets/graphics/trade/gba.pal.gbapal:
+build-pt2-d2/assets/graphics/trade/gba_affine.png.8bpp:
+build-pt2-d2/assets/graphics/trade/gba_screen.png.4bpp:
+build-pt2-d2/assets/graphics/trade/link_mon.pal.gbapal:
+build-pt2-d2/assets/graphics/trade/link_mon_glow.png.4bpp:
+build-pt2-d2/assets/graphics/trade/link_mon_shadow.pal.gbapal:
+build-pt2-d2/assets/graphics/trade/link_mon_shadow.png.4bpp:
+build-pt2-d2/assets/graphics/trade/pokeball.png.4bpp:
+build-pt2-d2/assets/graphics/trade/pokeball.png.gbapal:
+build-pt2-d2/assets/graphics/trade/pokeball_symbol.png.8bpp:
+build-pt2-d2/assets/graphics/trade/text.pal.gbapal:
+build-pt2-d2/assets/graphics/trade/unused1.pal.gbapal:
+build-pt2-d2/assets/graphics/trade/unused2.pal.gbapal:
+build-pt2-d2/assets/graphics/trade/wireless_signal.bin.smolTM:
+build-pt2-d2/assets/graphics/trade/wireless_signal.png.4bpp.smol:
+build-pt2-d2/assets/graphics/trade/wireless_signal_none.pal.gbapal:
+build-pt2-d2/assets/graphics/trade/wireless_signal_receive.pal.gbapal:
+build-pt2-d2/assets/graphics/trade/wireless_signal_send.pal.gbapal:
+graphics/trade/crossing_highlight_cable.bin:
+graphics/trade/gba_affine_map_cable.bin:
+graphics/trade/gba_affine_map_wireless.bin:
+graphics/trade/gba_map_cable.bin:
+graphics/trade/gba_map_wireless.bin:
+graphics/trade/moves_box_map.bin:
+graphics/trade/party_box_map.bin:
+graphics/trade/platform.bin:
+graphics/trade/pokeball_symbol_map.bin:
+graphics/trade/stripes_bg2_map.bin:
+graphics/trade/stripes_bg3_map.bin:
+include/AgbRfu_LinkManager.h:
+include/assertf.h:
+include/battle.h:
+include/battle_anim.h:
+include/battle_anim_scripts.h:
+include/battle_bg.h:
+include/battle_controllers.h:
+include/battle_debug.h:
+include/battle_dynamax.h:
+include/battle_gfx_sfx_util.h:
+include/battle_gimmick.h:
+include/battle_interface.h:
+include/battle_main.h:
+include/battle_message.h:
+include/battle_script_commands.h:
+include/battle_terastal.h:
+include/battle_util.h:
+include/battle_util2.h:
+include/bg.h:
+include/cable_club.h:
+include/config/ai.h:
+include/config/battle.h:
+include/config/caps.h:
+include/config/contest.h:
+include/config/debug.h:
+include/config/dexnav.h:
+include/config/follower_npc.h:
+include/config/general.h:
+include/config/item.h:
+include/config/map_preview_screen.h:
+include/config/overworld.h:
+include/config/pokemon.h:
+include/config/pokerus.h:
+include/config/save.h:
+include/config/species_enabled.h:
+include/config/summary_screen.h:
+include/config/test.h:
+include/config/text.h:
+include/config/wild_encounter.h:
+include/config_changes.h:
+include/constants/abilities.h:
+include/constants/apricorn_tree.h:
+include/constants/arena_story_flags.h:
+include/constants/battle.h:
+include/constants/battle_anim.h:
+include/constants/battle_end_turn.h:
+include/constants/battle_factory.h:
+include/constants/battle_frontier_trainers.h:
+include/constants/battle_move_effects.h:
+include/constants/battle_move_resolution.h:
+include/constants/battle_partner.h:
+include/constants/battle_script_commands.h:
+include/constants/battle_stat_change.h:
+include/constants/battle_string_ids.h:
+include/constants/battle_switch_in.h:
+include/constants/battle_z_move_effects.h:
+include/constants/berries.h:
+include/constants/berry.h:
+include/constants/cable_club.h:
+include/constants/characters.h:
+include/constants/config_changes.h:
+include/constants/contest.h:
+include/constants/cries.h:
+include/constants/daycare.h:
+include/constants/difficulty.h:
+include/constants/easy_chat.h:
+include/constants/egg_ids.h:
+include/constants/flags.h:
+include/constants/form_change_types.h:
+include/constants/game_stat.h:
+include/constants/global.h:
+include/constants/hold_effects.h:
+include/constants/item.h:
+include/constants/item_effects.h:
+include/constants/items.h:
+include/constants/map_groups.h:
+include/constants/map_types.h:
+include/constants/maps.h:
+include/constants/move_relearner.h:
+include/constants/moves.h:
+include/constants/mystery_gift.h:
+include/constants/opponents.h:
+include/constants/opponents_frlg.h:
+include/constants/party_menu.h:
+include/constants/pokeball.h:
+include/constants/pokedex.h:
+include/constants/pokemon.h:
+include/constants/region_map_sections.h:
+include/constants/regions.h:
+include/constants/rematches.h:
+include/constants/rgb.h:
+include/constants/siirtc.h:
+include/constants/songs.h:
+include/constants/sound.h:
+include/constants/species.h:
+include/constants/tms_hms.h:
+include/constants/trade.h:
+include/constants/trainer_card.h:
+include/constants/trainer_hill.h:
+include/constants/trainer_slide.h:
+include/constants/trainer_tower.h:
+include/constants/trainers.h:
+include/constants/tv.h:
+include/constants/union_room.h:
+include/constants/vars.h:
+include/constants/vars_frlg.h:
+include/contest_effect.h:
+include/data.h:
+include/daycare.h:
+include/debug.h:
+include/decompress.h:
+include/difficulty.h:
+include/event_data.h:
+include/evolution_scene.h:
+include/field_screen_effect.h:
+include/fpmath.h:
+include/gametypes.h:
+include/gba/defines.h:
+include/gba/gba.h:
+include/gba/io_reg.h:
+include/gba/isagbprint.h:
+include/gba/macro.h:
+include/gba/multiboot.h:
+include/gba/syscall.h:
+include/gba/types.h:
+include/global.berry.h:
+include/global.fieldmap.h:
+include/global.h:
+include/global.tv.h:
+include/gpu_regs.h:
+include/graphics.h:
+include/international_string_util.h:
+include/item.h:
+include/librfu.h:
+include/link.h:
+include/link_rfu.h:
+include/list_menu.h:
+include/load_save.h:
+include/mail.h:
+include/main.h:
+include/malloc.h:
+include/menu.h:
+include/metaprogram.h:
+include/move.h:
+include/mystery_gift.h:
+include/mystery_gift_menu.h:
+include/overworld.h:
+include/palette.h:
+include/party_menu.h:
+include/pokeball.h:
+include/pokedex.h:
+include/pokemon.h:
+include/pokemon_icon.h:
+include/pokemon_storage_system.h:
+include/pokemon_summary_screen.h:
+include/random.h:
+include/save.h:
+include/script.h:
+include/siirtc.h:
+include/sound.h:
+include/sprite.h:
+include/string_util.h:
+include/strings.h:
+include/task.h:
+include/test_result.h:
+include/text.h:
+include/text_window.h:
+include/trade.h:
+include/trainer_card.h:
+include/trainer_slide.h:
+include/union_room.h:
+include/util.h:
+include/wild_encounter_ow.h:
+include/window.h:
+src/data/trade.h:
+ifndef build-pt2-d2/assets/graphics/trade/cable_end.png.4bpp
+build-pt2-d2/assets/graphics/trade/cable_end.png.4bpp := defined
+build-pt2-d2/assets/graphics/trade/cable_end.png.4bpp: graphics/trade/cable_end.png
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/crossing_highlight_wireless.bin.smolTM
+build-pt2-d2/assets/graphics/trade/crossing_highlight_wireless.bin.smolTM := defined
+build-pt2-d2/assets/graphics/trade/crossing_highlight_wireless.bin.smolTM: graphics/trade/crossing_highlight_wireless.bin
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/gba.pal.gbapal
+build-pt2-d2/assets/graphics/trade/gba.pal.gbapal := defined
+build-pt2-d2/assets/graphics/trade/gba.pal.gbapal: graphics/trade/gba.pal
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/gba_affine.png.8bpp
+build-pt2-d2/assets/graphics/trade/gba_affine.png.8bpp := defined
+build-pt2-d2/assets/graphics/trade/gba_affine.png.8bpp: graphics/trade/gba_affine.png
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/gba_screen.png.4bpp
+build-pt2-d2/assets/graphics/trade/gba_screen.png.4bpp := defined
+build-pt2-d2/assets/graphics/trade/gba_screen.png.4bpp: graphics/trade/gba_screen.png
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/link_mon.pal.gbapal
+build-pt2-d2/assets/graphics/trade/link_mon.pal.gbapal := defined
+build-pt2-d2/assets/graphics/trade/link_mon.pal.gbapal: graphics/trade/link_mon.pal
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/link_mon_glow.png.4bpp
+build-pt2-d2/assets/graphics/trade/link_mon_glow.png.4bpp := defined
+build-pt2-d2/assets/graphics/trade/link_mon_glow.png.4bpp: graphics/trade/link_mon_glow.png
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/link_mon_shadow.pal.gbapal
+build-pt2-d2/assets/graphics/trade/link_mon_shadow.pal.gbapal := defined
+build-pt2-d2/assets/graphics/trade/link_mon_shadow.pal.gbapal: graphics/trade/link_mon_shadow.pal
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/link_mon_shadow.png.4bpp
+build-pt2-d2/assets/graphics/trade/link_mon_shadow.png.4bpp := defined
+build-pt2-d2/assets/graphics/trade/link_mon_shadow.png.4bpp: graphics/trade/link_mon_shadow.png
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/pokeball.png.4bpp
+build-pt2-d2/assets/graphics/trade/pokeball.png.4bpp := defined
+build-pt2-d2/assets/graphics/trade/pokeball.png.4bpp: graphics/trade/pokeball.png
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/pokeball.png.gbapal
+build-pt2-d2/assets/graphics/trade/pokeball.png.gbapal := defined
+build-pt2-d2/assets/graphics/trade/pokeball.png.gbapal: graphics/trade/pokeball.png
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/pokeball_symbol.png.8bpp
+build-pt2-d2/assets/graphics/trade/pokeball_symbol.png.8bpp := defined
+build-pt2-d2/assets/graphics/trade/pokeball_symbol.png.8bpp: graphics/trade/pokeball_symbol.png
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/text.pal.gbapal
+build-pt2-d2/assets/graphics/trade/text.pal.gbapal := defined
+build-pt2-d2/assets/graphics/trade/text.pal.gbapal: graphics/trade/text.pal
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/unused1.pal.gbapal
+build-pt2-d2/assets/graphics/trade/unused1.pal.gbapal := defined
+build-pt2-d2/assets/graphics/trade/unused1.pal.gbapal: graphics/trade/unused1.pal
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/unused2.pal.gbapal
+build-pt2-d2/assets/graphics/trade/unused2.pal.gbapal := defined
+build-pt2-d2/assets/graphics/trade/unused2.pal.gbapal: graphics/trade/unused2.pal
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/wireless_signal.bin.smolTM
+build-pt2-d2/assets/graphics/trade/wireless_signal.bin.smolTM := defined
+build-pt2-d2/assets/graphics/trade/wireless_signal.bin.smolTM: graphics/trade/wireless_signal.bin
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/wireless_signal.png.4bpp
+build-pt2-d2/assets/graphics/trade/wireless_signal.png.4bpp := defined
+build-pt2-d2/assets/graphics/trade/wireless_signal.png.4bpp: graphics/trade/wireless_signal.png
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/wireless_signal_none.pal.gbapal
+build-pt2-d2/assets/graphics/trade/wireless_signal_none.pal.gbapal := defined
+build-pt2-d2/assets/graphics/trade/wireless_signal_none.pal.gbapal: graphics/trade/wireless_signal_none.pal
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/wireless_signal_receive.pal.gbapal
+build-pt2-d2/assets/graphics/trade/wireless_signal_receive.pal.gbapal := defined
+build-pt2-d2/assets/graphics/trade/wireless_signal_receive.pal.gbapal: graphics/trade/wireless_signal_receive.pal
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif
+ifndef build-pt2-d2/assets/graphics/trade/wireless_signal_send.pal.gbapal
+build-pt2-d2/assets/graphics/trade/wireless_signal_send.pal.gbapal := defined
+build-pt2-d2/assets/graphics/trade/wireless_signal_send.pal.gbapal: graphics/trade/wireless_signal_send.pal
+	@mkdir -p 'build-pt2-d2/assets/graphics/trade'
+	$(GFX) $< $@ 
+endif

@@ -224,6 +224,7 @@ OlivineCity_Gym_Text_GymGuidePreText:
 OlivineCity_Gym_EventScript_Jasmine::
 	lock
 	faceplayer
+	goto_if_set FLAG_SYS_GAME_CLEAR, OlivineCity_Gym_EventScript_ArenaRematch
 	goto_if_set FLAG_DEFEATED_OLIVINE_CITY_GYM, OlivineCity_Gym_EventScript_Jasmine_Defeated
 	msgbox OlivineCity_Gym_Text_JasmineSteelTypeIntro, MSGBOX_DEFAULT
 	goto_if_set FLAG_DEFEATED_CIANWOOD_GYM, OlivineCity_Gym_EventScript_CianwoodCheckMahog
@@ -343,3 +344,12 @@ OlivineCity_Gym_Text_GymStatueCertified:
 	.string "OLIVINE CITY Pokémon GYM\p"
 	.string "JASMINE'S CERTIFIED TRAINERS:\n"
 	.string "{PLAYER}$"
+
+OlivineCity_Gym_EventScript_ArenaRematch::
+	msgbox Arena_Text_RematchAsk, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Arena_EventScript_RematchDeclined
+	special ArenaSeries_BeginRematch
+	trainerbattle_no_intro TRAINER_JASMINE_1, OlivineCity_Gym_Text_JasmineBetterTrainer
+	msgbox Arena_Text_RematchWon
+	release
+	end

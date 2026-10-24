@@ -1,4 +1,5 @@
 #include "global.h"
+#include "arena_series.h"
 #include "main.h"
 #include "bike.h"
 #include "event_data.h"
@@ -1684,6 +1685,8 @@ bool8 PartyHasMonWithSurf(void)
             if (MonKnowsMove(&gParties[B_TRAINER_PLAYER][i], MOVE_SURF))
                 return TRUE;
         }
+        if (ArenaSeries_HmBadgeOk(MOVE_SURF) && ArenaSeries_FirstFieldMon() >= 0)
+            return TRUE;
     }
     return FALSE;
 }

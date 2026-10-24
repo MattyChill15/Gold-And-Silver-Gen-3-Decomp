@@ -1,4 +1,5 @@
 #include "global.h"
+#include "arena_series.h"
 #include "arena_chief_starters.h"
 #include "battle.h"
 #include "battle_anim.h"
@@ -1982,20 +1983,20 @@ u8 CreateNPCTrainerPartyFromTrainer(struct Pokemon *party, const struct Trainer 
             if (gSaveBlock1Ptr->tx_Random_Chaos) //tx_randomizer_and_challenges
                 {
                     species = GetSpeciesRandomSeeded(partyData[i].species, TX_RANDOM_T_TRAINER, 0);
-                    CreateMon(&party[i], species, GetScaledLevel(partyData[i].lvl), personalityValue, otId);
+                    CreateMon(&party[i], species, ArenaSeries_ScaleTrainerLevel(GetScaledLevel(partyData[i].lvl), trainer->trainerClass), personalityValue, otId);
                     //DebugPrintf("Random, chaotic trainers");
                 }
             else if (gSaveBlock1Ptr->tx_Random_Trainer) //tx_randomizer_and_challenges
                 {
                     species = GetSpeciesRandomSeeded(partyData[i].species, TX_RANDOM_T_TRAINER, 0);
-                    CreateMon(&party[i], species, GetScaledLevel(partyData[i].lvl), personalityValue, otId);
+                    CreateMon(&party[i], species, ArenaSeries_ScaleTrainerLevel(GetScaledLevel(partyData[i].lvl), trainer->trainerClass), personalityValue, otId);
                     //DebugPrintf("Random trainers");
                 }
             else
             {
                 //DebugPrintf("Trainers not randomized.");
                 //CreateMon(&party[i], partyData[monIndex].species, partyData[monIndex].lvl, personalityValue, otId);
-                CreateMon(&party[i], partyData[monIndex].species, GetScaledLevel(partyData[i].lvl), personalityValue, otId);
+                CreateMon(&party[i], partyData[monIndex].species, ArenaSeries_ScaleTrainerLevel(GetScaledLevel(partyData[i].lvl), trainer->trainerClass), personalityValue, otId);
             }
 
 
@@ -2147,6 +2148,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum)
         retVal = CreateNPCTrainerPartyFromTrainer(party, GetTrainerStructFromId(trainerNum), halfTeam, gBattleTypeFlags);
     }
     ArenaChief_RemapTrainerParty(party, retVal, GetTrainerClassFromId(trainerNum));
+    gArenaRematchPending = 0; // series: rematch boost applies to this one battle
     return retVal;
 }
 

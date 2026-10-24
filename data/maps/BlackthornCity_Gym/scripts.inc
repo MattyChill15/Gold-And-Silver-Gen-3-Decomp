@@ -200,6 +200,7 @@ BlackthornGym_EventScript_Lola::
 BlackthornGym_EventScript_Clair::
 	lock
 	faceplayer
+	goto_if_set FLAG_SYS_GAME_CLEAR, BlackthornCity_Gym_EventScript_ArenaRematch
 	goto_if_set FLAG_IS_CHAMPION, BlackthornGym_EventScript_ClairAfterLeague
 	goto_if_ge VAR_BLACKTHORN_CITY_STATE, 4, BlackthornGym_EventScript_Clair_Defeated
 	goto_if_eq VAR_BLACKTHORN_CITY_STATE, 2, BlackthornGym_EventScript_ClairDuringChallenge
@@ -425,3 +426,12 @@ BlackthornGym_Text_GymStatueCertified:
 	.string "BLACKTHORN CITY Pokémon GYM\p"
 	.string "CLAIR'S CERTIFIED TRAINERS:\n"
 	.string "{PLAYER}$"
+
+BlackthornCity_Gym_EventScript_ArenaRematch::
+	msgbox Arena_Text_RematchAsk, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Arena_EventScript_RematchDeclined
+	special ArenaSeries_BeginRematch
+	trainerbattle_no_intro TRAINER_CLAIR_1, BlackthornGym_Text_ClairWinText
+	msgbox Arena_Text_RematchWon
+	release
+	end

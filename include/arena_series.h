@@ -70,6 +70,7 @@ u8 ArenaSeries_PartyTargetLevel(void);
 u8 ArenaSeries_ScaleWildLevel(u8 level);
 u8 ArenaSeries_ScaleTrainerLevel(u8 level, u8 trainerClass);
 void ArenaSeries_BeginRematch(void);
+void ArenaSeries_EndPart(void);
 bool8 ArenaSeries_HmBadgeOk(u16 move);
 s8 ArenaSeries_FirstFieldMon(void);
 const u8 *ArenaSeries_ChapterCompleteText(void);

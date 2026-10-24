@@ -533,6 +533,7 @@ AzaleaTown_Gym_EventScript_May::
 AzaleaTown_Gym_EventScript_Bugsy::
 	lock
 	faceplayer
+	goto_if_set FLAG_SYS_GAME_CLEAR, AzaleaTown_Gym_EventScript_ArenaRematch
 	goto_if_set FLAG_DEFEATED_AZALEA_TOWN_GYM, AzaleaTown_Gym_EventScript_Bugsy_Defeated
 	msgbox AzaleaTown_Gym_Text_BugsyIntro, MSGBOX_DEFAULT
 	trainerbattle_no_intro TRAINER_BUGSY_1, AzaleaTown_Gym_Text_BugsyBeaten
@@ -821,3 +822,12 @@ AzaleaTown_Gym_Text_GymGuideWin:
 	.string "clash of talented young trainers.\p"
 	.string "With people like you, the\n"
 	.string "future of Pokémon is bright!$"
+
+AzaleaTown_Gym_EventScript_ArenaRematch::
+	msgbox Arena_Text_RematchAsk, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Arena_EventScript_RematchDeclined
+	special ArenaSeries_BeginRematch
+	trainerbattle_no_intro TRAINER_BUGSY_1, AzaleaTown_Gym_Text_BugsyBeaten
+	msgbox Arena_Text_RematchWon
+	release
+	end

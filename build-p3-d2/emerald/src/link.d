@@ -1,0 +1,191 @@
+build-p3-d2/emerald/src/link.o: build-p3-d2/assets/graphics/link/comm_error_bg.png.4bpp build-p3-d2/assets/graphics/link/test_digits.png.4bpp build-p3-d2/assets/graphics/link/test_digits.png.gbapal build-p3-d2/assets/graphics/link/wireless_display.bin.smolTM build-p3-d2/assets/graphics/link/wireless_display.png.4bpp.smol build-p3-d2/assets/graphics/link/wireless_display.png.gbapal include/AgbRfu_LinkManager.h include/assertf.h include/battle.h include/battle_bg.h include/battle_debug.h include/battle_dynamax.h include/battle_gfx_sfx_util.h include/battle_gimmick.h include/battle_main.h include/battle_message.h include/battle_script_commands.h include/battle_terastal.h include/battle_util.h include/battle_util2.h include/bg.h include/config/ai.h include/config/battle.h include/config/caps.h include/config/contest.h include/config/debug.h include/config/dexnav.h include/config/follower_npc.h include/config/general.h include/config/item.h include/config/map_preview_screen.h include/config/overworld.h include/config/pokemon.h include/config/pokerus.h include/config/save.h include/config/species_enabled.h include/config/summary_screen.h include/config/test.h include/config/text.h include/config/wild_encounter.h include/config_changes.h include/constants/abilities.h include/constants/apricorn_tree.h include/constants/arena_story_flags.h include/constants/battle.h include/constants/battle_end_turn.h include/constants/battle_factory.h include/constants/battle_frontier_trainers.h include/constants/battle_move_effects.h include/constants/battle_move_resolution.h include/constants/battle_partner.h include/constants/battle_script_commands.h include/constants/battle_stat_change.h include/constants/battle_string_ids.h include/constants/battle_switch_in.h include/constants/battle_z_move_effects.h include/constants/berries.h include/constants/berry.h include/constants/characters.h include/constants/config_changes.h include/constants/cries.h include/constants/difficulty.h include/constants/easy_chat.h include/constants/egg_ids.h include/constants/flags.h include/constants/form_change_types.h include/constants/game_stat.h include/constants/global.h include/constants/hold_effects.h include/constants/item.h include/constants/item_effects.h include/constants/items.h include/constants/map_groups.h include/constants/map_types.h include/constants/maps.h include/constants/moves.h include/constants/opponents.h include/constants/opponents_frlg.h include/constants/pokeball.h include/constants/pokedex.h include/constants/pokemon.h include/constants/region_map_sections.h include/constants/regions.h include/constants/rematches.h include/constants/rgb.h include/constants/siirtc.h include/constants/songs.h include/constants/sound.h include/constants/species.h include/constants/tms_hms.h include/constants/trade.h include/constants/trainer_hill.h include/constants/trainer_slide.h include/constants/trainer_tower.h include/constants/trainers.h include/constants/tv.h include/constants/vars.h include/constants/vars_frlg.h include/contest_effect.h include/data.h include/debug.h include/decompress.h include/difficulty.h include/event_data.h include/fpmath.h include/gametypes.h include/gba/defines.h include/gba/gba.h include/gba/io_reg.h include/gba/isagbprint.h include/gba/m4a_internal.h include/gba/macro.h include/gba/multiboot.h include/gba/syscall.h include/gba/types.h include/global.berry.h include/global.fieldmap.h include/global.h include/global.tv.h include/gpu_regs.h include/item.h include/item_menu.h include/librfu.h include/link.h include/link_rfu.h include/m4a.h include/main.h include/malloc.h include/menu.h include/menu_helpers.h include/metaprogram.h include/move.h include/overworld.h include/palette.h include/pokeball.h include/pokemon.h include/random.h include/reload_save.h include/save.h include/scanline_effect.h include/script.h include/siirtc.h include/sound.h include/sprite.h include/string_util.h include/strings.h include/task.h include/test_result.h include/text.h include/trade.h include/trainer_slide.h include/wild_encounter_ow.h include/window.h
+build-p3-d2/emerald/src/link.d: include/AgbRfu_LinkManager.h include/assertf.h include/battle.h include/battle_bg.h include/battle_debug.h include/battle_dynamax.h include/battle_gfx_sfx_util.h include/battle_gimmick.h include/battle_main.h include/battle_message.h include/battle_script_commands.h include/battle_terastal.h include/battle_util.h include/battle_util2.h include/bg.h include/config/ai.h include/config/battle.h include/config/caps.h include/config/contest.h include/config/debug.h include/config/dexnav.h include/config/follower_npc.h include/config/general.h include/config/item.h include/config/map_preview_screen.h include/config/overworld.h include/config/pokemon.h include/config/pokerus.h include/config/save.h include/config/species_enabled.h include/config/summary_screen.h include/config/test.h include/config/text.h include/config/wild_encounter.h include/config_changes.h include/constants/abilities.h include/constants/apricorn_tree.h include/constants/arena_story_flags.h include/constants/battle.h include/constants/battle_end_turn.h include/constants/battle_factory.h include/constants/battle_frontier_trainers.h include/constants/battle_move_effects.h include/constants/battle_move_resolution.h include/constants/battle_partner.h include/constants/battle_script_commands.h include/constants/battle_stat_change.h include/constants/battle_string_ids.h include/constants/battle_switch_in.h include/constants/battle_z_move_effects.h include/constants/berries.h include/constants/berry.h include/constants/characters.h include/constants/config_changes.h include/constants/cries.h include/constants/difficulty.h include/constants/easy_chat.h include/constants/egg_ids.h include/constants/flags.h include/constants/form_change_types.h include/constants/game_stat.h include/constants/global.h include/constants/hold_effects.h include/constants/item.h include/constants/item_effects.h include/constants/items.h include/constants/map_groups.h include/constants/map_types.h include/constants/maps.h include/constants/moves.h include/constants/opponents.h include/constants/opponents_frlg.h include/constants/pokeball.h include/constants/pokedex.h include/constants/pokemon.h include/constants/region_map_sections.h include/constants/regions.h include/constants/rematches.h include/constants/rgb.h include/constants/siirtc.h include/constants/songs.h include/constants/sound.h include/constants/species.h include/constants/tms_hms.h include/constants/trade.h include/constants/trainer_hill.h include/constants/trainer_slide.h include/constants/trainer_tower.h include/constants/trainers.h include/constants/tv.h include/constants/vars.h include/constants/vars_frlg.h include/contest_effect.h include/data.h include/debug.h include/decompress.h include/difficulty.h include/event_data.h include/fpmath.h include/gametypes.h include/gba/defines.h include/gba/gba.h include/gba/io_reg.h include/gba/isagbprint.h include/gba/m4a_internal.h include/gba/macro.h include/gba/multiboot.h include/gba/syscall.h include/gba/types.h include/global.berry.h include/global.fieldmap.h include/global.h include/global.tv.h include/gpu_regs.h include/item.h include/item_menu.h include/librfu.h include/link.h include/link_rfu.h include/m4a.h include/main.h include/malloc.h include/menu.h include/menu_helpers.h include/metaprogram.h include/move.h include/overworld.h include/palette.h include/pokeball.h include/pokemon.h include/random.h include/reload_save.h include/save.h include/scanline_effect.h include/script.h include/siirtc.h include/sound.h include/sprite.h include/string_util.h include/strings.h include/task.h include/test_result.h include/text.h include/trade.h include/trainer_slide.h include/wild_encounter_ow.h include/window.h
+build-p3-d2/assets/graphics/link/comm_error_bg.png.4bpp:
+build-p3-d2/assets/graphics/link/test_digits.png.4bpp:
+build-p3-d2/assets/graphics/link/test_digits.png.gbapal:
+build-p3-d2/assets/graphics/link/wireless_display.bin.smolTM:
+build-p3-d2/assets/graphics/link/wireless_display.png.4bpp.smol:
+build-p3-d2/assets/graphics/link/wireless_display.png.gbapal:
+include/AgbRfu_LinkManager.h:
+include/assertf.h:
+include/battle.h:
+include/battle_bg.h:
+include/battle_debug.h:
+include/battle_dynamax.h:
+include/battle_gfx_sfx_util.h:
+include/battle_gimmick.h:
+include/battle_main.h:
+include/battle_message.h:
+include/battle_script_commands.h:
+include/battle_terastal.h:
+include/battle_util.h:
+include/battle_util2.h:
+include/bg.h:
+include/config/ai.h:
+include/config/battle.h:
+include/config/caps.h:
+include/config/contest.h:
+include/config/debug.h:
+include/config/dexnav.h:
+include/config/follower_npc.h:
+include/config/general.h:
+include/config/item.h:
+include/config/map_preview_screen.h:
+include/config/overworld.h:
+include/config/pokemon.h:
+include/config/pokerus.h:
+include/config/save.h:
+include/config/species_enabled.h:
+include/config/summary_screen.h:
+include/config/test.h:
+include/config/text.h:
+include/config/wild_encounter.h:
+include/config_changes.h:
+include/constants/abilities.h:
+include/constants/apricorn_tree.h:
+include/constants/arena_story_flags.h:
+include/constants/battle.h:
+include/constants/battle_end_turn.h:
+include/constants/battle_factory.h:
+include/constants/battle_frontier_trainers.h:
+include/constants/battle_move_effects.h:
+include/constants/battle_move_resolution.h:
+include/constants/battle_partner.h:
+include/constants/battle_script_commands.h:
+include/constants/battle_stat_change.h:
+include/constants/battle_string_ids.h:
+include/constants/battle_switch_in.h:
+include/constants/battle_z_move_effects.h:
+include/constants/berries.h:
+include/constants/berry.h:
+include/constants/characters.h:
+include/constants/config_changes.h:
+include/constants/cries.h:
+include/constants/difficulty.h:
+include/constants/easy_chat.h:
+include/constants/egg_ids.h:
+include/constants/flags.h:
+include/constants/form_change_types.h:
+include/constants/game_stat.h:
+include/constants/global.h:
+include/constants/hold_effects.h:
+include/constants/item.h:
+include/constants/item_effects.h:
+include/constants/items.h:
+include/constants/map_groups.h:
+include/constants/map_types.h:
+include/constants/maps.h:
+include/constants/moves.h:
+include/constants/opponents.h:
+include/constants/opponents_frlg.h:
+include/constants/pokeball.h:
+include/constants/pokedex.h:
+include/constants/pokemon.h:
+include/constants/region_map_sections.h:
+include/constants/regions.h:
+include/constants/rematches.h:
+include/constants/rgb.h:
+include/constants/siirtc.h:
+include/constants/songs.h:
+include/constants/sound.h:
+include/constants/species.h:
+include/constants/tms_hms.h:
+include/constants/trade.h:
+include/constants/trainer_hill.h:
+include/constants/trainer_slide.h:
+include/constants/trainer_tower.h:
+include/constants/trainers.h:
+include/constants/tv.h:
+include/constants/vars.h:
+include/constants/vars_frlg.h:
+include/contest_effect.h:
+include/data.h:
+include/debug.h:
+include/decompress.h:
+include/difficulty.h:
+include/event_data.h:
+include/fpmath.h:
+include/gametypes.h:
+include/gba/defines.h:
+include/gba/gba.h:
+include/gba/io_reg.h:
+include/gba/isagbprint.h:
+include/gba/m4a_internal.h:
+include/gba/macro.h:
+include/gba/multiboot.h:
+include/gba/syscall.h:
+include/gba/types.h:
+include/global.berry.h:
+include/global.fieldmap.h:
+include/global.h:
+include/global.tv.h:
+include/gpu_regs.h:
+include/item.h:
+include/item_menu.h:
+include/librfu.h:
+include/link.h:
+include/link_rfu.h:
+include/m4a.h:
+include/main.h:
+include/malloc.h:
+include/menu.h:
+include/menu_helpers.h:
+include/metaprogram.h:
+include/move.h:
+include/overworld.h:
+include/palette.h:
+include/pokeball.h:
+include/pokemon.h:
+include/random.h:
+include/reload_save.h:
+include/save.h:
+include/scanline_effect.h:
+include/script.h:
+include/siirtc.h:
+include/sound.h:
+include/sprite.h:
+include/string_util.h:
+include/strings.h:
+include/task.h:
+include/test_result.h:
+include/text.h:
+include/trade.h:
+include/trainer_slide.h:
+include/wild_encounter_ow.h:
+include/window.h:
+ifndef build-p3-d2/assets/graphics/link/comm_error_bg.png.4bpp
+build-p3-d2/assets/graphics/link/comm_error_bg.png.4bpp := defined
+build-p3-d2/assets/graphics/link/comm_error_bg.png.4bpp: graphics/link/comm_error_bg.png
+	@mkdir -p 'build-p3-d2/assets/graphics/link'
+	$(GFX) $< $@ 
+endif
+ifndef build-p3-d2/assets/graphics/link/test_digits.png.4bpp
+build-p3-d2/assets/graphics/link/test_digits.png.4bpp := defined
+build-p3-d2/assets/graphics/link/test_digits.png.4bpp: graphics/link/test_digits.png
+	@mkdir -p 'build-p3-d2/assets/graphics/link'
+	$(GFX) $< $@ 
+endif
+ifndef build-p3-d2/assets/graphics/link/test_digits.png.gbapal
+build-p3-d2/assets/graphics/link/test_digits.png.gbapal := defined
+build-p3-d2/assets/graphics/link/test_digits.png.gbapal: graphics/link/test_digits.png
+	@mkdir -p 'build-p3-d2/assets/graphics/link'
+	$(GFX) $< $@ 
+endif
+ifndef build-p3-d2/assets/graphics/link/wireless_display.bin.smolTM
+build-p3-d2/assets/graphics/link/wireless_display.bin.smolTM := defined
+build-p3-d2/assets/graphics/link/wireless_display.bin.smolTM: graphics/link/wireless_display.bin
+	@mkdir -p 'build-p3-d2/assets/graphics/link'
+	$(SMOLTM) $< $@ 
+endif
+ifndef build-p3-d2/assets/graphics/link/wireless_display.png.4bpp
+build-p3-d2/assets/graphics/link/wireless_display.png.4bpp := defined
+build-p3-d2/assets/graphics/link/wireless_display.png.4bpp: graphics/link/wireless_display.png
+	@mkdir -p 'build-p3-d2/assets/graphics/link'
+	$(GFX) $< $@ 
+endif
+ifndef build-p3-d2/assets/graphics/link/wireless_display.png.gbapal
+build-p3-d2/assets/graphics/link/wireless_display.png.gbapal := defined
+build-p3-d2/assets/graphics/link/wireless_display.png.gbapal: graphics/link/wireless_display.png
+	@mkdir -p 'build-p3-d2/assets/graphics/link'
+	$(GFX) $< $@ 
+endif

@@ -1,6 +1,7 @@
 // Arena series save hub (see docs/SERIES_SAVE.md). Shared verbatim between
 // the FireRed (chapter 1) and Emerald (chapter 3) trees.
 #include "global.h"
+#include "field_move.h"
 #include "rtc.h"
 #include "fieldmap.h"
 #include "arena_series.h"
@@ -499,6 +500,30 @@ u8 ArenaSeries_ScaleTrainerLevel(u8 level, u8 trainerClass)
     return CapLevel(lv);
 }
 
+#ifdef ARENA_JOHTO
+// End-of-part handoff. VAR_0x8005 = the part whose ending this is (1 Morty,
+// 2 Lance/HoF, 3 Red). In the matching ROM: marks the part complete, writes
+// the series record now, and returns the storyline in VAR_RESULT; otherwise
+// VAR_RESULT = 0xFF so the script skips the handoff.
+void ArenaSeries_EndPart(void)
+{
+    if (gSpecialVar_0x8005 != MATT_PART)
+    {
+        gSpecialVar_Result = 0xFF;
+        return;
+    }
+#if MATT_PART == 1
+    FlagSet(FLAG_MATT_PART1_COMPLETE);
+#elif MATT_PART == 2
+    FlagSet(FLAG_MATT_PART2_COMPLETE);
+#else
+    FlagSet(FLAG_DEFEATED_RED);
+#endif
+    ArenaSeries_WriteChapterComplete();
+    gSpecialVar_Result = ArenaStory_Get();
+}
+#endif
+
 void ArenaSeries_BeginRematch(void)
 {
     gArenaRematchPending = 1;
@@ -530,7 +555,20 @@ bool8 ArenaSeries_HmBadgeOk(u16 move)
 #endif
     default: return FALSE;
     }
+#ifdef ARENA_JOHTO
+    {
+        static const u8 sHms[] = {FIELD_MOVE_CUT, FIELD_MOVE_FLASH, FIELD_MOVE_ROCK_SMASH, FIELD_MOVE_STRENGTH,
+                                  FIELD_MOVE_SURF, FIELD_MOVE_FLY, FIELD_MOVE_DIVE, FIELD_MOVE_WATERFALL};
+        u32 k;
+        (void)badge;
+        for (k = 0; k < ARRAY_COUNT(sHms); k++)
+            if (FieldMove_GetMoveId(sHms[k]) == move)
+                return IsFieldMoveUnlocked(sHms[k]); // Johto badge order (field_move.c)
+        return FALSE;
+    }
+#else
     return FlagGet(FLAG_BADGE01_GET + badge - 1);
+#endif
 }
 
 s8 ArenaSeries_FirstFieldMon(void)

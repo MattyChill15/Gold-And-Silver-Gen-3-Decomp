@@ -33,6 +33,7 @@ CianwoodGym_EventScript_Chuck::
 	faceplayer
 	goto_if_unset FLAG_HIDE_DOJO_CHUCK, CianwoodGym_EventScript_ChuckAtDojo
 	goto_if_set FLAG_VISITED_VERMILION_CITY, CianwoodGym_EventScript_ChuckGotoDojo
+	goto_if_set FLAG_SYS_GAME_CLEAR, CianwoodGym_EventScript_ArenaRematch
 	goto_if_set FLAG_DEFEATED_CIANWOOD_GYM, CianwoodGym_EventScript_Chuck_Defeated
 	msgbox CianwoodGym_Text_ChuckIntro1, MSGBOX_DEFAULT
 	applymovement LOCALID_CIANWOOD_CHUCK, CianwoodGym_Movement_ChuckLeft
@@ -254,3 +255,12 @@ CianwoodGym_Text_BlackbeltLungAfter:
 	.string "My Pokémon lost…\n"
 	.string "My… my pride is shattered…$"
 
+
+CianwoodGym_EventScript_ArenaRematch::
+	msgbox Arena_Text_RematchAsk, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, NO, Arena_EventScript_RematchDeclined
+	special ArenaSeries_BeginRematch
+	trainerbattle_no_intro TRAINER_CHUCK_1, CianwoodGym_Text_ChuckIntro2
+	msgbox Arena_Text_RematchWon
+	release
+	end
