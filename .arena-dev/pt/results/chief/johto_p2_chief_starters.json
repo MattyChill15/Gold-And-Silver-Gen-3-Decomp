@@ -1,0 +1,80 @@
+[
+ {
+  "part": 2,
+  "story": "classic",
+  "ball": "Chikorita",
+  "field": true,
+  "player_starter": "CHIKORITA",
+  "level": 5,
+  "VAR_STARTER_MON": 0,
+  "rival_trainer": "TRAINER_RIVAL_CYNDAQUIL_1",
+  "rival_lead": "CYNDAQUIL",
+  "confirm_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/j2_classic_Chikorita_confirm.png",
+  "rival_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/j2_classic_Chikorita_rival.png"
+ },
+ {
+  "part": 2,
+  "story": "classic",
+  "ball": "Cyndaquil",
+  "field": true,
+  "player_starter": "CYNDAQUIL",
+  "level": 5,
+  "VAR_STARTER_MON": 1,
+  "rival_trainer": "TRAINER_RIVAL_TOTODILE_1",
+  "rival_lead": "TOTODILE",
+  "confirm_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/j2_classic_Cyndaquil_confirm.png",
+  "rival_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/j2_classic_Cyndaquil_rival.png"
+ },
+ {
+  "part": 2,
+  "story": "classic",
+  "ball": "Totodile",
+  "field": true,
+  "player_starter": "TOTODILE",
+  "level": 5,
+  "VAR_STARTER_MON": 7,
+  "rival_trainer": null,
+  "rival_lead": null,
+  "confirm_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/j2_classic_Totodile_confirm.png",
+  "rival_png": "None"
+ },
+ {
+  "part": 2,
+  "story": "chief",
+  "ball": "Chikorita",
+  "field": true,
+  "player_starter": "SNEASEL",
+  "level": 5,
+  "VAR_STARTER_MON": 0,
+  "rival_trainer": "TRAINER_RIVAL_CYNDAQUIL_1",
+  "rival_lead": "HOUNDOUR",
+  "confirm_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/j2_chief_Chikorita_confirm.png",
+  "rival_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/j2_chief_Chikorita_rival.png"
+ },
+ {
+  "part": 2,
+  "story": "chief",
+  "ball": "Cyndaquil",
+  "field": true,
+  "player_starter": "HOUNDOUR",
+  "level": 5,
+  "VAR_STARTER_MON": 1,
+  "rival_trainer": "TRAINER_RIVAL_TOTODILE_1",
+  "rival_lead": "DRATINI",
+  "confirm_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/j2_chief_Cyndaquil_confirm.png",
+  "rival_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/j2_chief_Cyndaquil_rival.png"
+ },
+ {
+  "part": 2,
+  "story": "chief",
+  "ball": "Totodile",
+  "field": true,
+  "player_starter": "DRATINI",
+  "level": 5,
+  "VAR_STARTER_MON": 2,
+  "rival_trainer": "TRAINER_RIVAL_CHIKORITA_1",
+  "rival_lead": "SNEASEL",
+  "confirm_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/j2_chief_Totodile_confirm.png",
+  "rival_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/j2_chief_Totodile_rival.png"
+ }
+]

@@ -880,7 +880,7 @@ static void ArenaPlaytest_Run(void)
         m->result[2] = gSaveFileStatus;
         m->result[3] = gArenaSeriesRejectedSave;
         break;
-#ifdef FIRERED
+#if defined(FIRERED) || defined(ARENA_JOHTO)
     case 21: // run event script at address a | b << 16; result[0] = flag c
         ScriptContext_SetupScript((const u8 *)(m->a | ((u32)m->b << 16)));
         m->result[0] = FlagGet(m->c);

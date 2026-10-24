@@ -1,4 +1,5 @@
 #include "global.h"
+#include "arena_chief_starters.h"
 #include "battle.h"
 #include "battle_anim.h"
 #include "battle_ai_main.h"
@@ -2145,6 +2146,7 @@ static u8 CreateNPCTrainerParty(struct Pokemon *party, u16 trainerNum)
     {
         retVal = CreateNPCTrainerPartyFromTrainer(party, GetTrainerStructFromId(trainerNum), halfTeam, gBattleTypeFlags);
     }
+    ArenaChief_RemapTrainerParty(party, retVal, GetTrainerClassFromId(trainerNum));
     return retVal;
 }
 

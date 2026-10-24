@@ -1,0 +1,62 @@
+[
+ {
+  "part": 1,
+  "story": "classic",
+  "slot": 0,
+  "player_starter": "VIBRAVA",
+  "rival_trainer": "TRAINER_MAY_ROUTE_103_TREECKO",
+  "rival_lead": "TORCHIC",
+  "screen_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/e1_classic_slot0_screen.png",
+  "rival_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/e1_classic_slot0_rival.png"
+ },
+ {
+  "part": 1,
+  "story": "classic",
+  "slot": 1,
+  "player_starter": "MUDKIP",
+  "rival_trainer": "TRAINER_MAY_ROUTE_103_TORCHIC",
+  "rival_lead": "MUDKIP",
+  "screen_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/e1_classic_slot1_screen.png",
+  "rival_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/e1_classic_slot1_rival.png"
+ },
+ {
+  "part": 1,
+  "story": "classic",
+  "slot": 2,
+  "player_starter": "ABRA",
+  "rival_trainer": "TRAINER_MAY_ROUTE_103_MUDKIP",
+  "rival_lead": "TREECKO",
+  "screen_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/e1_classic_slot2_screen.png",
+  "rival_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/e1_classic_slot2_rival.png"
+ },
+ {
+  "part": 1,
+  "story": "chief",
+  "slot": 0,
+  "player_starter": "BAGON",
+  "rival_trainer": "TRAINER_MAY_ROUTE_103_TREECKO",
+  "rival_lead": "POOCHYENA",
+  "screen_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/e1_chief_slot0_screen.png",
+  "rival_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/e1_chief_slot0_rival.png"
+ },
+ {
+  "part": 1,
+  "story": "chief",
+  "slot": 1,
+  "player_starter": "CARVANHA",
+  "rival_trainer": "TRAINER_MAY_ROUTE_103_TORCHIC",
+  "rival_lead": "BAGON",
+  "screen_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/e1_chief_slot1_screen.png",
+  "rival_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/e1_chief_slot1_rival.png"
+ },
+ {
+  "part": 1,
+  "story": "chief",
+  "slot": 2,
+  "player_starter": "POOCHYENA",
+  "rival_trainer": "TRAINER_MAY_ROUTE_103_MUDKIP",
+  "rival_lead": "CARVANHA",
+  "screen_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/e1_chief_slot2_screen.png",
+  "rival_png": "/workspace/johto/ws/.arena-dev/pt/results/chief/e1_chief_slot2_rival.png"
+ }
+]

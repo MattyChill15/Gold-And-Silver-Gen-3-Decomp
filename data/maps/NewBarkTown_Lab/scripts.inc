@@ -170,6 +170,8 @@ NewBarkTown_Lab_EventScript_ChikoritaBall::
 
 NewBarkTown_Lab_EventScript_ChikoritaBall_Choice::
 	setvar PLAYER_STARTER_SPECIES, SPECIES_CHIKORITA
+	callnative ArenaChief_StarterVars
+	goto_if_eq VAR_RESULT, TRUE, NewBarkTown_Lab_EventScript_ChiefChoice0
 	showmonpic PLAYER_STARTER_SPECIES, 10, 3
 	playmoncry PLAYER_STARTER_SPECIES, CRY_MODE_NORMAL
 	msgbox NewBarkTown_Lab_Text_ChooseChikorita, MSGBOX_YESNO
@@ -189,6 +191,8 @@ NewBarkTown_Lab_EventScript_CyndaquilBall::
 
 NewBarkTown_Lab_EventScript_CyndaquilBall_Choice::
 	setvar PLAYER_STARTER_SPECIES, SPECIES_CYNDAQUIL
+	callnative ArenaChief_StarterVars
+	goto_if_eq VAR_RESULT, TRUE, NewBarkTown_Lab_EventScript_ChiefChoice1
 	showmonpic PLAYER_STARTER_SPECIES, 10, 3
 	playmoncry PLAYER_STARTER_SPECIES, CRY_MODE_NORMAL
 	msgbox NewBarkTown_Lab_Text_ChooseCyndaquil, MSGBOX_YESNO
@@ -208,6 +212,8 @@ NewBarkTown_Lab_EventScript_TotodileBall::
 
 NewBarkTown_Lab_EventScript_TotodileBall_Choice::
 	setvar PLAYER_STARTER_SPECIES, SPECIES_TOTODILE
+	callnative ArenaChief_StarterVars
+	goto_if_eq VAR_RESULT, TRUE, NewBarkTown_Lab_EventScript_ChiefChoice2
 	showmonpic PLAYER_STARTER_SPECIES, 10, 3
 	playmoncry PLAYER_STARTER_SPECIES, CRY_MODE_NORMAL
 	msgbox NewBarkTown_Lab_Text_ChooseTotodile, MSGBOX_YESNO
@@ -988,3 +994,29 @@ NewBarkTown_Lab_Text_Elm_CallMe:
 	.string "How's your POKéDEX coming along?\n"
 	.string "I'm busy now, but call me sometime\l"
 	.string "and I can check your progress!$"
+
+@ Matt: Chief Story starters (Houndour / Sneasel / Dratini). Classic/Show untouched.
+NewBarkTown_Lab_EventScript_ChiefChoice0::
+	setvar VAR_STARTER_MON, 0
+	goto NewBarkTown_Lab_EventScript_ChiefConfirm
+
+NewBarkTown_Lab_EventScript_ChiefChoice1::
+	setvar VAR_STARTER_MON, 1
+	goto NewBarkTown_Lab_EventScript_ChiefConfirm
+
+NewBarkTown_Lab_EventScript_ChiefChoice2::
+	setvar VAR_STARTER_MON, 2
+	goto NewBarkTown_Lab_EventScript_ChiefConfirm
+
+NewBarkTown_Lab_EventScript_ChiefConfirm::
+	showmonpic PLAYER_STARTER_SPECIES, 10, 3
+	playmoncry PLAYER_STARTER_SPECIES, CRY_MODE_NORMAL
+	bufferspeciesname STR_VAR_1, PLAYER_STARTER_SPECIES
+	msgbox NewBarkTown_Lab_Text_ChooseChief, MSGBOX_YESNO
+	goto_if_eq VAR_RESULT, YES, NewBarkTown_Lab_EventScript_ChoseStarter
+	goto_if_eq VAR_RESULT, NO, NewBarkTown_Lab_EventScript_DeclinedStarter
+	end
+
+NewBarkTown_Lab_Text_ChooseChief::
+	.string "ELM: So, you'll take\n"
+	.string "{STR_VAR_1}?$"
