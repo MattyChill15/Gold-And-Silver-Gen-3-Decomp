@@ -2375,10 +2375,10 @@ bool8 ScrCmd_checkfieldmove(struct ScriptContext *ctx)
             break;
         }
     }
-    // Series QoL: the badge alone allows field HMs (first healthy mon acts).
-    if (gSpecialVar_Result == PARTY_SIZE && ArenaSeries_HmBadgeOk(move) && ArenaSeries_FirstFieldMon() >= 0)
+    // L050: no HM needed when a party mon can learn it (stock gate); that mon acts.
+    if (gSpecialVar_Result == PARTY_SIZE && ArenaSeries_FirstFieldCapableMon(move) >= 0)
     {
-        gSpecialVar_Result = ArenaSeries_FirstFieldMon();
+        gSpecialVar_Result = ArenaSeries_FirstFieldCapableMon(move);
         gSpecialVar_0x8004 = GetMonData(&gParties[B_TRAINER_PLAYER][gSpecialVar_Result], MON_DATA_SPECIES);
     }
 

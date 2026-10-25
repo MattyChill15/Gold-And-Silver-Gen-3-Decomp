@@ -220,3 +220,113 @@ void ArenaStory_CharizardFromLiza(void)
                 return;
             }
 }
+
+// SJ9A (Ring Masters): first party VAR_0x8004 species goes to the PC. Never the
+// last mon. VAR_RESULT = TRUE only if a mon was really sent; its personality is
+// kept in VAR_0x8005/0x8006 so SpeciesFromPC returns that exact mon (SJ9A-D1).
+void ArenaStory_SpeciesToPC(void)
+{
+    u32 i, pid;
+    gSpecialVar_Result = FALSE;
+    gSpecialVar_0x8005 = gSpecialVar_0x8006 = 0;
+    if (CalculatePlayerPartyCount() < 2)
+        return;
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG) == gSpecialVar_0x8004)
+        {
+            pid = GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY);
+            if (CopyMonToPC(&gPlayerParty[i]) != MON_CANT_GIVE)
+            {
+                ZeroMonData(&gPlayerParty[i]);
+                CompactPartySlots();
+                gSpecialVar_0x8005 = pid & 0xFFFF;
+                gSpecialVar_0x8006 = pid >> 16;
+                gSpecialVar_Result = TRUE;
+            }
+            return;
+        }
+    }
+}
+
+// SJ9A: the exact mon SpeciesToPC sent (species VAR_0x8004 + personality
+// VAR_0x8005/6) rejoins the party. No-op if nothing was sent or party is full.
+void ArenaStory_SpeciesFromPC(void)
+{
+    s32 b, p;
+    u32 n = CalculatePlayerPartyCount();
+    u32 pid = gSpecialVar_0x8005 | ((u32)gSpecialVar_0x8006 << 16);
+    if (n >= PARTY_SIZE || (gSpecialVar_0x8005 == 0 && gSpecialVar_0x8006 == 0))
+        return;
+    for (b = 0; b < TOTAL_BOXES_COUNT; b++)
+        for (p = 0; p < IN_BOX_COUNT; p++)
+            if (GetBoxMonDataAt(b, p, MON_DATA_SPECIES_OR_EGG) == gSpecialVar_0x8004
+             && GetBoxMonDataAt(b, p, MON_DATA_PERSONALITY) == pid)
+            {
+                BoxMonToMon(GetBoxedMonPtr(b, p), &gPlayerParty[n]);
+                ZeroBoxMonAt(b, p);
+                CalculatePlayerPartyCount();
+                return;
+            }
+}
+
+// SJ9A (Matt: "Fix — actually add/remove Snorlax"). Runs only after
+// SpeciesToPC really sent Noctowl, so the party always has a free slot.
+// Withdraws the first stored Snorlax from the PC (Oak's PC semantics); if the
+// PC has none, creates the episode Snorlax (Lv30, player OT) as the stand-in.
+// Its personality goes in VAR_0x8007/0x8008; VAR_0x8009 = 1 withdrawn / 2 created.
+void ArenaStory_SJ9A_SnorlaxIn(void)
+{
+    s32 b, p;
+    u32 n = CalculatePlayerPartyCount(), pid;
+    gSpecialVar_0x8007 = gSpecialVar_0x8008 = gSpecialVar_0x8009 = 0;
+    if (n >= PARTY_SIZE)
+        return;
+    for (b = 0; b < TOTAL_BOXES_COUNT; b++)
+        for (p = 0; p < IN_BOX_COUNT; p++)
+            if (GetBoxMonDataAt(b, p, MON_DATA_SPECIES_OR_EGG) == SPECIES_SNORLAX)
+            {
+                BoxMonToMon(GetBoxedMonPtr(b, p), &gPlayerParty[n]);
+                ZeroBoxMonAt(b, p);
+                gSpecialVar_0x8009 = 1;
+                goto done;
+            }
+    CreateMonLegacy(&gPlayerParty[n], SPECIES_SNORLAX, 30, USE_RANDOM_IVS, FALSE, 0, OT_ID_PLAYER_ID, 0);
+    gSpecialVar_0x8009 = 2;
+done:
+    pid = GetMonData(&gPlayerParty[n], MON_DATA_PERSONALITY);
+    gSpecialVar_0x8007 = pid & 0xFFFF;
+    gSpecialVar_0x8008 = pid >> 16;
+    CalculatePlayerPartyCount();
+}
+
+// SJ9A end of beat: atomic swap — that exact Snorlax goes into the box slot
+// Noctowl occupied, and that exact Noctowl (VAR_0x8005/6) takes Snorlax's party
+// slot. No capacity needed on either side, so a full party / full PC can't fail.
+void ArenaStory_SJ9A_SnorlaxOut(void)
+{
+    s32 b, p, i;
+    u32 npid = gSpecialVar_0x8005 | ((u32)gSpecialVar_0x8006 << 16);
+    u32 spid = gSpecialVar_0x8007 | ((u32)gSpecialVar_0x8008 << 16);
+    struct BoxPokemon snor;
+    if (gSpecialVar_0x8009 == 0)
+        return;
+    for (i = 0; i < PARTY_SIZE; i++)
+        if (GetMonData(&gPlayerParty[i], MON_DATA_SPECIES_OR_EGG) == SPECIES_SNORLAX
+         && GetMonData(&gPlayerParty[i], MON_DATA_PERSONALITY) == spid)
+            break;
+    if (i == PARTY_SIZE)
+        return;
+    for (b = 0; b < TOTAL_BOXES_COUNT; b++)
+        for (p = 0; p < IN_BOX_COUNT; p++)
+            if (GetBoxMonDataAt(b, p, MON_DATA_SPECIES_OR_EGG) == SPECIES_NOCTOWL
+             && GetBoxMonDataAt(b, p, MON_DATA_PERSONALITY) == npid)
+            {
+                snor = gPlayerParty[i].box;
+                BoxMonToMon(GetBoxedMonPtr(b, p), &gPlayerParty[i]);
+                SetBoxMonAt(b, p, &snor);
+                gSpecialVar_0x8009 = 0;
+                CalculatePlayerPartyCount();
+                return;
+            }
+}

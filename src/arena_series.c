@@ -5,6 +5,7 @@
 #include "rtc.h"
 #include "fieldmap.h"
 #include "arena_series.h"
+#include "party_menu.h"
 #include "save.h"
 #include "load_save.h"
 #ifdef FIRERED
@@ -584,6 +585,29 @@ s8 ArenaSeries_FirstFieldMon(void)
     return -1;
 }
 
+// L050 (Matt: "No-HM field moves: all games, all HM moves"): a field HM works
+// when a party mon knows OR can learn it (teachable/TM-HM learnset), stock Johto gate kept.
+bool8 ArenaSeries_MonFieldCapable(struct Pokemon *mon, u16 move)
+{
+    enum Species sp = GetMonData(mon, MON_DATA_SPECIES);
+    if (!sp || GetMonData(mon, MON_DATA_IS_EGG) || !ArenaSeries_HmBadgeOk(move))
+        return FALSE;
+    return MonKnowsMove(mon, move) || CanLearnTeachableMove(sp, move);
+}
+
+s8 ArenaSeries_FirstFieldCapableMon(u16 move)
+{
+    s8 i;
+    for (i = 0; i < PARTY_SIZE; i++)
+    {
+        if (!GetMonData(&gParties[B_TRAINER_PLAYER][i], MON_DATA_SPECIES))
+            break;
+        if (ArenaSeries_MonFieldCapable(&gParties[B_TRAINER_PLAYER][i], move))
+            return i;
+    }
+    return -1;
+}
+
 // ---- Emerald: import an earlier chapter -------------------------------
 #ifndef FIRERED
 static u16 SectorChecksum(const void *data, u16 size)
@@ -895,7 +919,7 @@ static void ArenaPlaytest_Run(void)
 #ifdef FIRERED
     case 10: // HM badge check for move a; result[1] = slot checkpartymove would use
         m->result[0] = ArenaSeries_HmBadgeOk(m->a);
-        m->result[1] = ArenaSeries_FirstFieldMon();
+        m->result[1] = ArenaSeries_FirstFieldCapableMon(m->a); // L050
         m->result[2] = PartyHasMonWithSurf();
         break;
     case 11: // bag quantity check: item a, qty b

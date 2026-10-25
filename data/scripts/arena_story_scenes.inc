@@ -13,25 +13,30 @@ ArenaStory_SJ7_Pre::
 	goto_if_ne VAR_RESULT, ARENA_STORYLINE_SHOW, ArenaStory_SJ7_Ret
 	goto_if_set FLAG_ARENA_SHOW_SJ7_LOSS, ArenaStory_SJ7_Rematch
 	msgbox ArenaStory_SJ7_T0, MSGBOX_DEFAULT
+	msgbox ArenaStory_SJ7_T1, MSGBOX_DEFAULT
+	msgbox ArenaStory_SJ7_T2, MSGBOX_DEFAULT
+	@ SJ7-D1 (Matt: "Force real unwinnable battle"; Gaps CLEAR e9266c3e):
+	@ battle 1 = real Whitney. FORCE_LOSS = Miltank endure 1 HP + LOST outcome;
+	@ NO_WHITEOUT returns to gym and continues script.
 	cleartrainerflag TRAINER_WHITNEY_1
 	setflag FLAG_ARENA_NO_WHITEOUT
+	setflag FLAG_ARENA_FORCE_LOSS
 	trainerbattle_no_intro TRAINER_WHITNEY_1, ArenaStory_Text_Lose
+	clearflag FLAG_ARENA_FORCE_LOSS
 	clearflag FLAG_ARENA_NO_WHITEOUT
 	special HealPlayerParty
 	cleartrainerflag TRAINER_WHITNEY_1
-	msgbox ArenaStory_SJ7_T1, MSGBOX_DEFAULT
-	msgbox ArenaStory_SJ7_T2, MSGBOX_DEFAULT
+	msgbox ArenaStory_SJ7_T3, MSGBOX_DEFAULT
 	setflag FLAG_ARENA_SHOW_SJ7_LOSS
 	release
 	end
 ArenaStory_SJ7_Rematch::
-	msgbox ArenaStory_SJ7_T3, MSGBOX_DEFAULT
+	msgbox ArenaStory_SJ7_T4, MSGBOX_DEFAULT
 ArenaStory_SJ7_Ret::
 	return
 ArenaStory_SJ7_PostWin::
 	callnative ArenaStory_GetStoryline
 	goto_if_ne VAR_RESULT, ARENA_STORYLINE_SHOW, ArenaStory_SJ7_Ret
-	msgbox ArenaStory_SJ7_T4, MSGBOX_DEFAULT
 	return
 ArenaStory_SJ7_Badge::
 	callnative ArenaStory_GetStoryline
@@ -40,17 +45,17 @@ ArenaStory_SJ7_Badge::
 	setflag FLAG_ARENA_SHOW_SJ7
 	return
 ArenaStory_SJ7_T0:
-	.string "Whitney:\nMiltank! Rollout!$"
+	.string "Whitney:\nGym's closed! Come shopping!$"
 ArenaStory_SJ7_T1:
-	.string "Whitney:\nYay! I win! I win!$"
+	.string "{PLAYER}:\nWait. YOU'RE the Gym Leader?!$"
 ArenaStory_SJ7_T2:
-	.string "Brock:\nWe need a new plan.$"
+	.string "Whitney:\nMiltank, Rollout!$"
 ArenaStory_SJ7_T3:
-	.string "Misty:\nBack again? She'll cry.$"
+	.string "Brock:\nRethink it. Work as a team.$"
 ArenaStory_SJ7_T4:
-	.string "Whitney:\nWaaah! No fair!$"
+	.string "Misty:\nRematch time. You got this!$"
 ArenaStory_SJ7_T5:
-	.string "Whitney:\nFine... here's your badge.$"
+	.string "Whitney:\nYou beat Miltank. Badge is yours!$"
 
 .if MATT_PART == 1
 ArenaStory_J1_0::
@@ -501,6 +506,27 @@ ArenaStory_SJ6_28_w0:
 .endif
 
 .if MATT_PART == 1
+ArenaStory_SJ6A_29a::
+	lockall
+	msgbox ArenaStory_SJ6A_T0, MSGBOX_DEFAULT
+	msgbox ArenaStory_SJ6A_T1, MSGBOX_DEFAULT
+	msgbox ArenaStory_SJ6A_T2, MSGBOX_DEFAULT
+	msgbox ArenaStory_SJ6A_T3, MSGBOX_DEFAULT
+	setflag FLAG_SET_SHINY
+	setwildbattle SPECIES_NOCTOWL, 18
+	dowildbattle
+	special ArenaStory_WasCaught
+	goto_if_eq VAR_RESULT, TRUE, ArenaStory_SJ6A_29a_c
+	givemon SPECIES_NOCTOWL, 18
+ArenaStory_SJ6A_29a_c:
+	clearflag FLAG_SET_SHINY
+	msgbox ArenaStory_SJ6A_T4, MSGBOX_DEFAULT
+	setflag FLAG_ARENA_SHOW_SJ6A
+	releaseall
+	end
+.endif
+
+.if MATT_PART == 1
 ArenaStory_SJ8_29::
 	lockall
 	msgbox ArenaStory_SJ8_T0, MSGBOX_DEFAULT
@@ -523,6 +549,31 @@ ArenaStory_SJ9_30::
 	msgbox ArenaStory_SJ9_T4, MSGBOX_DEFAULT
 	call ArenaStory_FollowBrock
 	setflag FLAG_ARENA_SHOW_SJ9
+	releaseall
+	end
+.endif
+
+.if MATT_PART == 1
+ArenaStory_SJ9A_30a::
+	lockall
+	msgbox ArenaStory_SJ9A_T0, MSGBOX_DEFAULT
+	msgbox ArenaStory_SJ9A_T1, MSGBOX_DEFAULT
+	setvar VAR_0x8004, SPECIES_NOCTOWL
+	special ArenaStory_SpeciesToPC
+	@ SJ9A-D1: swap (Noctowl -> PC, Snorlax -> party) only if a Noctowl really went.
+	goto_if_eq VAR_RESULT, FALSE, ArenaStory_SJ9A_30a_nosend
+	special ArenaStory_SJ9A_SnorlaxIn
+	msgbox ArenaStory_SJ9A_T2, MSGBOX_DEFAULT
+	msgbox ArenaStory_SJ9A_T3, MSGBOX_DEFAULT
+	msgbox ArenaStory_SJ9A_T4, MSGBOX_DEFAULT
+	@ End of beat: exact Snorlax -> PC, exact Noctowl back (atomic slot swap).
+	special ArenaStory_SJ9A_SnorlaxOut
+	goto ArenaStory_SJ9A_30a_end
+ArenaStory_SJ9A_30a_nosend:
+	msgbox ArenaStory_SJ9A_T3, MSGBOX_DEFAULT
+	msgbox ArenaStory_SJ9A_T4, MSGBOX_DEFAULT
+ArenaStory_SJ9A_30a_end:
+	setflag FLAG_ARENA_SHOW_SJ9A
 	releaseall
 	end
 .endif
@@ -1869,6 +1920,46 @@ ArenaStory_SJ18_T5:
 	.string "Scott:\nDoor's always open, champ!$"
 .endif
 
+.if MATT_PART == 1
+ArenaStory_SJ6A_T0:
+	.string "Wiseman:\nThat shiny one keeps outwitting me$"
+.endif
+.if MATT_PART == 1
+ArenaStory_SJ6A_T1:
+	.string "Brock:\nIt's small. And very clever.$"
+.endif
+.if MATT_PART == 1
+ArenaStory_SJ6A_T2:
+	.string "Misty:\nIts Hypnosis is fooling us!$"
+.endif
+.if MATT_PART == 1
+ArenaStory_SJ6A_T3:
+	.string "{PLAYER}:\nPikachu, don't fall for it!$"
+.endif
+.if MATT_PART == 1
+ArenaStory_SJ6A_T4:
+	.string "{PLAYER}:\nGotcha! A shiny Noctowl!$"
+.endif
+.if MATT_PART == 1
+ArenaStory_SJ9A_T0:
+	.string "{PLAYER}:\nSumo? Eighty kilos minimum?!$"
+.endif
+.if MATT_PART == 1
+ArenaStory_SJ9A_T1:
+	.string "{PLAYER}:\n...That means Snorlax!$"
+.endif
+.if MATT_PART == 1
+ArenaStory_SJ9A_T2:
+	.string "Oak:\nSending Snorlax. Noctowl's here.$"
+.endif
+.if MATT_PART == 1
+ArenaStory_SJ9A_T3:
+	.string "Brock:\nSnorlax won't even move.$"
+.endif
+.if MATT_PART == 1
+ArenaStory_SJ9A_T4:
+	.string "{PLAYER}:\nCome on, Snorlax. Push!$"
+.endif
 ArenaStory_Text_Lose:
 	.string "...$"
 

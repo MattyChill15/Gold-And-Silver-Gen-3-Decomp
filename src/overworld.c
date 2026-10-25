@@ -1,4 +1,5 @@
 #include "global.h"
+#include "constants/arena_story_flags.h"
 #include "arena_series.h"
 #include "realtime_arena.h"
 #include "overworld.h"
@@ -459,6 +460,7 @@ void Overworld_ResetBattleFlagsAndVars(void)
     FlagClear(B_FLAG_DYNAMAX_BATTLE);
     FlagClear(B_FLAG_SKY_BATTLE);
     FlagClear(B_FLAG_NO_WHITEOUT);
+    FlagClear(FLAG_ARENA_FORCE_LOSS);
 }
 #endif
 

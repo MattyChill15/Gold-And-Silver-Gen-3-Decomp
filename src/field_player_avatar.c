@@ -1685,7 +1685,7 @@ bool8 PartyHasMonWithSurf(void)
             if (MonKnowsMove(&gParties[B_TRAINER_PLAYER][i], MOVE_SURF))
                 return TRUE;
         }
-        if (ArenaSeries_HmBadgeOk(MOVE_SURF) && ArenaSeries_FirstFieldMon() >= 0)
+        if (ArenaSeries_FirstFieldCapableMon(MOVE_SURF) >= 0) // L050
             return TRUE;
     }
     return FALSE;

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "constants/arena_story_flags.h"
 #include "battle.h"
 #include "battle_anim.h"
 #include "battle_arena.h"
@@ -7995,6 +7996,10 @@ s32 GetAdjustedDamage(struct DamageContext *ctx, s32 damage)
     else if (GetMoveEffect(ctx->move) == EFFECT_FALSE_SWIPE)
     {
         enduredHit = TRUE;
+    }
+    else if (FlagGet(FLAG_ARENA_FORCE_LOSS) && !IsOnPlayerSide(ctx->battlerDef) && CountUsablePartyMons(ctx->battlerDef) == 0)
+    {
+        enduredHit = TRUE; // SJ7 scripted loss: foe's last mon (Miltank) always hangs on at 1 HP
     }
     else if ((gSaveBlock1Ptr->tx_Mode_Sturdy == 1) && ctx->abilities[ctx->battlerDef] == ABILITY_STURDY && IsBattlerAtMaxHp(ctx->battlerDef))
     {

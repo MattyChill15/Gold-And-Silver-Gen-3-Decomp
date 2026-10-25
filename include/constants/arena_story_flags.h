@@ -56,6 +56,9 @@
 #define FLAG_ARENA_SHOW_P2_END                  0x912
 #define FLAG_ARENA_SHOW_CH2_DONE           0x913
 #define FLAG_ARENA_HIDE_MISTY        0x914
+#define FLAG_ARENA_SHOW_SJ6A                0x915
+#define FLAG_ARENA_SHOW_SJ9A                0x916
+#define FLAG_ARENA_FORCE_LOSS               0x917 // SJ7: opponent cannot be KO'd / outcome forced to LOST
 #define TRAINER_ARENA_STORY          TRAINER_CHANSEY3
 #define ARENA_STORY_TRAINER_COUNT    11
 #endif

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "arena_series.h"
 #include "malloc.h"
 #include "battle.h"
 #include "battle_anim.h"
@@ -2969,6 +2970,13 @@ static void SetPartyMonFieldSelectionActions(struct Pokemon *mons, u8 slotId)
                 break;
             }
         }
+    }
+    // L050: list HM field moves this mon can learn but doesn't know (stock gate).
+    for (j = 0; j != FIELD_MOVES_COUNT && sPartyMenuInternal->numActions < 5; j++)
+    {
+        if (!MonKnowsMove(&mons[slotId], FieldMove_GetMoveId(j))
+         && ArenaSeries_MonFieldCapable(&mons[slotId], FieldMove_GetMoveId(j)))
+            AppendToList(sPartyMenuInternal->actions, &sPartyMenuInternal->numActions, j + MENU_FIELD_MOVES);
     }
 
     if (!InBattlePike())

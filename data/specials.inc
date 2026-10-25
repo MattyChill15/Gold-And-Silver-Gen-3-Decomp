@@ -677,5 +677,9 @@ gSpecials::
 	def_special ArenaStory_LoadReturn
 	def_special ArenaStory_CharizardToLiza
 	def_special ArenaStory_CharizardFromLiza
+	def_special ArenaStory_SpeciesToPC
+	def_special ArenaStory_SpeciesFromPC
+	def_special ArenaStory_SJ9A_SnorlaxIn
+	def_special ArenaStory_SJ9A_SnorlaxOut
 	def_special ArenaSeries_BeginRematch
 	def_special ArenaSeries_EndPart

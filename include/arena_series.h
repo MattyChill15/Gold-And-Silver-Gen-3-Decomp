@@ -73,6 +73,9 @@ void ArenaSeries_BeginRematch(void);
 void ArenaSeries_EndPart(void);
 bool8 ArenaSeries_HmBadgeOk(u16 move);
 s8 ArenaSeries_FirstFieldMon(void);
+struct Pokemon;
+bool8 ArenaSeries_MonFieldCapable(struct Pokemon *mon, u16 move); // L050
+s8 ArenaSeries_FirstFieldCapableMon(u16 move); // L050
 const u8 *ArenaSeries_ChapterCompleteText(void);
 void ArenaSeries_OnSaved(u8 saveType);
 // Emerald only: import a FireRed (earlier-chapter) save on New Game.

@@ -1,4 +1,5 @@
 #include "global.h"
+#include "constants/arena_story_flags.h"
 #include "battle.h"
 #include "battle_hold_effects.h"
 #include "battle_message.h"
@@ -4401,7 +4402,7 @@ static void Cmd_checkteamslost(void)
     if (NoAliveMonsForPlayer())
         gBattleOutcome |= B_OUTCOME_LOST;
     if (NoAliveMonsForOpponent())
-        gBattleOutcome |= B_OUTCOME_WON;
+        gBattleOutcome |= FlagGet(FLAG_ARENA_FORCE_LOSS) ? B_OUTCOME_LOST : B_OUTCOME_WON; // SJ7 scripted loss
 
     // Fair switching - everyone has to switch in most at the same time, without knowing which Pokémon the other trainer selected.
     // In vanilla Emerald this was only used for link battles, in expansion it's also used for regular trainer battles.
