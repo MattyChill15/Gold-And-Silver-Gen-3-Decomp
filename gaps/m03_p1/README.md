@@ -6,7 +6,14 @@ Scaffold landed on the Arena Johto tree. M04 Celebi is out of scope. Friend pin,
 
 ## sha1 / FILL
 
-No ROM, so no sha1 and no FILL line.
+Local ship (box, 2026-10-25 ~5:34pm AZ) after PR #1 merge:
+
+- ROM sha1: `8fbbffbce8b1d2aca290b031b45ac0a96a99ca46`
+- ELF sha1: `5475d4f66118c176a26d87ddba8aebc55d42239d`
+- FILL: EWRAM 91.16% / IWRAM 72.45% / ROM 84.42%
+- Pack: `ops/arena/movie34_m03_p1_bake_20261025/`
+
+Cloud VM still cannot regenerate gitignored `.arena-dev/art/*.4bpp` from missing pngs; local box already had the `.4bpp` sheets.
 
 `arm-none-eabi-gcc 13.2.1` and binutils are installed. Host tools (`preproc`, `mapjson`, `trainerproc`, `gbagfx`) build. The ship command from `docs/ARENA_JOHTO_PROGRESS.md` does not finish:
 
