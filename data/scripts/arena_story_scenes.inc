@@ -575,6 +575,7 @@ ArenaStory_SJ9A_30a_nosend:
 	msgbox ArenaStory_SJ9A_T4, MSGBOX_DEFAULT
 ArenaStory_SJ9A_30a_end:
 	setflag FLAG_ARENA_SHOW_SJ9A
+	goto_if_unset FLAG_M04_DONE, Arena_M04_StartFromSJ9A
 	releaseall
 	end
 .endif

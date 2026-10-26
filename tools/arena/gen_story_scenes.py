@@ -7,6 +7,144 @@ Outputs:
 """
 import re, sys, os
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+# Movie handoffs are not in Shorty's gen.py. The checked-in scenes file owns
+# SJ6A (M03) and SJ9A (M04). A regen must put both goto hooks back.
+MOVIE_HOOKS = (
+    ('\tsetflag FLAG_ARENA_SHOW_SJ6A\n', '\tgoto_if_unset FLAG_M03_DONE, Arena_M03_StartFromSJ6A\n'),
+    ('\tsetflag FLAG_ARENA_SHOW_SJ9A\n', '\tgoto_if_unset FLAG_M04_DONE, Arena_M04_StartFromSJ9A\n'),
+)
+HAND_SCENE_MARK = ('ArenaStory_SJ6A', 'ArenaStory_SJ9A')
+PART1_EXTRA = (
+    'extern const u8 ArenaStory_SJ6A_29a[];',
+    'extern const u8 ArenaStory_SJ9A_30a[];',
+    '    {MAP_ILEX_FOREST, ARENA_STORYLINE_SHOW, FLAG_ARENA_SHOW_SJ6A, FLAG_ARENA_SHOW_SJ6, 0, 1, ArenaStory_SJ6A_29a},',
+    '    {MAP_VIOLET_CITY_POKEMON_CENTER, ARENA_STORYLINE_SHOW, FLAG_ARENA_SHOW_SJ9A, FLAG_ARENA_SHOW_SJ8, 0, 0, ArenaStory_SJ9A_30a},',
+)
+HAND_FLAGS = (
+    '#define FLAG_ARENA_SHOW_SJ6A                0x915',
+    '#define FLAG_ARENA_SHOW_SJ9A                0x916',
+    '#define FLAG_ARENA_FORCE_LOSS               0x917 // SJ7: opponent cannot be KO\'d / outcome forced to LOST',
+)
+
+def _if_blocks(text):
+    return re.findall(r'\.if MATT_PART == \d+\n.*?\n\.endif\n', text, re.S)
+
+def reattach_hand_scenes(prev, new):
+    """Paste SJ6A/SJ9A blocks a from-scratch regen would omit."""
+    if not prev:
+        return new
+    extra = []
+    for block in _if_blocks(prev):
+        if not any(mark in block for mark in HAND_SCENE_MARK):
+            continue
+        m = re.search(r'^(ArenaStory_SJ(?:6A|9A)\w*):', block, re.M)
+        if not m:
+            continue
+        lab = m.group(1)
+        if (lab + '::') in new or re.search(r'(?m)^%s:' % re.escape(lab), new):
+            continue
+        extra.append(block if block.endswith('\n') else block + '\n')
+    if not extra:
+        return new
+    if not new.endswith('\n'):
+        new += '\n'
+    return new + '\n' + ''.join(extra)
+
+def inject_movie_hooks(text):
+    for anchor, hook in MOVIE_HOOKS:
+        if hook in text:
+            continue
+        if anchor not in text:
+            sys.exit('gen_story_scenes: movie hook anchor missing after regen: %s' % anchor.strip())
+        text = text.replace(anchor, anchor + hook, 1)
+    for _, hook in MOVIE_HOOKS:
+        if text.count(hook) != 1:
+            sys.exit('gen_story_scenes: movie hook not unique: %s' % hook.strip())
+    return text
+
+def preserve_story_header(text):
+    m = re.search(r'#if MATT_PART == 1\n(.*?)#endif', text, re.S)
+    if not m:
+        sys.exit('gen_story_scenes: no MATT_PART == 1 scene table')
+    block = m.group(0)
+    if 'ArenaStory_SJ6A_29a' not in block:
+        block = block.replace('#if MATT_PART == 1\n', '#if MATT_PART == 1\n%s\n%s\n' % (PART1_EXTRA[0], PART1_EXTRA[1]), 1)
+    if 'FLAG_ARENA_SHOW_SJ6A' not in block:
+        block = block.replace('\n};', '\n%s\n%s\n};' % (PART1_EXTRA[2], PART1_EXTRA[3]), 1)
+    return text[:m.start()] + block + text[m.end():]
+
+def preserve_story_flags(text):
+    missing = [line for line in HAND_FLAGS if line.split()[1] not in text]
+    if not missing:
+        return text
+    needle = '#define TRAINER_ARENA_STORY'
+    if needle not in text:
+        sys.exit('gen_story_scenes: flags header missing TRAINER_ARENA_STORY')
+    return text.replace(needle, '\n'.join(missing) + '\n' + needle, 1)
+
+# 0x915-0x917 are hand-assigned FLAG_ARENA_SHOW_SJ6A / SJ9A / FORCE_LOSS.
+# 0x918-0x91B are FLAG_M03_STARTED/DONE/HIDE_ENTEI/HIDE_CHARIZARD. Do not reuse.
+# 0x91C-0x91F are FLAG_M04_STARTED/DONE/HIDE_CELEBI/HIDE_SUICUNE. Do not reuse.
+# First 55 assignments stay on 0x935-0x95F then 0x909-0x914.
+FREE = [0x935 + i for i in range(0x95F - 0x935 + 1)] + [0x909 + i for i in range(0x915 - 0x909)] \
+     + [0x924 + i for i in range(6)] + [0x933] + [0x2B1 + i for i in range(11)]
+assert FREE[54] == 0x914, hex(FREE[54])
+assert all(slot not in FREE for slot in range(0x915, 0x920))
+
+def _selftest():
+    inc = os.path.join(ROOT, 'data/scripts/arena_story_scenes.inc')
+    live = open(inc).read()
+    for _, hook in MOVIE_HOOKS:
+        if live.count(hook) != 1:
+            sys.exit('selftest: live hook count for %s is %d' % (hook.strip(), live.count(hook)))
+    blocks = [b for b in _if_blocks(live) if any(mark in b for mark in HAND_SCENE_MARK)]
+    if len(blocks) < 12:
+        sys.exit('selftest: expected SJ6A/SJ9A script+text blocks, got %d' % len(blocks))
+    stripped = live
+    for b in blocks:
+        if b not in stripped:
+            sys.exit('selftest: block missing on strip')
+        stripped = stripped.replace(b, '', 1)
+    if 'Arena_M03_StartFromSJ6A' in stripped or 'Arena_M04_StartFromSJ9A' in stripped:
+        sys.exit('selftest: strip left a movie hook behind')
+    restored = inject_movie_hooks(reattach_hand_scenes(live, stripped))
+    if restored.count(MOVIE_HOOKS[0][1]) != 1 or restored.count(MOVIE_HOOKS[1][1]) != 1:
+        sys.exit('selftest: restored hooks not unique')
+    if 'ArenaStory_SJ6A_29a::' not in restored or 'ArenaStory_SJ9A_30a::' not in restored:
+        sys.exit('selftest: scene labels missing after reattach')
+    bare = (
+        '@ gen\n.if MATT_PART == 1\nArenaStory_SJ6A_29a::\n\tsetflag FLAG_ARENA_SHOW_SJ6A\n\treleaseall\n\tend\n.endif\n'
+        '\n.if MATT_PART == 1\nArenaStory_SJ9A_30a::\n\tsetflag FLAG_ARENA_SHOW_SJ9A\n\treleaseall\n\tend\n.endif\n'
+    )
+    injected = inject_movie_hooks(reattach_hand_scenes(live, bare))
+    if injected.count('ArenaStory_SJ6A_29a::') != 1 or injected.count('ArenaStory_SJ9A_30a::') != 1:
+        sys.exit('selftest: duplicated a scene the generator already emitted')
+    if injected.count(MOVIE_HOOKS[0][1]) != 1 or injected.count(MOVIE_HOOKS[1][1]) != 1:
+        sys.exit('selftest: bare inject missed a hook')
+    flags = '#define FLAG_ARENA_HIDE_MISTY        0x914\n#define TRAINER_ARENA_STORY          TRAINER_CHANSEY3\n'
+    outf = preserve_story_flags(flags)
+    if 'FLAG_ARENA_SHOW_SJ6A' not in outf or 'FLAG_ARENA_SHOW_SJ9A' not in outf or 'FLAG_ARENA_FORCE_LOSS' not in outf:
+        sys.exit('selftest: flags')
+    if preserve_story_flags(outf) != outf:
+        sys.exit('selftest: flags not idempotent')
+    header = (
+        '#if MATT_PART == 1\nextern const u8 ArenaStory_SJ8_29[];\n'
+        'static const struct ArenaScene sArenaScenes[] = {\n'
+        '    {MAP_X, ARENA_STORYLINE_SHOW, FLAG_ARENA_SHOW_SJ8, 0, 0, 0, ArenaStory_SJ8_29},\n'
+        '};\n#endif\n'
+    )
+    outh = preserve_story_header(header)
+    if outh.count('ArenaStory_SJ6A_29a') != 2 or 'FLAG_ARENA_SHOW_SJ9A' not in outh:
+        sys.exit('selftest: header\n' + outh)
+    if preserve_story_header(outh) != outh:
+        sys.exit('selftest: header not idempotent')
+    print('m04 hook selftest ok', len(blocks))
+
+if os.environ.get('ARENA_HOOK_SELFTEST') == '1':
+    _selftest()
+    sys.exit(0)
+
 GEN = '/workspace/ops/arena/gen.py'
 src = open(GEN).read().split('out=[')[0]
 ns = {}; exec(src, ns)
@@ -14,10 +152,6 @@ LINES = {e[0]: e[5] for e in ns['E']}
 PART = {e[0]: int(e[1][1]) for e in ns['E']}
 
 # ---- flags (real names -> free slots) ----
-# 0x918-0x91B are FLAG_M03_STARTED/DONE/HIDE_ENTEI/HIDE_CHARIZARD. Do not reuse.
-FREE = [0x935 + i for i in range(0x95F - 0x935 + 1)] + [0x909 + i for i in range(0x918 - 0x909)] \
-     + [0x91C + i for i in range(0x920 - 0x91C)] \
-     + [0x924 + i for i in range(6)] + [0x933] + [0x2B1 + i for i in range(11)]
 FLAGS = ['FLAG_ARENA_NO_WHITEOUT'] + ['FLAG_ARENA_CHIEF_J%d' % i for i in range(1, 19)] + \
     ['FLAG_ARENA_CHIEF_J8_DELIVERY', 'FLAG_ARENA_CHIEF_J15A', 'FLAG_ARENA_CHIEF_J16_WON', 'FLAG_ARENA_CHIEF_CH2_DONE',
      'FLAG_ARENA_SHOW_SJ1', 'FLAG_ARENA_SHOW_SJ2', 'FLAG_ARENA_SHOW_SJ3A', 'FLAG_ARENA_SHOW_SJ3B', 'FLAG_ARENA_SHOW_SJ3C'] + \
@@ -189,7 +323,12 @@ h = ['// Generated by tools/arena/gen_story_scenes.py from Shorty\'s gen.py. Do 
 for f, v in zip(FLAGS, FREE): h.append('#define %-28s 0x%X' % (f, v))
 h.append('#define TRAINER_ARENA_STORY          TRAINER_CHANSEY3')
 h.append('#define ARENA_STORY_TRAINER_COUNT    %d' % len(TR))
-h.append('#endif'); open(os.path.join(ROOT, 'include/constants/arena_story_flags.h'), 'w').write('\n'.join(h) + '\n')
+h.append('#endif')
+flags_path = os.path.join(ROOT, 'include/constants/arena_story_flags.h')
+header_path = os.path.join(ROOT, 'src/data/arena_story_scenes.h')
+inc_path = os.path.join(ROOT, 'data/scripts/arena_story_scenes.inc')
+prev_inc = open(inc_path).read() if os.path.exists(inc_path) else ''
+open(flags_path, 'w').write(preserve_story_flags('\n'.join(h) + '\n'))
 
 c = ['// Generated by tools/arena/gen_story_scenes.py. Do not edit.']
 for k, (nm, cl, pic, party) in TR.items():
@@ -207,7 +346,7 @@ for p in (1, 2, 3):
         lab = r.rsplit(', ', 1)[1].rstrip('},')
         c.append('extern const u8 %s[];' % lab)
     c.append('static const struct ArenaScene sArenaScenes[] = {'); c += ROWS[p]; c.append('};'); c.append('#endif')
-open(os.path.join(ROOT, 'src/data/arena_story_scenes.h'), 'w').write('\n'.join(c) + '\n')
+open(header_path, 'w').write(preserve_story_header('\n'.join(c) + '\n'))
 
 out = ['@ Generated by tools/arena/gen_story_scenes.py. Do not edit.']
 for p in (1, 2, 3):
@@ -269,5 +408,5 @@ ArenaStory_SJ7_Badge::
 """ + ''.join('ArenaStory_SJ7_T%d:\n\t.string "%s"\n' % (i, text(l)) for i, l in enumerate(L7))
 out += [sj7]
 out += out2 + tt + ['ArenaStory_Text_Lose:\n\t.string "...$"\n', 'ArenaStory_Text_Fight:\n\t.string "Fight the Chief?$"\n']
-open(os.path.join(ROOT, 'data/scripts/arena_story_scenes.inc'), 'w').write('\n'.join(out) + '\n')
+open(inc_path, 'w').write(inject_movie_hooks(reattach_hand_scenes(prev_inc, '\n'.join(out) + '\n')))
 print('scenes', {p: len(ROWS[p]) for p in ROWS}, 'flags', len(FLAGS), 'trainers', len(TR))

@@ -866,10 +866,13 @@
 #define TRAINER_M03_ENTEI_ILLUSION          859 //85B reused dummy TRAINER_CHANSEY5; Lv60 Entei FORCE_LOSS
 #define TRAINER_CHANSEY4                    TRAINER_M03_LISA
 #define TRAINER_CHANSEY5                    TRAINER_M03_ENTEI_ILLUSION
-#define TRAINER_SIDNEY2                     860 //85C
-#define TRAINER_PHOEBE2                     861 //85D
+#define TRAINER_M04_DUNDEE                  860 //85C reused dummy TRAINER_SIDNEY2; B03 winnable ~lv30
+#define TRAINER_SIDNEY2                     TRAINER_M04_DUNDEE
+#define TRAINER_M04_MARAUDER_FOREST         861 //85D reused dummy TRAINER_PHOEBE2; B10 Scizor + Sneasel
+#define TRAINER_PHOEBE2                     TRAINER_M04_MARAUDER_FOREST
 #define TRAINER_PROTON_1                     862 //85E
-#define TRAINER_KIP2                      863 //85F
+#define TRAINER_M04_DARK_TYRANITAR          863 //85F reused dummy TRAINER_KIP2; B13 Lv60 Tyranitar FORCE_LOSS
+#define TRAINER_KIP2                        TRAINER_M04_DARK_TYRANITAR
 
 // NOTE: Because each Trainer uses a flag to determine when they are defeated, there is only space for 0 additional trainers before trainer flag space overflows
 //       More space can be made by shifting flags around in constants/flags.h or changing how trainer flags are handled
