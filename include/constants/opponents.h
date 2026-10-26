@@ -862,8 +862,10 @@
 #define TRAINER_GRUNT_12                    855 //857
 #define TRAINER_WALLACE2                    856 //858
 #define TRAINER_CHANSEY3                    857 //859
-#define TRAINER_CHANSEY4                    858 //85A
-#define TRAINER_CHANSEY5                    859 //85B
+#define TRAINER_M03_LISA                    858 //85A reused dummy TRAINER_CHANSEY4; winnable ~lv20
+#define TRAINER_M03_ENTEI_ILLUSION          859 //85B reused dummy TRAINER_CHANSEY5; Lv60 Entei FORCE_LOSS
+#define TRAINER_CHANSEY4                    TRAINER_M03_LISA
+#define TRAINER_CHANSEY5                    TRAINER_M03_ENTEI_ILLUSION
 #define TRAINER_SIDNEY2                     860 //85C
 #define TRAINER_PHOEBE2                     861 //85D
 #define TRAINER_PROTON_1                     862 //85E

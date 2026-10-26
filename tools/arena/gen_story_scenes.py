@@ -14,7 +14,9 @@ LINES = {e[0]: e[5] for e in ns['E']}
 PART = {e[0]: int(e[1][1]) for e in ns['E']}
 
 # ---- flags (real names -> free slots) ----
-FREE = [0x935 + i for i in range(0x95F - 0x935 + 1)] + [0x909 + i for i in range(0x920 - 0x909 + 1)] \
+# 0x918-0x91B are FLAG_M03_STARTED/DONE/HIDE_ENTEI/HIDE_CHARIZARD. Do not reuse.
+FREE = [0x935 + i for i in range(0x95F - 0x935 + 1)] + [0x909 + i for i in range(0x918 - 0x909)] \
+     + [0x91C + i for i in range(0x920 - 0x91C)] \
      + [0x924 + i for i in range(6)] + [0x933] + [0x2B1 + i for i in range(11)]
 FLAGS = ['FLAG_ARENA_NO_WHITEOUT'] + ['FLAG_ARENA_CHIEF_J%d' % i for i in range(1, 19)] + \
     ['FLAG_ARENA_CHIEF_J8_DELIVERY', 'FLAG_ARENA_CHIEF_J15A', 'FLAG_ARENA_CHIEF_J16_WON', 'FLAG_ARENA_CHIEF_CH2_DONE',

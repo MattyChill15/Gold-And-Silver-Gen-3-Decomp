@@ -1572,10 +1572,14 @@
 #define FLAG_UNUSED_0x915                           (SYSTEM_FLAGS + 0xB5) // Unused Flag
 #define FLAG_UNUSED_0x916                           (SYSTEM_FLAGS + 0xB6) // Unused Flag
 #define FLAG_UNUSED_0x917                           (SYSTEM_FLAGS + 0xB7) // Unused Flag
-#define FLAG_UNUSED_0x918                           (SYSTEM_FLAGS + 0xB8) // Unused Flag
-#define FLAG_UNUSED_0x919                           (SYSTEM_FLAGS + 0xB9) // Unused Flag
-#define FLAG_UNUSED_0x91A                           (SYSTEM_FLAGS + 0xBA) // Unused Flag
-#define FLAG_UNUSED_0x91B                           (SYSTEM_FLAGS + 0xBB) // Unused Flag
+#define FLAG_M03_STARTED                            (SYSTEM_FLAGS + 0xB8) // M03: SJ6A handed off into Spell of the Unown
+#define FLAG_M03_DONE                               (SYSTEM_FLAGS + 0xB9) // M03: farewell finished. Does not set SJ7 or seriesBit(7)
+#define FLAG_M03_HIDE_ENTEI                         (SYSTEM_FLAGS + 0xBA) // M03: hide Entei and Molly until the abduction
+#define FLAG_M03_HIDE_CHARIZARD                     (SYSTEM_FLAGS + 0xBB) // M03: hide the B12 rescue overworld
+#define FLAG_UNUSED_0x918                           FLAG_M03_STARTED
+#define FLAG_UNUSED_0x919                           FLAG_M03_DONE
+#define FLAG_UNUSED_0x91A                           FLAG_M03_HIDE_ENTEI
+#define FLAG_UNUSED_0x91B                           FLAG_M03_HIDE_CHARIZARD
 #define FLAG_UNUSED_0x91C                           (SYSTEM_FLAGS + 0xBC) // Unused Flag
 #define FLAG_UNUSED_0x91D                           (SYSTEM_FLAGS + 0xBD) // Unused Flag
 #define FLAG_UNUSED_0x91E                           (SYSTEM_FLAGS + 0xBE) // Unused Flag

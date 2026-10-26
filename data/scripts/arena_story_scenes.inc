@@ -522,6 +522,7 @@ ArenaStory_SJ6A_29a_c:
 	clearflag FLAG_SET_SHINY
 	msgbox ArenaStory_SJ6A_T4, MSGBOX_DEFAULT
 	setflag FLAG_ARENA_SHOW_SJ6A
+	goto_if_unset FLAG_M03_DONE, Arena_M03_StartFromSJ6A
 	releaseall
 	end
 .endif
