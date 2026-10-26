@@ -766,6 +766,12 @@ gStdScripts_End::
 	.include "data/maps/M03_CharicificValley/scripts.inc"
 	.include "data/maps/M03_CrystalHallWater/scripts.inc"
 	.include "data/maps/M03_CrystalTowerRoof/scripts.inc"
+	.include "data/maps/M04_ArborvillePast/scripts.inc"
+	.include "data/maps/M04_Ferry/scripts.inc"
+	.include "data/maps/M04_Arborville/scripts.inc"
+	.include "data/maps/M04_TowaHouse/scripts.inc"
+	.include "data/maps/M04_Forest/scripts.inc"
+	.include "data/maps/M04_LakeOfLife/scripts.inc"
 
 	.include "data/maps/IlexForest/scripts.inc"
 
@@ -2213,6 +2219,7 @@ EventScript_PalletTown_PlayersHouse_2F_TurnOnPC::
 	.include "data/scripts/arena_practice.inc"
 	.include "data/scripts/arena_story_scenes.inc"
 	.include "data/scripts/arena_m03.inc"
+	.include "data/scripts/arena_m04.inc"
 	.include "data/scripts/arena_gym_rematch.inc"
 	.include "data/scripts/dexnav.inc"
 	.include "data/scripts/battle_frontier.inc"

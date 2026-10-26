@@ -14471,18 +14471,22 @@ Steve (Rattata)
 Level: 50
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-=== TRAINER_KIP2 ===
-Name: Kip
-Class: Pkmn Trainer 1
-Pic: Hiker
+=== TRAINER_M04_DARK_TYRANITAR ===
+Name: Marauder
+Class: Team Rocket
+Pic: Rocket Grunt M
 Gender: Male
-Music: Male
+Music: Rocket
 Double Battle: No
 AI: Check Bad Move
 
-Steve (Rattata)
-Level: 50
-IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+Tyranitar
+Level: 60
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+- Crunch
+- Earthquake
+- Rock Slide
+- Hyper Beam
 
 === TRAINER_KIRA_AND_DAN_1 ===
 Name: Kira
@@ -17033,17 +17037,21 @@ Tentacool
 Level: 15
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-=== TRAINER_PHOEBE2 ===
-Name: Phoebe
-Class: Pkmn Trainer 1
-Pic: Hiker
+=== TRAINER_M04_MARAUDER_FOREST ===
+Name: Marauder
+Class: Team Rocket
+Pic: Rocket Grunt M
 Gender: Male
-Music: Male
+Music: Rocket
 Double Battle: No
 AI: Check Bad Move
 
-Steve (Rattata)
-Level: 50
+Scizor
+Level: 30
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+Sneasel
+Level: 30
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
 === TRAINER_PRESLEY ===
@@ -17700,17 +17708,25 @@ Hariyama
 Level: 39
 IVs: 29 HP / 29 Atk / 29 Def / 29 SpA / 29 SpD / 29 Spe
 
-=== TRAINER_SIDNEY2 ===
-Name: Sidney
-Class: Pkmn Trainer 1
-Pic: Hiker
+=== TRAINER_M04_DUNDEE ===
+Name: Dundee
+Class: Pkmn Ranger
+Pic: Pokemon Ranger M
 Gender: Male
-Music: Male
+Music: Cool
 Double Battle: No
 AI: Check Bad Move
 
-Steve (Rattata)
-Level: 50
+Fearow
+Level: 28
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+Ariados
+Level: 29
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+Ursaring
+Level: 30
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
 === TRAINER_SIENNA ===

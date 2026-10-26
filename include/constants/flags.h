@@ -1580,10 +1580,14 @@
 #define FLAG_UNUSED_0x919                           FLAG_M03_DONE
 #define FLAG_UNUSED_0x91A                           FLAG_M03_HIDE_ENTEI
 #define FLAG_UNUSED_0x91B                           FLAG_M03_HIDE_CHARIZARD
-#define FLAG_UNUSED_0x91C                           (SYSTEM_FLAGS + 0xBC) // Unused Flag
-#define FLAG_UNUSED_0x91D                           (SYSTEM_FLAGS + 0xBD) // Unused Flag
-#define FLAG_UNUSED_0x91E                           (SYSTEM_FLAGS + 0xBE) // Unused Flag
-#define FLAG_UNUSED_0x91F                           (SYSTEM_FLAGS + 0xBF) // Unused Flag
+#define FLAG_M04_STARTED                            (SYSTEM_FLAGS + 0xBC) // M04: SJ9A handed off into Celebi
+#define FLAG_M04_DONE                               (SYSTEM_FLAGS + 0xBD) // M04: epilogue finished. Does not set SJ10 or seriesBit(8)
+#define FLAG_M04_HIDE_CELEBI                        (SYSTEM_FLAGS + 0xBE) // M04: hide Celebi until B08, and again after B14
+#define FLAG_M04_HIDE_SUICUNE                       (SYSTEM_FLAGS + 0xBF) // M04: hide Suicune except the B04/B13 flashes
+#define FLAG_UNUSED_0x91C                           FLAG_M04_STARTED
+#define FLAG_UNUSED_0x91D                           FLAG_M04_DONE
+#define FLAG_UNUSED_0x91E                           FLAG_M04_HIDE_CELEBI
+#define FLAG_UNUSED_0x91F                           FLAG_M04_HIDE_SUICUNE
 
 // Daily Flags
 // These flags are cleared once per day

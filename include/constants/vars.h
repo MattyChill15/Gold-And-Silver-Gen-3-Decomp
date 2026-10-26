@@ -240,6 +240,7 @@
 #define VAR_REGISTER_BIRCH_STATE                         0x40DA
 #define VAR_ROUTE_NUMBER                                0x40DB // Unused by Johto scripts
 #define VAR_M03_SCENE                                   VAR_ROUTE_NUMBER // M03 beats: 0 idle, 1..14 running, 15 exited
+#define VAR_M04_SCENE                                   VAR_M03_SCENE // M04 shares 0x40DB: 16..33 running, 34 exited. M03 ON_FRAME reads only 1..14
 #define VAR_UNUSED_0x40DC                                0x40DC // Unused Var
 #define VAR_ARENA_GAME_STAMP                             VAR_UNUSED_0x40DC // Arena: save identity (series parts)
 #define VAR_GIFT_PICHU_SLOT                              0x40DD
