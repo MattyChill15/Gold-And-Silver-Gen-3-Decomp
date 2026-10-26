@@ -6,10 +6,24 @@ Scaffold landed on the Arena Johto tree. M04 Celebi is out of scope. Friend pin,
 
 ## sha1 / FILL
 
-Recorded after `make RELEASE=1 FILE_NAME=johto_p1 BUILD_DIR=build-p1-rel MATT_PART=1`.
+No ROM, so no sha1 and no FILL line.
 
-- sha1: pending
-- ROM / EWRAM / IWRAM: pending
+`arm-none-eabi-gcc 13.2.1` and binutils are installed. Host tools (`preproc`, `mapjson`, `trainerproc`, `gbagfx`) build. The ship command from `docs/ARENA_JOHTO_PROGRESS.md` does not finish:
+
+```
+make RELEASE=1 FILE_NAME=johto_p1 BUILD_DIR=build-p1-rel MATT_PART=1
+tools/gbagfx/gbagfx .arena-dev/art/actions.png .arena-dev/art/actions.4bpp
+Failed to open ".arena-dev/art/actions.png" for reading.
+make: *** [Makefile:431: .arena-dev/art/actions.4bpp] Error 1
+```
+
+`*.4bpp` / `*.8bpp` / `*.gbapal` are gitignored. `tools/arena/dev.sh` `build_background` writes `.arena-dev/art/actions.4bpp` with `pack_move_fx` and does not write `actions.png`. Make's `%.4bpp: %.png` rule still requires that png. The same gap covers the other realtime-arena sheets. `graphics/arena/cover-smoke/README.md` points at private `export_redesign.py` and `pack_doll.py`, which are not in this tree. `tools/arena/pack_signatures150.py` stops on missing `graphics/arena/signatures150/frame-00.png`.
+
+What did assemble, with `NODEP=1` so the missing art was not pulled in:
+
+- `build-p1-rel/emerald-release/data/event_scripts.o` (M03 script, seven map scripts, SJ6A hook). Exit 0.
+- `build-p1-rel/emerald-release/data/maps.o` (mapjson accepted all seven M03 maps). Exit 0.
+- `src/data/trainers.h` contains `TRAINER_M03_LISA` (Nidorina 18 / Flaaffy 19 / Sunflora 20) and `TRAINER_M03_ENTEI_ILLUSION` (Entei 60, Flamethrower / Fire Blast / Bite / Stomp, IVs 31).
 
 ## IDs checked against this tree
 
