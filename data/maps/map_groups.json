@@ -32,7 +32,8 @@
     "gMapGroup_Emerald3",
     "gMapGroup_Emerald4",
     "gMapGroup_Emerald5",
-    "gMapGroup_IcePath"
+    "gMapGroup_IcePath",
+    "gMapGroup_M03"
   ],
   "gMapGroup_TownsAndRoutes": [
     "NewBarkTown",
@@ -1052,5 +1053,14 @@
     "ArenaCharicificValley",
     "ArenaWhirlCup",
     "ArenaSilverConference"
+  ],
+  "gMapGroup_M03": [
+    "M03_HaleManor",
+    "M03_UnownChamber",
+    "M03_GreenfieldApproach",
+    "M03_GreenfieldCenter",
+    "M03_CharicificValley",
+    "M03_CrystalHallWater",
+    "M03_CrystalTowerRoof"
   ]
 }

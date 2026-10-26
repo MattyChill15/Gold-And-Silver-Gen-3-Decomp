@@ -759,6 +759,13 @@ gStdScripts_End::
 	.include "data/maps/ArenaCharicificValley/scripts.inc"
 	.include "data/maps/ArenaWhirlCup/scripts.inc"
 	.include "data/maps/ArenaSilverConference/scripts.inc"
+	.include "data/maps/M03_HaleManor/scripts.inc"
+	.include "data/maps/M03_UnownChamber/scripts.inc"
+	.include "data/maps/M03_GreenfieldApproach/scripts.inc"
+	.include "data/maps/M03_GreenfieldCenter/scripts.inc"
+	.include "data/maps/M03_CharicificValley/scripts.inc"
+	.include "data/maps/M03_CrystalHallWater/scripts.inc"
+	.include "data/maps/M03_CrystalTowerRoof/scripts.inc"
 
 	.include "data/maps/IlexForest/scripts.inc"
 
@@ -2205,6 +2212,7 @@ EventScript_PalletTown_PlayersHouse_2F_TurnOnPC::
 	.include "data/text/birch_speech.inc"
 	.include "data/scripts/arena_practice.inc"
 	.include "data/scripts/arena_story_scenes.inc"
+	.include "data/scripts/arena_m03.inc"
 	.include "data/scripts/arena_gym_rematch.inc"
 	.include "data/scripts/dexnav.inc"
 	.include "data/scripts/battle_frontier.inc"

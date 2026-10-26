@@ -13284,31 +13284,43 @@ Pelipper
 Level: 76
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-=== TRAINER_CHANSEY4 ===
-Name: Chansey
-Class: Pkmn Trainer 1
-Pic: Hiker
-Gender: Male
-Music: Male
+=== TRAINER_M03_LISA ===
+Name: Lisa
+Class: Lass
+Pic: Lass
+Gender: Female
+Music: Hg Girl 1
 Double Battle: No
 AI: Check Bad Move
 
-Steve (Rattata)
-Level: 50
+Nidorina
+Level: 18
 IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
 
-=== TRAINER_CHANSEY5 ===
-Name: Chansey
-Class: Pkmn Trainer 1
-Pic: Hiker
+Flaaffy
+Level: 19
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+Sunflora
+Level: 20
+IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+
+=== TRAINER_M03_ENTEI_ILLUSION ===
+Name: Entei
+Class: Expert
+Pic: Expert M
 Gender: Male
-Music: Male
+Music: Intense
 Double Battle: No
 AI: Check Bad Move
 
-Steve (Rattata)
-Level: 50
-IVs: 0 HP / 0 Atk / 0 Def / 0 SpA / 0 SpD / 0 Spe
+Entei
+Level: 60
+IVs: 31 HP / 31 Atk / 31 Def / 31 SpA / 31 SpD / 31 Spe
+- Flamethrower
+- Fire Blast
+- Bite
+- Stomp
 
 === TRAINER_CLARK ===
 Name: Clark
