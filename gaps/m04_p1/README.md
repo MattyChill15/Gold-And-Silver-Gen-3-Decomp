@@ -6,11 +6,14 @@ Scaffold landed on the Arena Johto tree. Friend pin 1.8.25, launcher `Series.jav
 
 ## sha1 / FILL
 
-Local box build has not been run for this land. Cloud VM cannot regenerate gitignored `.arena-dev/art/*.4bpp`. Do not treat the placeholders below as measurements.
+Local ship (box, 2026-10-25 ~7:05pm AZ) after PR #2 merge (arena @ 55eb9e32):
 
-- ROM sha1: FILL
-- ELF sha1: FILL
-- FILL: EWRAM FILL / IWRAM FILL / ROM FILL
+- ROM sha1: `85fdf3f81190a5ee4a98c015fcc9c5e351a3d06d`
+- ELF sha1: `44d0e3671c4df3228af88726cbfcf49b06ba5bb1`
+- FILL: EWRAM 91.16% / IWRAM 72.45% / ROM 84.44%
+- Pack: `ops/arena/movie34_m04_p1_bake_20261025/`
+
+Cloud VM cannot regenerate gitignored `.arena-dev/art/*.4bpp`; local box had the sheets.
 
 Ship command, when the `.4bpp` sheets are present, is the one in `docs/ARENA_JOHTO_PROGRESS.md`:
 
