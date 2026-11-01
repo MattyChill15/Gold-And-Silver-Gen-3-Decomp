@@ -173,6 +173,15 @@ static EWRAM_DATA struct {
     u8 moveSlot, statusActions;
 } sArenaResident[2] = {};
 static EWRAM_INIT u8 sArenaSendoutMask = 3;
+// vc227 send-out / faint banners. Kind is none until a send-out or a KO.
+#define ARENA_BANNER_NONE  0
+#define ARENA_BANNER_FIGHT 1
+#define ARENA_BANNER_DOWN  2
+#define ARENA_BANNER_GO    3
+static EWRAM_INIT u8 sArenaBannerKind = ARENA_BANNER_NONE;
+static EWRAM_INIT u8 sArenaBannerFrames = 0;
+static EWRAM_INIT u8 sArenaBannerSide = 0;
+static EWRAM_INIT u8 sArenaBannerOnScreen = 0;
 static EWRAM_INIT u8 sFlameReach[2]={},sFlameElementMask[2]={};
 // starts, active ticks, native hit opportunities, prop hits, peak reach.
 EWRAM_DATA u32 gArenaFlameTelemetry[5]={};
@@ -639,6 +648,8 @@ void RealtimeArena_ResetBattle(void)
 {
     memset(sArenaResident, 0, sizeof(sArenaResident));
     sArenaSendoutMask = 3;
+    sArenaBannerKind = ARENA_BANNER_NONE;
+    sArenaBannerFrames = sArenaBannerSide = sArenaBannerOnScreen = 0;
     sMattPrompt = sMattCatchMode = sMattStatusUsed = sMattThrowWait = sMattBackoff = 0;
     sMattLeftoversClock[0] = sMattLeftoversClock[1] = 0;
     sProtectChain[0] = sProtectChain[1] = 0; sMattItemCd = 0; sMattProtectGap = 0; sEndureLife[0] = sEndureLife[1] = 0;
@@ -828,6 +839,61 @@ static const u8 sQualityLevel[] = _("LVL ");
 #include "arena_hud.inc"
 #include "arena_quality.inc"
 
+// vc227: StringCopyN returns dest+n. Appending from that pointer (the tip GO
+// banner) starts past the name EOS, so " GO!" never shows and the scan can
+// write off the buffer into the width WindowRect uses. Copy the terminated
+// name, then append. Names here are POKEMON_NAME_LENGTH 12, not 11-byte slots.
+static void ArenaCopySpeciesLine(u8 *dest, u8 side, const u8 *suffix)
+{
+    StringCopy(dest, GetSpeciesName(gBattleMons[side & 1].species));
+    StringAppend(dest, suffix);
+}
+
+static void ArenaStartBanner(u8 kind, u8 side, u8 frames)
+{
+    sArenaBannerKind = kind;
+    sArenaBannerSide = side & 1;
+    sArenaBannerFrames = frames;
+    sArena.hudDirty = TRUE;
+}
+
+static void ArenaDrawSendBanner(void)
+{
+    static const u8 sFightStr[] = _("FIGHT!");
+    static const u8 sIsDownStr[] = _(" IS DOWN!");
+    static const u8 sGoStr[] = _(" GO!");
+    u8 bBuf[32];
+    u32 bn = 0, bw, bx;
+
+    if (!sArenaBannerFrames)
+    {
+        if (sArenaBannerOnScreen)
+        {
+            sArenaBannerOnScreen = FALSE;
+            DrawStage();
+        }
+        return;
+    }
+    if (sArenaBannerKind == ARENA_BANNER_FIGHT)
+        StringCopy(bBuf, sFightStr);
+    else if (sArenaBannerKind == ARENA_BANNER_GO)
+        ArenaCopySpeciesLine(bBuf, sArenaBannerSide, sGoStr);
+    else
+        ArenaCopySpeciesLine(bBuf, sArenaBannerSide, sIsDownStr);
+    while (bn < 22 && bBuf[bn] != EOS)
+        bn++;
+    bBuf[bn] = EOS;
+    bw = bn * 4 + 8;
+    bx = (u32)Clamp(112 - (s32)(bw / 2), 4, (s32)(220 - bw));
+    FillWindowPixelBuffer(1, PIXEL_FILL(0));
+    WindowRect(1, bx - 1, 27, bw + 2, 13, 8);
+    WindowRect(1, bx, 28, bw, 11, 9);
+    HudTinyWindow(1, bx + 4, 31, bBuf, sArenaBannerKind == ARENA_BANNER_DOWN ? 6 : 5, 22);
+    PutWindowTilemap(1);
+    CopyWindowToVram(1, COPYWIN_FULL);
+    sArenaBannerOnScreen = TRUE;
+}
+
 static void DrawHud(void)
 {
     u32 side;
@@ -893,6 +959,8 @@ static void DrawHud(void)
         CopyWindowToVram(1,COPYWIN_GFX);
         }
     }
+    else
+        ArenaDrawSendBanner();
     CopyWindowToVram(0, COPYWIN_GFX);
     CaptureHud();
     sArena.hudDirty = FALSE;
@@ -1216,6 +1284,15 @@ static void CB2_ArenaInit(void)
     gRealtimeArenaTelemetry.entries++;
     gRealtimeArenaTelemetry.hpBefore = gBattleMons[0].hp;
     gRealtimeArenaTelemetry.expBefore = GetMonData(&gPlayerParty[gBattlerPartyIndexes[0]], MON_DATA_EXP);
+    sArenaBannerKind = ARENA_BANNER_NONE;
+    sArenaBannerFrames = sArenaBannerSide = sArenaBannerOnScreen = 0;
+    if (sArenaSendoutMask == 3)
+        ArenaStartBanner(ARENA_BANNER_FIGHT, 0, 36);
+    else if (sArenaSendoutMask)
+    {
+        ArenaStartBanner(ARENA_BANNER_GO, (sArenaSendoutMask & 1) ? 0 : 1, 28);
+        PlaySE(SE_BALL_OPEN);
+    }
     DrawHud();
     PutWindowTilemap(0);
     CopyWindowToVram(0, COPYWIN_FULL);
@@ -3688,6 +3765,13 @@ static void CB2_Arena(void)
     gArenaFeedbackTelemetry.hitstop = sArena.hitstop;
     gArenaFeedbackTelemetry.attackBuffer = sArena.attackBuffer;
     gArenaFeedbackTelemetry.dashBuffer = sArena.dashBuffer;
+    // Banner frames do not advance during the send-out callback (it returns
+    // above). The first in-play DrawHud rebuilds the line, which is the
+    // vc226 GO overflow window.
+    if (sArena.resultTimer && sArenaBannerKind != ARENA_BANNER_DOWN)
+        ArenaStartBanner(ARENA_BANNER_DOWN, sArena.lastTarget, 36);
+    if (!sArena.paused && sArenaBannerFrames && !--sArenaBannerFrames)
+        sArena.hudDirty = TRUE;
     if (sArena.hudDirty || sHudRecovery!=RecoveryPips() || JOY_NEW(START_BUTTON | L_BUTTON | R_BUTTON)) DrawHud();
     gArenaRenderTelemetry[1]=gMain.vblankCounter1*228+(REG_VCOUNT+68)%228-now;
     now=gMain.vblankCounter1*228+(REG_VCOUNT+68)%228;
